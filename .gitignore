@@ -16,6 +16,8 @@
 # next.js
 /.next/
 /out/
+/android
+/ios
 
 # production
 /build
@@ -39,3 +41,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+AGENTS.md
+CLAUDE.md
