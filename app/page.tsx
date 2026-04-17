@@ -6,6 +6,7 @@ import { rooms as staticRooms } from '@/data/rooms'
 import { Calendar } from '@/components/ui/calendar'
 import 'react-day-picker/dist/style.css'
 import FilterOptions, { useFilterState } from '@/components/FilterOptions'
+import { FeeBadge } from '@/components/FeeBadge'
 import {
   Drawer,
   DrawerClose,
@@ -65,6 +66,7 @@ export default function HomePage() {
 
   return (
     <div className='min-h-screen bg-white'>
+      <FeeBadge />
       <header className='w-full bg-white relative z-40 shadow-[0_1px_12px_rgba(0,0,0,0.08)]'>
         {/* Desktop Search Pill */}
 
@@ -221,16 +223,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-
-      {/* Floating Price Include Box (from image) */}
-      <div className='fixed md:bottom-8 bottom-[100px] left-1/2 -translate-x-1/2 bg-white border border-outline-variant/30 shadow-[0_0_15px_rgba(0,0,0,0.1)] px-4 sm:px-5 py-2.5 sm:py-3 rounded-[14px] z-40 flex items-center gap-2 sm:gap-3 w-max max-w-[90vw]'>
-        <div className='bg-[#FF385C] rounded md:rotate-45 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center -ml-1 mr-0.5'>
-          <div className='md:-rotate-45 block'>
-            <Tags className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-white' strokeWidth={2.5} />
-          </div>
-        </div>
-        <span className='text-[13px] sm:text-[15px] font-semibold text-on-surface text-center leading-tight'>Prices include all fees</span>
-      </div>
     </div>
   )
 }

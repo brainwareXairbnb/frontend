@@ -1,11 +1,12 @@
-'use client'
+"use client";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Search, Heart, Briefcase, User, Bell, Map } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Search, Heart, Map, CircleUser, Bell } from 'lucide-react'
-
-export function BottomNav() {
-  const pathname = usePathname()
+export default function BottomNav() {
+  const pathname = usePathname();
+  const { user } = useAuth();
   const authPaths = ['/login', '/register', '/verify-email', '/verify-student-email', '/forgot-password', '/reset-password'];
   const isAuthPath = authPaths.some(path => pathname.startsWith(path));
 
@@ -14,32 +15,31 @@ export function BottomNav() {
   const navItems = [
     { label: 'Explore', icon: Search, path: '/' },
     { label: 'Wishlists', icon: Heart, path: '/student/saved' },
-    { label: 'Bookings', icon: Map, path: '/student/bookings' },
-    { label: 'Notifications', icon: Bell, path: '/student/notifications' },
-    { label: 'Profile', icon: CircleUser, path: '/student/profile' },
-  ]
+    { label: 'Bookings', icon: Map, path: '/student/bookings', authRequired: true },
+    { label: 'Notifications', icon: Bell, path: '/student/notifications', authRequired: true },
+    { label: user ? 'Profile' : 'Log in', icon: User, path: '/student/profile' },
+  ];
+
+  const visibleItems = navItems.filter(item => !item.authRequired || user);
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-outline-variant/10 z-30 px-2 pt-3 pb-6">
-      <div className="flex justify-around items-center max-w-lg mx-auto relative">
-
-        {navItems.map((item) => {
-          const ActiveIcon = item.icon
-          const current = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path))
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant/10 px-4 py-3 pb-6 md:hidden z-50">
+      <div className="flex justify-around items-center max-w-md mx-auto">
+        {visibleItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.path;
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`flex flex-col items-center justify-center min-w-[64px] transition-all duration-200 ${current ? 'text-[#FF385C] scale-110' : 'text-on-surface-variant'}`}
+              className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-[#FF385C]' : 'text-on-surface-variant opacity-60'}`}
             >
-              <ActiveIcon className={`w-6 h-6 mb-1 ${current ? 'stroke-[2.5px]' : 'stroke-2 opacity-70'}`} />
-              <span className={`text-[10px] tracking-tight ${current ? 'font-bold' : 'font-medium'}`}>
-                {item.label}
-              </span>
+              <Icon className={`w-[24px] h-[24px] ${isActive ? 'fill-current' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+              <span className={`text-[10px] font-bold ${isActive ? 'opacity-100' : 'opacity-80'}`}>{item.label}</span>
             </Link>
-          )
+          );
         })}
       </div>
-    </nav>
-  )
+    </div>
+  );
 }

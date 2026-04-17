@@ -3,7 +3,7 @@ import { Manrope, Inter } from 'next/font/google';
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Navbar } from "@/components/Navbar";
-import { BottomNav } from "@/components/BottomNav";
+import BottomNav from "@/components/BottomNav";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Toaster } from "sonner";
 

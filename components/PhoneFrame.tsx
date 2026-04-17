@@ -17,8 +17,8 @@ const NAV = [
 export function PhoneFrame({ children, screen, setScreen }: PhoneFrameProps) {
   return (
     <div className="flex flex-col items-center py-6 sm:py-12 bg-gradient-to-br from-slate-50 to-slate-100 min-h-[calc(100vh-64px)] overflow-x-hidden pt-20">
-      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-30 mb-8 sm:mb-12">
-        Integrated Ecosystem Hub — Mobile Node
+      <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant opacity-40 mb-8 sm:mb-12">
+        Student Dashboard
       </div>
       
       {/* Device Body */}

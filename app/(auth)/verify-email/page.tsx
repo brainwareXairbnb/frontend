@@ -166,7 +166,7 @@ function VerifyEmailForm() {
             </span>
           </Link>
           <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>Verification Check</h2>
-          <p className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
+          <p className='text-[12px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
             Sent to <span className='text-on-surface opacity-100'>{email}</span>
           </p>
         </header>
