@@ -2,12 +2,7 @@
 import { R, DARK, GRAY, BG, LT } from "@/lib/data";
 import { Avatar } from "@/components/ui";
 import Link from "next/link";
-
-interface OwnerLayoutProps {
-  children: React.ReactNode;
-  screen: string;
-  setScreen: (screen: string) => void;
-}
+import { OwnerLayoutComponentProps } from "@/lib/types";
 
 const NAV = [
   { id:"o-dashboard", label:"Dashboard", icon:"📊", href:"/owner" },
@@ -16,7 +11,7 @@ const NAV = [
   { id:"o-payouts", label:"Payouts", icon:"💰", href:"/owner/payouts" },
 ];
 
-export function OwnerLayout({ children, screen, setScreen }: OwnerLayoutProps) {
+export function OwnerLayout({ children, screen, setScreen }: OwnerLayoutComponentProps) {
   return (
     <div style={{ display:"flex", minHeight:"calc(100vh - 56px)", background:BG }}>
       <div style={{ width:200, background:"#fff", borderRight:`1px solid ${LT}`, display:"flex", flexDirection:"column", padding:"20px 0", flexShrink:0 }}>

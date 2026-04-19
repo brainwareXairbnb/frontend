@@ -1,9 +1,6 @@
 "use client";
 import { R, DARK, GRAY } from "@/lib/data";
-
-interface StatusBadgeProps {
-  s: string;
-}
+import { StatusBadgeProps, ChipProps, AvatarProps, StarsProps } from "@/lib/types";
 
 const STATUS_MAP: Record<string, { bg: string; c: string; l: string }> = {
   pending:           { bg:"#FEF3C7", c:"#92400E", l:"Pending" },
@@ -33,22 +30,10 @@ export function StatusBadge({ s }: StatusBadgeProps) {
   );
 }
 
-interface ChipProps {
-  label: string;
-  bg?: string;
-  color?: string;
-  border?: string;
-}
-
 export function Chip({ label, bg="#F7F7F7", color=GRAY, border="none" }: ChipProps) {
   return (
     <span style={{ background:bg, color, fontSize:11, fontWeight:600, padding:"3px 10px", borderRadius:20, border, whiteSpace:"nowrap" }}>{label}</span>
   );
-}
-
-interface AvatarProps {
-  name: string;
-  size?: number;
 }
 
 export function Avatar({ name, size=36 }: AvatarProps) {
@@ -58,11 +43,6 @@ export function Avatar({ name, size=36 }: AvatarProps) {
   return (
     <div style={{ width:size, height:size, borderRadius:"50%", background:`${c}22`, border:`1.5px solid ${c}55`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:size*0.35, fontWeight:700, color:c, flexShrink:0 }}>{i}</div>
   );
-}
-
-interface StarsProps {
-  v: number;
-  size?: number;
 }
 
 export function Stars({ v, size=12 }: StarsProps) {

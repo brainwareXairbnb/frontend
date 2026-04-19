@@ -1,21 +1,17 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { X, AlertTriangle, Loader2 } from 'lucide-react';
-
-interface ConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (inputValue?: string) => Promise<void>;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  type?: 'danger' | 'success' | 'warning' | 'info';
-  requiresInput?: boolean;
-  inputPlaceholder?: string;
-  inputLabel?: string;
-}
+import React, { useState } from 'react'
+import { AlertTriangle, Loader2, CheckCircle, Info } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { ConfirmationModalProps } from '@/lib/types'
 
 export function ConfirmationModal({
   isOpen,
@@ -28,161 +24,141 @@ export function ConfirmationModal({
   type = 'info',
   requiresInput = false,
   inputPlaceholder = 'Enter reason...',
-  inputLabel = 'Reason'
+  inputLabel = 'Reason',
 }: ConfirmationModalProps) {
-  const [inputValue, setInputValue] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Prevent background scroll
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  const [inputValue, setInputValue] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleConfirm = async () => {
     if (requiresInput && !inputValue.trim()) {
-      setError(`${inputLabel} is required`);
-      return;
+      setError(`${inputLabel} is required`)
+      return
     }
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-      await onConfirm(requiresInput ? inputValue : undefined);
-      onClose();
-      setInputValue('');
+      await onConfirm(requiresInput ? inputValue : undefined)
+      setInputValue('')
+      onClose()
     } catch (err: any) {
-      setError(err.message || 'Operation failed');
+      setError(err.message || 'Operation failed')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const getThemeColors = () => {
+  const getTypeConfig = () => {
     switch (type) {
       case 'danger':
         return {
-          bg: 'bg-red-600',
-          hover: 'hover:bg-red-700',
-          light: 'bg-red-50',
-          text: 'text-red-600',
-          icon: 'text-red-600',
-          border: 'border-red-100'
-        };
+          icon: AlertTriangle,
+          iconBg: 'bg-red-50',
+          iconColor: 'text-red-600',
+          buttonClass: 'bg-red-600 hover:bg-red-700 text-white',
+        }
       case 'success':
         return {
-          bg: 'bg-emerald-600',
-          hover: 'hover:bg-emerald-700',
-          light: 'bg-emerald-50',
-          text: 'text-emerald-600',
-          icon: 'text-emerald-600',
-          border: 'border-emerald-100'
-        };
+          icon: CheckCircle,
+          iconBg: 'bg-emerald-50',
+          iconColor: 'text-emerald-600',
+          buttonClass: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+        }
       case 'warning':
         return {
-          bg: 'bg-orange-600',
-          hover: 'hover:bg-orange-700',
-          light: 'bg-orange-50',
-          text: 'text-orange-600',
-          icon: 'text-orange-600',
-          border: 'border-orange-100'
-        };
+          icon: AlertTriangle,
+          iconBg: 'bg-orange-50',
+          iconColor: 'text-orange-600',
+          buttonClass: 'bg-orange-600 hover:bg-orange-700 text-white',
+        }
       default:
         return {
-          bg: 'bg-primary',
-          hover: 'hover:opacity-90',
-          light: 'bg-blue-50',
-          text: 'text-primary',
-          icon: 'text-primary',
-          border: 'border-blue-100'
-        };
+          icon: Info,
+          iconBg: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          buttonClass: 'bg-primary hover:bg-primary/90 text-white',
+        }
     }
-  };
+  }
 
-  const colors = getThemeColors();
+  const config = getTypeConfig()
+  const Icon = config.icon
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-on-surface/60 backdrop-blur-[2px] transition-opacity"
-        onClick={loading ? undefined : onClose}
-      />
-
-      {/* Modal Content */}
-      <div className="relative bg-white w-full max-w-[440px] rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in slide-in-from-bottom-4 duration-300">
-        <div className="p-6 sm:p-8">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div className={`p-3.5 rounded-2xl ${colors.light}`}>
-              <AlertTriangle className={`w-6 h-6 ${colors.icon}`} />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className='w-[calc(100%-2rem)] sm:w-full sm:max-w-[440px] max-h-[90vh] overflow-hidden rounded-3xl p-0 gap-0'>
+        <div className='p-6 sm:p-8 overflow-y-auto'>
+          <DialogHeader className='space-y-0 mb-6'>
+            <div className='flex items-start justify-between'>
+              <div className={`p-3.5 rounded-2xl ${config.iconBg} mb-4`}>
+                <Icon className={`w-6 h-6 ${config.iconColor}`} />
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant/40 hover:text-on-surface disabled:opacity-30"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="mb-8">
-            <h3 className="text-xl font-extrabold text-on-surface mb-2.5 tracking-tight">{title}</h3>
-            <p className="text-on-surface-variant text-sm leading-relaxed">{message}</p>
-          </div>
+            <DialogTitle className='text-xl font-extrabold text-on-surface tracking-tight text-left'>
+              {title}
+            </DialogTitle>
+            <DialogDescription className='text-on-surface-variant text-sm leading-relaxed text-left mt-2.5'>
+              {message}
+            </DialogDescription>
+          </DialogHeader>
 
           {requiresInput && (
-            <div className="mb-8">
-              <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2.5 px-1">
+            <div className='mb-6'>
+              <label className='block text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2.5 px-1'>
                 {inputLabel}
               </label>
               <textarea
                 value={inputValue}
                 onChange={(e) => {
-                  setInputValue(e.target.value);
-                  if (error) setError(null);
+                  setInputValue(e.target.value)
+                  if (error) setError(null)
                 }}
                 disabled={loading}
                 autoFocus
                 placeholder={inputPlaceholder}
-                className={`w-full bg-surface-container-lowest border-2 ${error ? 'border-red-500' : 'border-outline-variant/10 focus:border-primary'} rounded-2xl p-4 text-sm focus:outline-none transition-all resize-none min-h-[120px]`}
+                className={`w-full bg-surface-container-lowest border-2 ${
+                  error
+                    ? 'border-red-500'
+                    : 'border-outline-variant/10 focus:border-primary'
+                } rounded-2xl p-4 text-sm focus:outline-none transition-all resize-none min-h-[120px]`}
               />
-              {error && <p className="text-red-600 text-[10px] font-bold mt-2.5 ml-1 uppercase">{error}</p>}
+              {error && (
+                <p className='text-red-600 text-[10px] font-bold mt-2.5 ml-1 uppercase'>
+                  {error}
+                </p>
+              )}
             </div>
           )}
 
-          {/* Footer Actions */}
-          <div className="flex flex-row gap-3">
-            <button
+          <DialogFooter className='flex-col sm:flex-row gap-3'>
+            <Button
+              type='button'
+              variant='outline'
               onClick={onClose}
               disabled={loading}
-              className="flex-1 order-2 sm:order-1 h-14 md:h-12 rounded-xl font-bold text-sm text-on-surface bg-surface-container hover:bg-surface-container-high transition-all active:scale-95 disabled:opacity-50"
+              className='w-full sm:flex-1 h-12 rounded-xl font-bold text-sm'
             >
               {cancelText}
-            </button>
-            <button
+            </Button>
+            <Button
+              type='button'
               onClick={handleConfirm}
               disabled={loading}
-              className={`flex-[1.5] order-1 sm:order-2 h-14 md:h-12 rounded-xl font-bold text-sm text-white px-8 ${colors.bg} ${colors.hover} transition-all active:scale-95 shadow-md flex items-center justify-center gap-2.5 disabled:opacity-50`}
+              className={`w-full sm:flex-[1.5] h-12 rounded-xl font-bold text-sm ${config.buttonClass} shadow-md`}
             >
               {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <>
+                  <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                  Loading...
+                </>
               ) : (
                 confirmText
               )}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </div>
-      </div>
-    </div>
-  );
+      </DialogContent>
+    </Dialog>
+  )
 }

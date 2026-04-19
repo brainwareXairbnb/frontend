@@ -2,31 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authApi } from './api';
+import { User, UserRole, AuthContextType } from './types';
 
-export type UserRole = 'student' | 'owner' | 'admin';
-
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-  phoneNumber?: string;
-  universityRollNo?: string;
-  bankDetails?: any;
-  profilePicUrl?: string;
-  isStudentVerified?: boolean;
-  studentEmail?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  register: (role: 'student' | 'owner', data: any) => Promise<void>;
-}
+export type { User, UserRole };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -65,14 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
+      // Call backend logout API - this clears HTTP-only cookies (accessToken, refreshToken)
       await authApi.logout();
-      // Clear token from localStorage
-      localStorage.removeItem('br_access_token');
-      setUser(null);
     } catch (error) {
-      // Even if API call fails, clear local user and token
+      // Even if API call fails, still proceed with logout
+      console.error('Logout API error:', error);
+    } finally {
+      // Always clear localStorage token and user state
       localStorage.removeItem('br_access_token');
       setUser(null);
+
+      // Note: HTTP-only cookies are cleared by the server via res.clearCookie()
+      // We cannot directly delete them from JavaScript for security reasons
     }
   };
 

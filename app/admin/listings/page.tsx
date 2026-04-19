@@ -1,251 +1,349 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { 
-  Search, 
-  MapPin, 
-  Eye, 
-  CheckCircle2, 
-  X, 
-  ChevronLeft, 
-  ChevronRight,
-  ShieldCheck,
-  AlertCircle
-} from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { adminApi } from '@/lib/api'
+import {
+  Search,
+  MapPin,
+  Eye,
+  CheckCircle2,
+  X,
+  AlertCircle,
+  Loader2,
+  Home,
+  Users,
+  IndianRupee,
+  Calendar,
+  Building2,
+} from 'lucide-react'
+import { format } from 'date-fns'
+import { toast } from 'sonner'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
+import { EmptyState } from '@/components/EmptyState'
+import { AdminListingCard } from '@/components/admin/AdminListingCard'
+import { Listing, ModalConfig, FilterStatus } from '@/lib/types'
 
 export default function AdminListingsPage() {
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
+  const [listings, setListings] = useState<Listing[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  const listings = [
-    {
-      id: 1,
-      title: "Scholar's Atrium",
-      owner: 'Arnesh Maheshwari',
-      status: 'Under Review',
-      submitted: 'Apr 08, 24',
-      price: '₹12,400/month',
-      location: 'Barasat, Kolkata',
-      image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=400&h=300&fit=crop',
-      badge: 'NEW SUBMISSION',
-    },
-    {
-      id: 2,
-      title: 'Minimalist Studio',
-      owner: 'Priya Roy',
-      status: 'Pending Review',
-      submitted: 'Apr 07, 24',
-      price: '₹8,900/month',
-      location: 'Newtown, Kolkata',
-      image: 'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=400&h=300&fit=crop',
-      badge: null,
-    },
-    {
-      id: 3,
-      title: 'The Serenity Loft',
-      owner: 'Rohit Saha',
-      status: 'Approved',
-      submitted: 'Apr 06, 24',
-      price: '₹15,200/month',
-      location: 'Salt Lake, Kolkata',
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
-      badge: null,
-    },
-    {
-      id: 4,
-      title: 'Nordic Designer Pad',
-      owner: 'Ankit Verma',
-      status: 'Needs Revision',
-      submitted: 'Apr 05, 24',
-      price: '₹11,800/month',
-      location: 'Madhyamgram, Kolkata',
-      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
-      badge: null,
-    },
-    {
-      id: 5,
-      title: 'The Constellation Loft',
-      owner: 'Sneha Das',
-      status: 'Under Review',
-      submitted: 'Apr 04, 24',
-      price: '₹13,600/month',
-      location: 'Barasat, Kolkata',
-      image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=300&fit=crop',
-      badge: null,
-    },
-    {
-      id: 6,
-      title: 'High-Rise Urban Suite',
-      owner: 'Arjun Ghosh',
-      status: 'Rejected',
-      submitted: 'Apr 03, 24',
-      price: '₹9,500/month',
-      location: 'Rajarhat, Kolkata',
-      image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop',
-      badge: 'REJECTED',
-    },
-  ];
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Approved':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'Under Review':
-        return 'bg-blue-50 text-blue-600 border border-blue-100';
-      case 'Pending Review':
-        return 'bg-orange-50 text-orange-600 border border-orange-100';
-      case 'Needs Revision':
-        return 'bg-yellow-50 text-yellow-700 border border-yellow-100';
-      case 'Rejected':
-        return 'bg-red-50 text-red-600 border border-red-100';
-      default:
-        return 'bg-gray-50 text-gray-600 border border-gray-100';
+  // Modal State
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean
+    type: 'success' | 'danger' | 'warning' | 'info'
+    title: string
+    message: string
+    confirmText: string
+    requiresInput: boolean
+    listingId: string | null
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    requiresInput: false,
+    listingId: null,
+  })
+
+  useEffect(() => {
+    fetchListings()
+  }, [])
+
+  const fetchListings = async () => {
+    try {
+      setLoading(true)
+      // Fetch all listings (draft listings are already filtered out on server side)
+      const response: any = await adminApi.getAllListings()
+      const allListings = response.listings || []
+      setListings(allListings)
+
+      // Calculate stats - use 'under_review' instead of 'pending'
+      const total = allListings.length
+      const pending = allListings.filter(
+        (l: Listing) => l.status === 'under_review',
+      ).length
+      const approved = allListings.filter(
+        (l: Listing) => l.status === 'approved',
+      ).length
+      const rejected = allListings.filter(
+        (l: Listing) => l.status === 'rejected',
+      ).length
+
+      setStats({ total, pending, approved, rejected })
+    } catch (error: any) {
+      toast.error('Failed to load listings', { description: error.message })
+    } finally {
+      setLoading(false)
     }
-  };
+  }
+
+  const handleApproveClick = (listingId: string, listingTitle: string) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'success',
+      title: 'Approve Listing',
+      message: `Are you sure you want to approve "${listingTitle}"? This will make it visible to all students.`,
+      confirmText: 'Approve Listing',
+      requiresInput: false,
+      listingId,
+    })
+  }
+
+  const handleRejectClick = (listingId: string, listingTitle: string) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'danger',
+      title: 'Reject Listing',
+      message: `Please provide a reason for rejecting "${listingTitle}". This message will be sent to the owner.`,
+      confirmText: 'Reject Listing',
+      requiresInput: true,
+      listingId,
+    })
+  }
+
+  const handleConfirmAction = async (inputValue?: string) => {
+    if (!modalConfig.listingId) return
+
+    try {
+      setActionLoading(modalConfig.listingId)
+
+      if (modalConfig.type === 'success') {
+        // Approve listing
+        await adminApi.approveListing(modalConfig.listingId)
+        toast.success('Listing Approved', {
+          description: 'Property is now visible to students',
+        })
+        setListings((prev) =>
+          prev.map((l) =>
+            l._id === modalConfig.listingId ? { ...l, status: 'approved' } : l,
+          ),
+        )
+        setStats((prev) => ({
+          ...prev,
+          pending: Math.max(0, prev.pending - 1),
+          approved: prev.approved + 1,
+        }))
+      } else if (modalConfig.type === 'danger') {
+        // Reject listing
+        await adminApi.rejectListing(
+          modalConfig.listingId,
+          inputValue || 'No reason provided',
+        )
+        toast.warning('Listing Rejected', {
+          description: 'Owner has been notified',
+        })
+        setListings((prev) =>
+          prev.map((l) =>
+            l._id === modalConfig.listingId ? { ...l, status: 'rejected' } : l,
+          ),
+        )
+        setStats((prev) => ({
+          ...prev,
+          pending: Math.max(0, prev.pending - 1),
+          rejected: prev.rejected + 1,
+        }))
+      }
+
+      setModalConfig((prev) => ({ ...prev, isOpen: false }))
+      await fetchListings() // Refresh data
+    } catch (error: any) {
+      toast.error('Action Failed', {
+        description: error.message || 'Could not process request',
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+
+
+  // Filter listings based on active filter and search query
+  const filteredListings = listings.filter((listing) => {
+    // Map 'pending' filter to 'under_review' status
+    const statusToMatch =
+      activeFilter === 'pending' ? 'under_review' : activeFilter
+
+    const matchesFilter =
+      activeFilter === 'all' || listing.status?.toLowerCase() === statusToMatch
+
+    const matchesSearch =
+      searchQuery === '' ||
+      listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.owner?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.address?.city?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    return matchesFilter && matchesSearch
+  })
 
   return (
-    <div className="px-6 md:px-12 py-6 pb-20">
-      {/* Header Section */}
-      <header className="mb-8">
-        <h2 className="text-xl font-headline font-bold text-on-surface mb-1">Listing Approval</h2>
-        <p className="text-on-surface-variant font-body text-sm leading-relaxed mb-6 max-w-2xl">
-          Review and approve property listings to maintain quality standards and ensure property safety for students.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-          <div className="flex-1 bg-white border border-outline-variant/10 rounded-xl px-4 py-3 flex items-center gap-3 w-full max-w-md shadow-sm focus-within:border-primary transition-all">
-            <Search className="text-on-surface-variant w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search listings by title or owner..."
-              className="flex-1 bg-transparent border-none focus:outline-none text-sm placeholder:text-on-surface-variant/40"
-            />
-          </div>
-        </div>
-      </header>
+    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 max-w-[1600px] mx-auto'>
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={handleConfirmAction}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        requiresInput={modalConfig.requiresInput}
+        confirmText={modalConfig.confirmText}
+        inputPlaceholder='Reason for rejection...'
+        inputLabel='Rejection Reason'
+      />
 
-      {/* Filter Tabs */}
-      <div className="mb-8 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      {/* Stats Cards */}
+      <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6'>
         {[
-          { key: 'all', label: 'All Listings', count: 124 },
-          { key: 'pending', label: 'Pending Review', count: 38 },
-          { key: 'approved', label: 'Approved', count: 72 },
-          { key: 'rejected', label: 'Rejected', count: 14 },
-        ].map((filter) => (
-          <button
-            key={filter.key}
-            onClick={() => setActiveFilter(filter.key)}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
-              activeFilter === filter.key
-                ? 'bg-primary text-on-primary shadow-md'
-                : 'bg-white border border-outline-variant/10 text-on-surface-variant hover:bg-surface-container-lowest'
-            }`}
-          >
-            {filter.label}
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${activeFilter === filter.key ? 'bg-on-primary/20 text-on-primary' : 'bg-surface-container text-on-surface-variant/60'}`}>
-              {filter.count}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Listings Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {listings.map((listing) => (
+          {
+            label: 'Total',
+            value: stats.total,
+            icon: Building2,
+            color: 'text-blue-600',
+            bg: 'bg-blue-50',
+            border: 'border-blue-100',
+          },
+          {
+            label: 'Pending',
+            value: stats.pending,
+            icon: AlertCircle,
+            color: 'text-orange-600',
+            bg: 'bg-orange-50',
+            border: 'border-orange-100',
+          },
+          {
+            label: 'Approved',
+            value: stats.approved,
+            icon: CheckCircle2,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
+            border: 'border-emerald-100',
+          },
+          {
+            label: 'Rejected',
+            value: stats.rejected,
+            icon: X,
+            color: 'text-red-600',
+            bg: 'bg-red-50',
+            border: 'border-red-100',
+          },
+        ].map((stat, index) => (
           <div
-            key={listing.id}
-            className="group bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300"
+            key={index}
+            className={`bg-white p-4 sm:p-5 rounded-2xl border ${stat.border} shadow-sm hover:shadow-md transition-shadow`}
           >
-            <div className="relative aspect-video overflow-hidden bg-surface-container">
-              {listing.badge && (
-                <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm text-on-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest z-10 border border-primary/20">
-                  {listing.badge}
-                </div>
-              )}
-              <img
-                alt={listing.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                src={listing.image}
-              />
-            </div>
-
-            <div className="p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-headline font-bold text-on-surface text-base mb-1.5 truncate group-hover:text-primary transition-colors">
-                    {listing.title}
-                  </h3>
-                  <div className="flex items-center gap-1 text-on-surface-variant font-medium">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span className="text-[11px] uppercase tracking-wider">{listing.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center mb-6">
-                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${getStatusColor(listing.status)}`}>
-                  {listing.status}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-5 border-t border-outline-variant/10 mb-6">
-                <div>
-                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-60 mb-1">Owner</p>
-                  <p className="text-sm font-bold text-on-surface truncate">{listing.owner}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-60 mb-1">Price</p>
-                  <p className="text-sm font-black text-primary">{listing.price}</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button className="flex-1 bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
-                  <Eye className="w-4 h-4" />
-                  View
-                </button>
-                {listing.status === 'Under Review' || listing.status === 'Pending Review' ? (
-                  <>
-                    <button className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Approve
-                    </button>
-                    <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 active:scale-95 transition-all">
-                      <X className="w-5 h-5" />
-                    </button>
-                  </>
-                ) : (
-                  <button className="flex-1 bg-primary hover:brightness-110 active:scale-95 text-on-primary h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm">
-                    View Logs
-                  </button>
-                )}
+            <div className='flex items-center justify-between mb-3'>
+              <div className={`p-2.5 rounded-xl ${stat.bg}`}>
+                <stat.icon className={`w-5 h-5 ${stat.color}`} />
               </div>
             </div>
+            <h3 className='text-2xl sm:text-3xl font-bold text-on-surface mb-1'>
+              {stat.value}
+            </h3>
+            <p className='text-xs font-bold uppercase tracking-wider text-on-surface-variant'>
+              {stat.label}
+            </p>
           </div>
         ))}
       </section>
 
-      {/* Pagination */}
-      <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-          Showing <span className="text-on-surface">1-6</span> of <span className="text-on-surface">124</span> listings
-        </p>
-        <div className="flex gap-2 p-1 bg-surface-container-lowest rounded-2xl border border-outline-variant/10">
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all active:scale-90">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 text-on-primary font-black text-xs">
-            1
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all text-xs font-bold active:scale-90">
-            2
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all text-xs font-bold active:scale-90">
-            3
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all active:scale-90">
-            <ChevronRight className="w-5 h-5" />
-          </button>
+      {/* Search and Filters */}
+      <div className='mb-6 space-y-4'>
+        {/* Search Bar */}
+        <div className='bg-white border-2 border-outline-variant/10 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-sm focus-within:border-primary focus-within:shadow-md transition-all'>
+          <Search className='text-on-surface-variant w-5 h-5 shrink-0' />
+          <input
+            type='text'
+            placeholder='Search by title, owner, or city...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='flex-1 bg-transparent border-none focus:outline-none text-sm placeholder:text-on-surface-variant/50'
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className='p-1 hover:bg-surface-container rounded-full transition-colors'
+            >
+              <X className='w-4 h-4 text-on-surface-variant' />
+            </button>
+          )}
+        </div>
+
+        {/* Filter Tabs */}
+        <div className='flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide'>
+          {[
+            { key: 'all', label: 'All', count: stats.total },
+            { key: 'pending', label: 'Pending', count: stats.pending },
+            { key: 'approved', label: 'Approved', count: stats.approved },
+            { key: 'rejected', label: 'Rejected', count: stats.rejected },
+          ].map((filter) => (
+            <button
+              key={filter.key}
+              onClick={() => setActiveFilter(filter.key)}
+              className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                activeFilter === filter.key
+                  ? 'bg-primary text-on-primary shadow-lg shadow-primary/25'
+                  : 'bg-white border-2 border-outline-variant/10 text-on-surface-variant hover:bg-surface-container-lowest hover:border-primary/20'
+              }`}
+            >
+              <span>{filter.label}</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-black min-w-[24px] text-center ${
+                  activeFilter === filter.key
+                    ? 'bg-on-primary/20 text-on-primary'
+                    : 'bg-surface-container text-on-surface-variant'
+                }`}
+              >
+                {filter.count}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
+
+      {loading ? (
+        <div className='h-96 flex flex-col items-center justify-center gap-4'>
+          <Loader2 className='w-10 h-10 animate-spin text-primary' />
+          <p className='text-sm text-on-surface-variant font-medium'>
+            Loading listings...
+          </p>
+        </div>
+      ) : filteredListings.length === 0 ? (
+        <EmptyState
+          icon={Home}
+          title='No Listings Found'
+          message={
+            searchQuery
+              ? 'No listings match your search criteria'
+              : `No ${activeFilter === 'all' ? '' : activeFilter} listings found in the system.`
+          }
+        />
+      ) : (
+        <>
+          {/* Listings Grid */}
+          <section className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6'>
+            {filteredListings.map((listing) => (
+              <AdminListingCard
+                key={listing._id}
+                listing={listing}
+                handleApproveClick={handleApproveClick}
+                handleRejectClick={handleRejectClick}
+                actionLoading={actionLoading}
+              />
+            ))}
+          </section>
+        </>
+      )}
     </div>
-  );
+  )
 }

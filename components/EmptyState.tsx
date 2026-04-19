@@ -3,16 +3,7 @@
 import React from 'react';
 import { LucideIcon, Search, PackageOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-interface EmptyStateProps {
-  icon?: LucideIcon;
-  title: string;
-  message: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-}
+import { EmptyStateProps } from '@/lib/types';
 
 export function EmptyState({ 
   icon: Icon = PackageOpen, 

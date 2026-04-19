@@ -14,7 +14,7 @@ import {
   ArrowRight,
   Sparkles,
   ChevronRight,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -35,8 +35,8 @@ function LoginForm() {
         router.push(redirectTo)
       } else {
         if (user.role === 'student') router.push('/')
-        else if (user.role === 'owner') router.push('/owner/dashboard')
-        else if (user.role === 'admin') router.push('/admin/dashboard')
+        else if (user.role === 'owner') router.push('/owner')
+        else if (user.role === 'admin') router.push('/admin')
       }
     }
   }, [user, redirectTo, router])
@@ -47,9 +47,9 @@ function LoginForm() {
 
     try {
       await login(email, password)
-      toast.success('Access Granted', { description: 'Portal connection established' })
+      toast.success('Access Granted')
     } catch (err: any) {
-      toast.error('Access Denied', { description: err.message || 'Invalid email or password' })
+      toast.error('Access Denied')
     } finally {
       setLoading(false)
     }
@@ -78,7 +78,8 @@ function LoginForm() {
             <span className='text-primary'>Scholarly Minds.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            Welcome to the Hub. Synchronize your academic lifestyle with our premium residency network.
+            Welcome to the Hub. Synchronize your academic lifestyle with our
+            premium residency network.
           </p>
         </div>
       </div>
@@ -86,7 +87,10 @@ function LoginForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-12 lg:p-16 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-10 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Link href='/' className='flex items-center gap-3 mb-6 md:mb-10 group'>
+          <Link
+            href='/'
+            className='flex items-center gap-3 mb-6 md:mb-10 group'
+          >
             <div className='w-10 h-10 md:w-12 md:h-12 bg-primary flex items-center justify-center rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 group-hover:rotate-12 transition-transform'>
               <Home className='w-5 h-5 md:w-6 md:h-6 text-white' />
             </div>
@@ -94,13 +98,17 @@ function LoginForm() {
               Brainware <span className='text-primary/40'>Rooms</span>
             </span>
           </Link>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-6 h-6 bg-primary/5 rounded-lg flex items-center justify-center text-primary">
-              <Sparkles className="w-3 h-3" />
+          <div className='flex items-center gap-3 mb-3'>
+            <div className='w-6 h-6 bg-primary/5 rounded-lg flex items-center justify-center text-primary'>
+              <Sparkles className='w-3 h-3' />
             </div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Portal Access</h2>
+            <h2 className='text-[10px] font-black uppercase tracking-[0.2em] text-primary'>
+              Portal Access
+            </h2>
           </div>
-          <h1 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>Welcome Back</h1>
+          <h1 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
+            Welcome Back
+          </h1>
           <p className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
             Activate your node connection to manage your residency.
           </p>
@@ -108,7 +116,6 @@ function LoginForm() {
 
         <main className='w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
           <form onSubmit={handleSubmit} className='space-y-6 md:space-y-8'>
-
             <div className='space-y-4 md:space-y-6'>
               <div className='space-y-2'>
                 <label className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40 ml-1'>
@@ -154,23 +161,29 @@ function LoginForm() {
                     disabled={loading}
                   />
                   <button
-                    className="absolute right-6 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors cursor-pointer"
-                    type="button"
+                    className='absolute right-6 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors cursor-pointer'
+                    type='button'
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className='w-5 h-5' />
+                    ) : (
+                      <Eye className='w-5 h-5' />
+                    )}
                   </button>
                 </div>
               </div>
             </div>
 
-            <Button
-              className='w-full'
-              type='submit'
-              disabled={loading}
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
-              {!loading && <ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />}
+            <Button className='w-full' type='submit' disabled={loading}>
+              {loading ? (
+                <Loader2 className='w-4 h-4 animate-spin' />
+              ) : (
+                'Submit'
+              )}
+              {!loading && (
+                <ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
+              )}
             </Button>
           </form>
 
@@ -183,8 +196,8 @@ function LoginForm() {
           </div>
 
           <Button
-            variant="outline"
-            rounded="2xl"
+            variant='outline'
+            rounded='2xl'
             className='w-full h-14 md:h-16 flex items-center justify-center gap-4'
             type='button'
           >
@@ -229,11 +242,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className='min-h-screen flex items-center justify-center bg-white'>
+          <div className='w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin'></div>
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   )

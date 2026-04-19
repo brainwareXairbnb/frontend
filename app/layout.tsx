@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Toaster } from "sonner";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
+          <ScrollToTop />
           <div className="hidden md:block fixed top-0 w-full z-50">
             <Navbar />
           </div>

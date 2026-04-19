@@ -3,11 +3,9 @@
  * Handles all HTTP requests to the backend server
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { FetchOptions } from './types';
 
-interface FetchOptions extends RequestInit {
-  token?: string;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 /**
  * Base fetch wrapper with error handling
@@ -282,7 +280,7 @@ export const roomsApi = {
    */
   updateListing: async (id: string, data: any, token?: string) => {
     return apiFetch(`/owner/listings/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(data),
       token,
     });
@@ -294,6 +292,35 @@ export const roomsApi = {
   deleteListing: async (id: string, token?: string) => {
     return apiFetch(`/owner/listings/${id}`, {
       method: 'DELETE',
+      token,
+    });
+  },
+
+  /**
+   * Get owner's listings
+   */
+  getOwnerListings: async (params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }, token?: string) => {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value));
+        }
+      });
+    }
+    return apiFetch(`/owner/listings?${queryParams.toString()}`, { token });
+  },
+
+  /**
+   * Submit listing for approval (owner only)
+   */
+  submitListing: async (id: string, token?: string) => {
+    return apiFetch(`/owner/listings/${id}/submit`, {
+      method: 'PATCH',
       token,
     });
   },
@@ -401,12 +428,23 @@ export const userApi = {
   },
 
   /**
-   * Update profile
+   * Update profile (with email verification if email changes)
    */
-  updateProfile: async (data: any, token?: string) => {
-    return apiFetch('/users/profile', {
+  updateProfile: async (data: { name?: string; email?: string; phone?: string }, token?: string) => {
+    return apiFetch<{ message: string; requiresVerification?: boolean; pendingEmail?: string; user?: any }>('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
+      token,
+    });
+  },
+
+  /**
+   * Verify email change
+   */
+  verifyEmailChange: async (otp: string, token?: string) => {
+    return apiFetch<{ message: string; user: any }>('/auth/verify-email-change', {
+      method: 'POST',
+      body: JSON.stringify({ otp }),
       token,
     });
   },
@@ -434,6 +472,17 @@ export const userApi = {
   unsaveRoom: async (listingId: string, token?: string) => {
     return apiFetch(`/users/bookmarks/${listingId}`, {
       method: 'DELETE',
+      token,
+    });
+  },
+
+  /**
+   * Change password
+   */
+  changePassword: async (data: { currentPassword: string; newPassword: string }, token?: string) => {
+    return apiFetch('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
       token,
     });
   },
@@ -474,10 +523,24 @@ export const adminApi = {
   },
 
   /**
+   * Get all listings
+   */
+  getAllListings: async (token?: string) => {
+    return apiFetch<{ listings: any[] }>('/admin/listings', { token });
+  },
+
+  /**
    * Get pending listings
    */
   getPendingListings: async (token?: string) => {
-    return apiFetch<{ listings: any[] }>('/admin/listings/pending', { token });
+    return apiFetch<{ listings: any[] }>('/admin/listings/pending-review', { token });
+  },
+
+  /**
+   * Get listing by ID (admin)
+   */
+  getListingById: async (listingId: string, token?: string) => {
+    return apiFetch<{ listing: any }>(`/admin/listings/${listingId}`, { token });
   },
 
   /**
@@ -485,7 +548,7 @@ export const adminApi = {
    */
   approveListing: async (listingId: string, token?: string) => {
     return apiFetch(`/admin/listings/${listingId}/approve`, {
-      method: 'POST',
+      method: 'PATCH',
       token,
     });
   },
@@ -495,7 +558,7 @@ export const adminApi = {
    */
   rejectListing: async (listingId: string, reason: string, token?: string) => {
     return apiFetch(`/admin/listings/${listingId}/reject`, {
-      method: 'POST',
+      method: 'PATCH',
       body: JSON.stringify({ reason }),
       token,
     });
@@ -510,12 +573,30 @@ export const adminApi = {
   },
 
   /**
+   * Get user by ID
+   */
+  getUserById: async (userId: string, token?: string) => {
+    return apiFetch<{ user: any }>(`/admin/users/${userId}`, { token });
+  },
+
+  /**
    * Update user status
    */
-  updateUserStatus: async (userId: string, status: string, token?: string) => {
+  updateUserStatus: async (userId: string, status: string, reason?: string, token?: string) => {
     return apiFetch(`/admin/users/${userId}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, reason }),
+      token,
+    });
+  },
+
+  /**
+   * Delete user
+   */
+  deleteUser: async (userId: string, reason: string, token?: string) => {
+    return apiFetch(`/admin/users/${userId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ reason }),
       token,
     });
   },
@@ -547,6 +628,54 @@ export const adminApi = {
   },
 };
 
+/**
+ * Notifications API
+ */
+export const notificationsApi = {
+  /**
+   * Get all notifications for authenticated user
+   */
+  getNotifications: async (limit: number = 50, skip: number = 0) => {
+    return apiFetch<{ notifications: any[]; unreadCount: number }>(
+      `/notifications?limit=${limit}&skip=${skip}`
+    );
+  },
+
+  /**
+   * Get unread notification count
+   */
+  getUnreadCount: async () => {
+    return apiFetch<{ count: number }>('/notifications/unread-count');
+  },
+
+  /**
+   * Mark notification as read
+   */
+  markAsRead: async (notificationId: string) => {
+    return apiFetch<{ notification: any }>(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  /**
+   * Mark all notifications as read
+   */
+  markAllAsRead: async () => {
+    return apiFetch<{ message: string }>('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
+
+  /**
+   * Delete a notification
+   */
+  deleteNotification: async (notificationId: string) => {
+    return apiFetch<{ message: string }>(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 export default {
   auth: authApi,
   rooms: roomsApi,
@@ -555,4 +684,5 @@ export default {
   user: userApi,
   reviews: reviewsApi,
   admin: adminApi,
+  notifications: notificationsApi,
 };

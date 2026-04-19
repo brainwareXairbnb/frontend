@@ -1,11 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
-interface AuthPromptProps {
-  title: string;
-  description: string;
-}
+import { AuthPromptProps } from "@/lib/types";
 
 export function AuthPrompt({ title, description }: AuthPromptProps) {
   const router = useRouter();

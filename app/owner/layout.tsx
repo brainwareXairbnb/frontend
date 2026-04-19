@@ -1,159 +1,359 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Calendar, 
-  IndianRupee, 
-  BarChart3, 
-  LogOut, 
-  Bell, 
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { toast } from 'sonner'
+import { useState } from 'react'
+import { RoleGuard } from '@/components/RoleGuard'
+import { NotificationBell } from '@/components/NotificationBell'
+import {
+  LayoutDashboard,
+  Building2,
+  Calendar,
+  IndianRupee,
+  BarChart3,
+  LogOut,
+  Bell,
   User,
   Menu,
   X,
-  Plus
-} from 'lucide-react';
+  ChevronRight,
+  ShieldCheck,
+} from 'lucide-react'
+import { OwnerLayoutProps } from '@/lib/types'
 
-interface OwnerLayoutProps {
-  children: React.ReactNode;
-}
+const NAV_ITEMS = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/owner',
+  },
+  {
+    id: 'listings',
+    label: 'My Listings',
+    icon: Building2,
+    href: '/owner/listings',
+  },
+  {
+    id: 'bookings',
+    label: 'Bookings',
+    icon: Calendar,
+    href: '/owner/bookings',
+  },
+  {
+    id: 'payouts',
+    label: 'Payouts',
+    icon: IndianRupee,
+    href: '/owner/payouts',
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    icon: BarChart3,
+    href: '/owner/analytics',
+  },
+]
 
 export default function OwnerLayout({ children }: OwnerLayoutProps) {
-  const pathname = usePathname();
+  const pathname = usePathname()
+  const router = useRouter()
+  const { logout, user } = useAuth()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-  const isActive = (path: string) => {
-    if (path === '/owner') return pathname === '/owner';
-    return pathname?.startsWith(path);
-  };
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success('Logged out successfully')
+      router.push('/login')
+    } catch (error: any) {
+      toast.error('Logout failed', { description: error.message })
+      router.push('/login')
+    }
+  }
 
-  const menuItems = [
-    { href: '/owner', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/owner/listings', label: 'My Listings', icon: Building2 },
-    { href: '/owner/bookings', label: 'Bookings', icon: Calendar },
-    { href: '/owner/payouts', label: 'Payouts', icon: IndianRupee },
-    { href: '/owner/analytics', label: 'Analytics', icon: BarChart3 },
-  ];
+  const getPageTitle = () => {
+    if (pathname === '/owner') return 'Dashboard Overview'
+    if (pathname.startsWith('/owner/listings')) return 'My Listings'
+    if (pathname.startsWith('/owner/bookings')) return 'Bookings'
+    if (pathname.startsWith('/owner/payouts')) return 'Payouts'
+    if (pathname.startsWith('/owner/analytics')) return 'Analytics'
+    if (pathname.startsWith('/owner/notifications')) return 'Notifications'
+    if (pathname.startsWith('/owner/profile')) return 'My Profile'
+    return 'Owner Portal'
+  }
+
+  const isActive = (href: string) => {
+    if (href === '/owner') {
+      return pathname === '/owner'
+    }
+    return pathname.startsWith(href)
+  }
 
   return (
-    <div className="bg-[#FAFAFA] font-body text-on-surface min-h-screen">
-      {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 hidden md:flex h-full w-72 bg-white flex-col p-6 z-50 shadow-[20px_0_40px_rgba(0,0,0,0.02)] border-r border-outline-variant/5">
-        <div className="mb-12 px-2 flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-             <div className="w-4 h-4 bg-white rounded-sm"></div>
-          </div>
-          <span className="text-on-surface font-black uppercase tracking-[0.2em] text-xs font-headline">Brainware Rooms</span>
-        </div>
-        
-        <div className="flex-1 space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 group ${
-                  active
-                    ? 'bg-primary text-on-primary shadow-lg shadow-primary/20 scale-[1.02]'
-                    : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
-                }`}
-              >
-                <Icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${active ? 'text-on-primary' : 'text-primary'}`} />
-                <span className="font-headline font-bold text-sm tracking-tight">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="mt-auto space-y-6">
-          <div className="bg-surface-container-lowest p-5 rounded-[2rem] border border-outline-variant/10 relative overflow-hidden group">
-             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-             <div className="flex items-center gap-4 relative z-10">
-                <div className="w-11 h-11 rounded-2xl overflow-hidden bg-primary/10 border-2 border-white shadow-sm shrink-0">
-                  <img
-                    alt="Owner"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                    src="https://ui-avatars.com/api/?name=Editorial+Guest&background=b6212f&color=fff&size=128"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-headline font-black text-xs text-on-surface truncate">Editorial Guest</p>
-                  <p className="text-[10px] text-tertiary font-black uppercase tracking-widest mt-0.5">Verified Partner</p>
-                </div>
-             </div>
-          </div>
-
-          <Link
-            href="/logout"
-            className="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-red-600 transition-all duration-300 group rounded-2xl bg-surface-container-lowest border border-outline-variant/5"
-          >
-            <LogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-            <span className="font-headline font-bold text-sm">Logout Session</span>
-          </Link>
-        </div>
-      </aside>
-
-      {/* Common Header */}
-      <header className="fixed top-0 right-0 left-0 md:left-72 z-40 bg-white/80 backdrop-blur-xl border-b border-outline-variant/5">
-        <div className="px-6 md:px-12 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="font-headline text-xl md:text-2xl font-black tracking-tighter text-on-surface uppercase">
-              {pathname === '/owner' && 'Overview'}
-              {pathname === '/owner/listings' && 'My Inventory'}
-              {pathname?.startsWith('/owner/listings/create') && 'Asset Creation'}
-              {pathname === '/owner/bookings' && 'Tenant Ledger'}
-              {pathname === '/owner/payouts' && 'Yield Settlements'}
-              {pathname === '/owner/analytics' && 'Market Intelligence'}
-              {pathname === '/owner/profile' && 'Partner Identity'}
+    <RoleGuard allowedRoles={['owner']}>
+      <div className='flex min-h-screen bg-[#fafafa] flex-col'>
+        {/* Common Header */}
+        <div className='sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-16'>
+          <div className='flex items-center justify-between h-full px-6 md:px-8'>
+            <h1 className='font-headline text-xl md:text-2xl font-bold text-on-surface'>
+              {getPageTitle()}
             </h1>
-          </div>
-          <div className="flex items-center gap-5">
-            <button className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-outline-variant/10 hover:shadow-lg hover:-translate-y-0.5 transition-all text-on-surface group">
-              <Bell className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors" />
-            </button>
-            <div className="hidden lg:flex items-center gap-3 pl-5 border-l border-outline-variant/10">
-               <div className="text-right">
-                  <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-60">Revenue Tier</p>
-                  <p className="text-xs font-black text-primary uppercase">Diamond Partner</p>
-               </div>
-               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.55)]"></div>
+            <div className='flex items-center gap-3'>
+              <NotificationBell />
+              <Link
+                href='/owner/profile'
+                className='w-10 h-10 rounded-full overflow-hidden bg-primary'
+              >
+                <img
+                  alt='Owner'
+                  className='w-full h-full object-cover'
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
+                />
+              </Link>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="md:ml-72 min-h-screen pb-24 md:pb-12 pt-24">
-        {children}
-      </main>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-xl flex justify-around items-center h-20 px-4 z-50 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-outline-variant/5">
-        {menuItems.slice(0, 3).map((item) => {
-           const Icon = item.icon;
-           const active = isActive(item.href);
-           return (
-             <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center transition-all ${active ? 'scale-110' : 'opacity-40'}`}>
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${active ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : ''}`}>
-                   <Icon className="w-6 h-6" />
+        {/* Main Layout */}
+        <div className='flex flex-1'>
+          {/* Sidebar */}
+          <div className='hidden md:flex w-64 bg-white border-r border-outline-variant/10 flex-col shrink-0 fixed left-0 top-16 bottom-0'>
+            {/* Logo */}
+            <div className='px-6 py-6 border-b border-outline-variant/10 shrink-0'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary'>
+                  <ShieldCheck className='w-6 h-6' />
                 </div>
-             </Link>
-           );
-        })}
-        <Link href="/owner/profile" className={`flex flex-col items-center justify-center transition-all ${isActive('/owner/profile') ? 'scale-110' : 'opacity-40'}`}>
-           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isActive('/owner/profile') ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : ''}`}>
-              <User className="w-6 h-6" />
-           </div>
-        </Link>
-        <Link href="/owner/listings/create" className="flex flex-col items-center justify-center">
-           <div className="w-14 h-14 bg-on-surface text-surface rounded-[2rem] flex items-center justify-center shadow-xl shadow-on-surface/20 active:scale-95 transition-all -mt-12">
-              <Plus className="w-7 h-7" />
-           </div>
-        </Link>
-      </nav>
-    </div>
-  );
+                <div>
+                  <h2 className='font-headline text-sm font-bold text-on-surface'>
+                    Owner Portal
+                  </h2>
+                  <p className='text-xs text-on-surface-variant'>
+                    Property Management
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <nav className='flex-1 py-4 px-3 overflow-y-auto'>
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all text-sm ${
+                      isActive(item.href)
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
+                    }`}
+                  >
+                    <Icon className='w-5 h-5' />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {/* Owner Profile - Fixed at bottom */}
+            <div className='p-4 border-t border-outline-variant/10 shrink-0'>
+              <Link
+                href='/owner/profile'
+                className='flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-3 hover:bg-surface-container-high transition-colors'
+              >
+                <div className='w-10 h-10 rounded-full overflow-hidden bg-primary shrink-0'>
+                  <img
+                    alt='Owner'
+                    className='w-full h-full object-cover'
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
+                  />
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <p className='text-xs font-bold text-on-surface truncate'>
+                    {user?.name || 'Owner'}
+                  </p>
+                  <p className='text-[10px] text-on-surface-variant'>
+                    Property Owner
+                  </p>
+                </div>
+                <ChevronRight className='w-5 h-5 text-on-surface-variant' />
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className='w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-error hover:bg-error/10 transition-colors'
+              >
+                <LogOut className='w-5 h-5' />
+                <span className='text-sm font-bold'>Logout</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className='flex-1 overflow-y-auto bg-[#fafafa] md:ml-64'>
+            {children}
+          </div>
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <div className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 safe-area-inset-bottom'>
+          <div className='flex items-center justify-around px-2 py-2'>
+            <Link
+              href='/owner'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner') ? 'text-primary' : 'text-on-surface-variant'
+              }`}
+            >
+              <LayoutDashboard className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Dashboard</span>
+            </Link>
+            <Link
+              href='/owner/listings'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner/listings')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
+            >
+              <Building2 className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Listings</span>
+            </Link>
+            <Link
+              href='/owner/bookings'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner/bookings')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
+            >
+              <Calendar className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Bookings</span>
+            </Link>
+            <Link
+              href='/owner/payouts'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner/payouts')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
+            >
+              <IndianRupee className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Payouts</span>
+            </Link>
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className='flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-on-surface-variant'
+            >
+              <Menu className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>More</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        {isDrawerOpen && (
+          <>
+            <div
+              className='fixed inset-0 bg-black/50 z-50 md:hidden'
+              onClick={() => setIsDrawerOpen(false)}
+            />
+            <div className='fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden max-h-[80vh] overflow-y-auto'>
+              <div className='sticky top-0 bg-white border-b border-outline-variant/10 px-6 py-4 rounded-t-3xl'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <div className='w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary'>
+                      <ShieldCheck className='w-6 h-6' />
+                    </div>
+                    <div>
+                      <h2 className='font-headline text-sm font-bold text-on-surface'>
+                        Owner Portal
+                      </h2>
+                      <p className='text-xs text-on-surface-variant'>
+                        Property Management
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsDrawerOpen(false)}
+                    className='w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface'
+                  >
+                    <X className='w-5 h-5' />
+                  </button>
+                </div>
+              </div>
+
+              <nav className='px-3 py-4'>
+                {NAV_ITEMS.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setIsDrawerOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${
+                        isActive(item.href)
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
+                      }`}
+                    >
+                      <Icon className='w-6 h-6' />
+                      <span className='text-sm'>{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              <div className='px-3 pb-6 pt-2 border-t border-outline-variant/10'>
+                <div className='flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-3 mt-3'>
+                  <div className='w-12 h-12 rounded-full overflow-hidden bg-primary shrink-0'>
+                    <img
+                      alt='Owner'
+                      className='w-full h-full object-cover'
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
+                    />
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <p className='text-sm font-bold text-on-surface truncate'>
+                      {user?.name || 'Owner'}
+                    </p>
+                    <p className='text-xs text-on-surface-variant'>
+                      {user?.email || 'owner@brainwarerooms.com'}
+                    </p>
+                    <p className='text-[10px] text-on-surface-variant mt-0.5'>
+                      Property Owner
+                    </p>
+                  </div>
+                </div>
+
+                <div className='space-y-2'>
+                  <Link
+                    href='/owner/profile'
+                    onClick={() => setIsDrawerOpen(false)}
+                    className='flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-gray-50 hover:text-on-surface transition-colors'
+                  >
+                    <User className='w-6 h-6' />
+                    <span className='text-sm font-medium'>My Profile</span>
+                  </Link>
+
+                  <button
+                    onClick={() => {
+                      setIsDrawerOpen(false)
+                      handleLogout()
+                    }}
+                    className='w-full flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error/10 transition-colors'
+                  >
+                    <LogOut className='w-6 h-6' />
+                    <span className='text-sm font-bold'>Logout</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </RoleGuard>
+  )
 }

@@ -2,15 +2,7 @@ import Link from 'next/link'
 import { Room } from '@/data/rooms'
 import { Heart, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-interface RoomCardProps {
-  room: Room
-  imageIndex?: number
-  subtitle?: React.ReactNode
-  dateStr?: React.ReactNode
-  priceSuffix?: React.ReactNode
-  showReviewCount?: boolean
-}
+import { RoomCardProps } from '@/lib/types'
 
 export function RoomCard({
   room,

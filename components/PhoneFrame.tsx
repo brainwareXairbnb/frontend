@@ -1,11 +1,6 @@
 "use client";
 import { Home, Heart, ClipboardList, User, Wifi, Battery, Signal } from "lucide-react";
-
-interface PhoneFrameProps {
-  children: React.ReactNode;
-  screen: string;
-  setScreen: (screen: string) => void;
-}
+import { PhoneFrameProps } from "@/lib/types";
 
 const NAV = [
   { id: "s-home", icon: Home, label: "Explore" },

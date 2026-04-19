@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 import {
   User,
   Settings,
@@ -17,7 +18,19 @@ import { Button } from "@/components/ui/button";
 
 export default function StudentProfilePage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      router.push('/login');
+    } catch (error: any) {
+      toast.error('Logout failed', { description: error.message });
+      // Force redirect anyway
+      router.push('/login');
+    }
+  };
 
   const sections = [
     {
@@ -126,8 +139,8 @@ export default function StudentProfilePage() {
           {user && (
             <div className="pt-4">
               <button
-                onClick={() => router.push('/')}
-                className="w-full h-14 border border-on-surface rounded-xl font-bold text-[15px] flex items-center justify-center gap-2"
+                onClick={handleLogout}
+                className="w-full h-14 border border-on-surface rounded-xl font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-600 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Log out
