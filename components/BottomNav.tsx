@@ -17,10 +17,6 @@ export default function BottomNav() {
   ]
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path))
 
-  console.log('====================================')
-  console.log(user)
-  console.log('====================================')
-
   if (
     pathname.startsWith('/rooms/') ||
     pathname.startsWith('/host/') ||

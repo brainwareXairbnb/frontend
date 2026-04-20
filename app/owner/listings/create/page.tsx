@@ -2,22 +2,22 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { 
-  ChevronRight, 
-  FileEdit, 
-  DoorOpen, 
-  MapPin, 
-  Wallet, 
-  ImagePlus, 
-  UploadCloud, 
+import {
+  ChevronRight,
+  FileEdit,
+  DoorOpen,
+  MapPin,
+  Wallet,
+  ImagePlus,
   CheckSquare,
-  Sparkles,
   Zap,
   ArrowLeft
 } from 'lucide-react';
+import { PhotoUpload } from '@/components/PhotoUpload';
 
 export default function CreateListingPage() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<string[]>([]);
 
   const amenities = [
     'High-Speed Wi-Fi',
@@ -194,9 +194,9 @@ export default function CreateListingPage() {
         {/* Right Column: Visuals & Amenities */}
         <div className="lg:col-span-5 space-y-8">
           {/* Image Upload Area */}
-          <section className="bg-white p-8 md:p-10 rounded-[3rem] shadow-xl shadow-black/[0.02] border border-outline-variant/10 border-dashed hover:border-primary transition-colors group">
+          <section className="bg-white p-8 md:p-10 rounded-[3rem] shadow-xl shadow-black/[0.02] border border-outline-variant/10">
             <div className="flex items-center gap-4 mb-10">
-               <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/20 group-hover:rotate-12 transition-transform">
+               <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/20">
                   <ImagePlus className="w-6 h-6 text-white" />
                </div>
                <div>
@@ -205,24 +205,12 @@ export default function CreateListingPage() {
                </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center py-16 px-6 bg-[#FAFAFA] rounded-[2.5rem] border border-outline-variant/5 cursor-pointer hover:bg-white hover:shadow-2xl transition-all duration-500">
-              <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mb-6">
-                <UploadCloud className="w-8 h-8 text-primary" />
-              </div>
-              <p className="font-black text-on-surface text-[10px] uppercase tracking-widest mb-2">Ingest Visual Streams</p>
-              <p className="text-[8px] font-bold text-on-surface-variant opacity-30 uppercase tracking-[0.2em]">JPG, PNG, WEBP (Maximum 10MB)</p>
-              
-              <div className="mt-8 flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-outline-variant/5">
-                 <Zap className="w-3 h-3 text-indigo-500" />
-                 <span className="text-[8px] font-black uppercase tracking-widest text-indigo-500">Fast-Path Enabled</span>
-              </div>
-            </div>
-            {/* Image Preview Placeholder Grid */}
-            <div className="grid grid-cols-3 gap-4 mt-8">
-              <div className="aspect-square rounded-2xl bg-[#FAFAFA] animate-pulse"></div>
-              <div className="aspect-square rounded-2xl bg-[#FAFAFA] animate-pulse"></div>
-              <div className="aspect-square rounded-2xl bg-[#FAFAFA] animate-pulse"></div>
-            </div>
+            <PhotoUpload
+              photos={photos}
+              onChange={setPhotos}
+              maxPhotos={10}
+              minPhotos={2}
+            />
           </section>
 
           {/* Amenities Checklist */}

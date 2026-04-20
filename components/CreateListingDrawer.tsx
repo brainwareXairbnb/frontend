@@ -30,6 +30,7 @@ import { roomsApi } from '@/lib/api'
 import { toast } from 'sonner'
 import useIsMobile from '@/lib/useIsMobile'
 import { Listing, CreateListingDrawerProps } from '@/lib/types'
+import { PhotoUpload } from '@/components/PhotoUpload'
 
 export default function CreateListingDrawer({
   open,
@@ -40,6 +41,7 @@ export default function CreateListingDrawer({
 }: CreateListingDrawerProps) {
   const [loading, setLoading] = useState(false)
   const [showCoordinateInput, setShowCoordinateInput] = useState(false)
+  const [photos, setPhotos] = useState<string[]>([])
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -94,6 +96,7 @@ export default function CreateListingDrawer({
             : [88.4337, 22.9716],
         },
       })
+      setPhotos(editingListing.photos || [])
     } else {
       // Reset form when not editing
       setFormData({
@@ -114,6 +117,7 @@ export default function CreateListingDrawer({
           coordinates: [88.4337, 22.9716],
         },
       })
+      setPhotos([])
     }
   }, [editingListing])
 
@@ -153,7 +157,7 @@ export default function CreateListingDrawer({
           type: 'Point',
           coordinates: formData.location.coordinates,
         },
-        photos: [], // TODO: Image upload
+        photos: photos,
       }
 
       if (editingListing) {
@@ -190,6 +194,7 @@ export default function CreateListingDrawer({
           coordinates: [88.4337, 22.9716],
         },
       })
+      setPhotos([])
     } catch (error: any) {
       toast.error('Failed to save listing', {
         description: error.message,
@@ -235,7 +240,7 @@ export default function CreateListingDrawer({
           type: 'Point',
           coordinates: formData.location.coordinates,
         },
-        photos: [], // TODO: Image upload
+        photos: photos,
       }
 
       if (editingListing) {
@@ -276,6 +281,7 @@ export default function CreateListingDrawer({
           coordinates: [88.4337, 22.9716],
         },
       })
+      setPhotos([])
     } catch (error: any) {
       toast.error('Failed to submit listing', {
         description: error.message,
@@ -879,27 +885,24 @@ export default function CreateListingDrawer({
               </section>
             )}
 
-            {/* Image Upload Placeholder */}
-            <section className='space-y-4'>
-              <div className='flex items-center gap-3 mb-4'>
-                <div className='w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center'>
-                  <ImagePlus className='w-4 h-4 text-indigo-600' />
+            {/* Photos Upload */}
+            {!viewMode && (
+              <section className='space-y-4'>
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center'>
+                    <ImagePlus className='w-4 h-4 text-indigo-600' />
+                  </div>
+                  <h3 className='text-base font-bold text-on-surface'>Photos</h3>
                 </div>
-                <h3 className='text-base font-bold text-on-surface'>Photos</h3>
-              </div>
 
-              <div className='flex flex-col items-center justify-center py-12 px-6 bg-surface-container border-2 border-dashed border-outline-variant/20 rounded cursor-pointer hover:bg-white hover:border-primary/30 transition-all group'>
-                <div className='w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform'>
-                  <ImagePlus className='w-6 h-6 text-primary' />
-                </div>
-                <p className='text-sm font-semibold text-on-surface mb-1'>
-                  Upload Property Photos
-                </p>
-                <p className='text-xs text-on-surface-variant'>
-                  Coming soon - Image upload feature
-                </p>
-              </div>
-            </section>
+                <PhotoUpload
+                  photos={photos}
+                  onChange={setPhotos}
+                  maxPhotos={10}
+                  minPhotos={2}
+                />
+              </section>
+            )}
           </form>
         </div>
 

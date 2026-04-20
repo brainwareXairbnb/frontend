@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { adminApi } from '@/lib/api';
+import { DashboardStats } from '@/lib/types';
 import { 
   UserPlus, 
   Home, 
@@ -14,12 +15,12 @@ import {
 
 export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
-  const [statsData, setStatsData] = useState<any>(null);
+  const [statsData, setStatsData] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response: any = await adminApi.getDashboardStats();
+        const response = await adminApi.getDashboardStats();
         setStatsData(response.stats);
       } catch (error) {
         console.error('Failed to fetch admin stats:', error);

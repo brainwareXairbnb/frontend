@@ -11,9 +11,10 @@ import {
   Fingerprint,
   ArrowLeft,
   RotateCcw,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/Logo'
 
 function VerifyEmailForm() {
   const router = useRouter()
@@ -26,23 +27,25 @@ function VerifyEmailForm() {
   const [timer, setTimer] = useState(30)
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+        setTimer((prev) => prev - 1)
+      }, 1000)
     }
     return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [timer]);
+      if (interval) clearInterval(interval)
+    }
+  }, [timer])
 
   useEffect(() => {
     const emailParam = searchParams.get('email')
     if (emailParam) {
       setEmail(emailParam)
     } else {
-      toast.error('Identity Identification Missing', { description: 'Email parameter could not be recovered' })
+      toast.error('Identity Identification Missing', {
+        description: 'Email parameter could not be recovered',
+      })
     }
   }, [searchParams])
 
@@ -57,26 +60,38 @@ function VerifyEmailForm() {
     }
 
     if (!otp || otp.length !== 6) {
-      toast.error('Identity Sequence Invalid', { description: 'Please enter the 6-digit OTP' })
+      toast.error('Identity Sequence Invalid', {
+        description: 'Please enter the 6-digit OTP',
+      })
       setLoading(false)
       return
     }
 
     try {
-      const response = await authApi.verifyEmail(email, otp);
-      toast.success('Identity Verified', { description: 'Node synchronized successfully' })
+      const response = await authApi.verifyEmail(email, otp)
+      toast.success('Identity Verified', {
+        description: 'Node synchronized successfully',
+      })
       setSuccess(true)
 
       setTimeout(() => {
         // If it's a student and they have a student email but it's not verified yet
-        if (response.user?.role === 'student' && response.user?.studentEmail && !response.user?.isStudentVerified) {
-          router.push(`/verify-student-email?email=${encodeURIComponent(response.user.studentEmail)}`)
+        if (
+          response.user?.role === 'student' &&
+          response.user?.studentEmail &&
+          !response.user?.isStudentVerified
+        ) {
+          router.push(
+            `/verify-student-email?email=${encodeURIComponent(response.user.studentEmail)}`,
+          )
         } else {
           router.push('/')
         }
       }, 2000)
     } catch (err: any) {
-      toast.error('Validation Failed', { description: err.message || 'Please try again.' })
+      toast.error('Validation Failed', {
+        description: err.message || 'Please try again.',
+      })
     } finally {
       setLoading(false)
     }
@@ -89,11 +104,13 @@ function VerifyEmailForm() {
     setResendSuccess(false)
 
     try {
-      await authApi.resendOTP(email);
+      await authApi.resendOTP(email)
       toast.success('New Sequence Dispatched')
       setTimer(30)
     } catch (err: any) {
-      toast.error('Dispatch Failed', { description: err.message || 'Please try again later' })
+      toast.error('Dispatch Failed', {
+        description: err.message || 'Please try again later',
+      })
     } finally {
       setResending(false)
     }
@@ -106,18 +123,25 @@ function VerifyEmailForm() {
           <div className='w-20 h-20 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/20'>
             <CheckCircle2 className='text-white w-10 h-10' />
           </div>
-          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>Identity Validated</h2>
+          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>
+            Identity Validated
+          </h2>
           <p className='text-sm font-medium text-on-surface-variant leading-relaxed opacity-60 mb-8'>
-            Your node connection has been successfully verified. Synchronizing with the ecosystem hub...
+            Your node connection has been successfully verified. Synchronizing
+            with the ecosystem hub...
           </p>
-          <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-500 animate-progress origin-left"></div>
+          <div className='w-full h-1 bg-slate-100 rounded-full overflow-hidden'>
+            <div className='h-full bg-emerald-500 animate-progress origin-left'></div>
           </div>
         </div>
         <style jsx>{`
           @keyframes progress {
-            0% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
+            0% {
+              transform: scaleX(0);
+            }
+            100% {
+              transform: scaleX(1);
+            }
           }
           .animate-progress {
             animation: progress 2s linear forwards;
@@ -149,7 +173,8 @@ function VerifyEmailForm() {
             <span className='text-primary'>Connection.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            A 6-digit verification sequence has been dispatched to your primary identifier.
+            A 6-digit verification sequence has been dispatched to your primary
+            identifier.
           </p>
         </div>
       </div>
@@ -157,15 +182,11 @@ function VerifyEmailForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-10 lg:p-12 pt-6 md:pt-8 lg:pt-10 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-8 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Link href='/' className='flex items-center gap-3 mb-8 md:mb-10 group'>
-            <div className='w-12 h-12 bg-primary flex items-center justify-center rounded-2xl shadow-xl shadow-primary/20 group-hover:rotate-12 transition-transform'>
-              <Home className='w-6 h-6 text-white' />
-            </div>
-            <span className='font-headline font-black text-2xl tracking-tighter text-on-surface uppercase group-hover:text-primary transition-colors'>
-              Brainware <span className='text-primary/40'>Rooms</span>
-            </span>
-          </Link>
-          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>Verification Check</h2>
+          <Logo />
+
+          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
+            Verification Check
+          </h2>
           <p className='text-[12px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
             Sent to <span className='text-on-surface opacity-100'>{email}</span>
           </p>
@@ -174,15 +195,15 @@ function VerifyEmailForm() {
         <main className='w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-2'>
-              <div className="flex justify-between items-center px-1">
+              <div className='flex justify-between items-center px-1'>
                 <label className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
                   Verification Code (OTP)
                 </label>
-                <Fingerprint className="w-4 h-4 text-primary opacity-40" />
+                <Fingerprint className='w-4 h-4 text-primary opacity-40' />
               </div>
               <div className='relative group/input'>
                 <input
-                  className='w-full h-16 md:h-20 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl px-6 text-2xl md:text-3xl font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all tracking-[0.4em] md:tracking-[0.8em] text-center placeholder:opacity-20'
+                  className='w-full h-14 md:h-16 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl px-6 text-2xl md:text-3xl font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all tracking-[0.4em] md:tracking-[0.8em] text-center placeholder:opacity-20'
                   id='otp'
                   type='text'
                   placeholder='000000'
@@ -199,12 +220,12 @@ function VerifyEmailForm() {
               </p>
             </div>
 
-            <Button
-              className='w-full'
-              type='submit'
-              disabled={loading}
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+            <Button className='w-full' type='submit' disabled={loading}>
+              {loading ? (
+                <Loader2 className='w-4 h-4 animate-spin' />
+              ) : (
+                'Verify'
+              )}
             </Button>
           </form>
 
@@ -213,13 +234,19 @@ function VerifyEmailForm() {
               OTP not received?
             </p>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={handleResendOTP}
               disabled={resending || timer > 0}
               className='w-full h-12 rounded-2xl'
             >
-              <RotateCcw className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`} />
-              {resending ? 'DISPATCHING...' : timer > 0 ? `Resend in ${timer}s` : 'Resend Code'}
+              <RotateCcw
+                className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`}
+              />
+              {resending
+                ? 'DISPATCHING...'
+                : timer > 0
+                  ? `Resend in ${timer}s`
+                  : 'Resend Code'}
             </Button>
           </div>
 
@@ -247,11 +274,13 @@ function VerifyEmailForm() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className='min-h-screen flex items-center justify-center bg-white'>
+          <div className='w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin'></div>
+        </div>
+      }
+    >
       <VerifyEmailForm />
     </Suspense>
   )

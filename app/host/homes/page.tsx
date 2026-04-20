@@ -36,12 +36,17 @@ export default function BecomeHostPage() {
       accountNumber: '',
       ifsc: '',
       bankName: '',
+      upiId: '',
     },
   })
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/host/homes')
+      const params = new URLSearchParams({
+        redirect: '/host/homes',
+      })
+
+      router.push(`/login?${params.toString()}`)
     } else if (user?.role === 'owner') {
       router.push('/owner')
     } else if (isAuthenticated) {
@@ -304,6 +309,19 @@ export default function BecomeHostPage() {
                         className='w-full p-3.5 md:p-4 rounded border border-outline-variant/30 focus:border-[#FF385C] focus:ring-1 focus:ring-[#FF385C] transition-all outline-none uppercase'
                       />
                     </div>
+                    <div className='space-y-2'>
+                      <label className='text-sm font-bold text-on-surface-variant ml-1'>
+                        UPI ID (Optional)
+                      </label>
+                      <input
+                        name='bankDetails.upiId'
+                        type='text'
+                        value={formData.bankDetails.upiId}
+                        onChange={handleInputChange}
+                        placeholder='username@okbank'
+                        className='w-full p-3.5 md:p-4 rounded border border-outline-variant/30 focus:border-[#FF385C] focus:ring-1 focus:ring-[#FF385C] transition-all outline-none'
+                      />
+                    </div>
                   </div>
                 </section>
 
@@ -323,8 +341,8 @@ export default function BecomeHostPage() {
                 </button>
 
                 <p className='text-center text-xs text-on-surface-variant leading-relaxed px-10'>
-                  By submitting, you agree to the Brainware Rooms Owner Terms of
-                  Service and Payout Policy. Your data is encrypted and handled
+                  By submitting, you agree to the BrainX Owner Terms of Service
+                  and Payout Policy. Your data is encrypted and handled
                   securely.
                 </p>
               </form>
@@ -376,9 +394,8 @@ export default function BecomeHostPage() {
 
             <div className='p-8 bg-[#FF385C]/5 rounded-3xl border border-[#FF385C]/10'>
               <p className='text-sm text-[#FF385C] font-semibold italic leading-relaxed'>
-                "I listed my flat on Brainware Rooms and found 3 great student
-                tenants within a week. The verification process gives me peace
-                of mind."
+                "I listed my flat on BrainX and found 3 great student tenants
+                within a week. The verification process gives me peace of mind."
               </p>
               <p className='mt-4 font-bold text-sm'>— Mrs. Sen, Barasat</p>
             </div>

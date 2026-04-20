@@ -87,7 +87,7 @@ export default function ListingDetailClient() {
   const fetchListing = async () => {
     try {
       setLoading(true)
-      const response: any = await adminApi.getListingById(listingId)
+      const response = await adminApi.getListingById(listingId)
       setListing(response.listing)
     } catch (error: any) {
       toast.error('Failed to load listing', { description: error.message })
@@ -237,7 +237,22 @@ export default function ListingDetailClient() {
     return null
   }
 
-  const roomSubLabel = `${listing.roomType} · ${(listing as any).genderPreference || 'Any'} · ${(listing as any).totalArea ? `${(listing as any).totalArea} sqft` : 'N/A'}`
+  const roomSubLabel = `${listing.roomType} · ${listing.genderPreference || 'Any'} · ${listing.totalArea ? `${listing.totalArea} sqft` : 'N/A'}`
+
+  // Map coordinates logic
+  const coords = listing.location?.coordinates
+  let lat: number | undefined
+  let lng: number | undefined
+  
+  if (Array.isArray(coords)) {
+    lng = (coords as number[])[0]
+    lat = (coords as number[])[1]
+  } else if (coords) {
+    lat = (coords as { lat?: number; lng?: number }).lat
+    lng = (coords as { lat?: number; lng?: number }).lng
+  }
+  
+  const hasCoordinates = lat !== undefined && lng !== undefined
 
   return (
     <div className='bg-white min-h-screen pb-24 md:pb-0'>
@@ -396,7 +411,7 @@ export default function ListingDetailClient() {
                 {listing.title}
               </h1>
               <h2 className='text-base font-semibold text-on-surface-variant mb-2'>
-                {listing.address.city}, {listing.address.state}
+                {listing.address?.city}, {listing.address?.state}
               </h2>
               <p className='text-[15px] text-on-surface-variant'>{roomSubLabel}</p>
             </div>
@@ -404,7 +419,7 @@ export default function ListingDetailClient() {
             {/* Desktop Sublabel */}
             <div className='hidden md:block mb-8 pb-8 border-b border-outline-variant/30 text-xl font-semibold'>
               <h2 className='mb-2'>
-                {listing.address.city} listed by {listing.owner?.name}
+                {listing.address?.city} listed by {listing.owner?.name}
               </h2>
               <p className='text-base font-normal text-on-surface-variant'>
                 {roomSubLabel}
@@ -517,14 +532,14 @@ export default function ListingDetailClient() {
               <h3 className='text-[22px] font-semibold mb-2'>Where you'll find it</h3>
               <p className='text-[15px] text-on-surface-variant mb-6'>
                 <MapPin className='w-4 h-4 inline mr-1' />
-                {listing.address.street}, {listing.address.city}
-                {listing.address.state && `, ${listing.address.state}`}{' '}
-                {listing.address.postalCode}
+                {listing.address?.street}, {listing.address?.city}
+                {listing.address?.state && `, ${listing.address?.state}`}{' '}
+                {listing.address?.pincode}
               </p>
 
               {/* Google Map */}
               <div className='w-full h-[250px] md:h-[400px] bg-surface-container rounded-2xl relative overflow-hidden mb-4'>
-                {listing.location?.coordinates && listing.location.coordinates.length === 2 ? (
+                {hasCoordinates ? (
                   <iframe
                     width='100%'
                     height='100%'
@@ -532,7 +547,7 @@ export default function ListingDetailClient() {
                     loading='lazy'
                     allowFullScreen
                     referrerPolicy='no-referrer-when-downgrade'
-                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8'}&q=${listing.location.coordinates[1]},${listing.location.coordinates[0]}&zoom=15`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8'}&q=${lat},${lng}&zoom=15`}
                   ></iframe>
                 ) : (
                   // Fallback: Show static map with city search
@@ -544,16 +559,16 @@ export default function ListingDetailClient() {
                       loading='lazy'
                       allowFullScreen
                       referrerPolicy='no-referrer-when-downgrade'
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8'}&q=${encodeURIComponent(`${listing.address.street}, ${listing.address.city}, ${listing.address.state}`)}&zoom=14`}
+                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8'}&q=${encodeURIComponent(`${listing.address?.street}, ${listing.address?.city}, ${listing.address?.state}`)}&zoom=14`}
                     ></iframe>
                   </div>
                 )}
               </div>
 
-              {listing.location?.coordinates && listing.location.coordinates.length === 2 && (
+              {hasCoordinates && (
                 <div className='bg-surface-container-lowest rounded-lg p-3 text-xs text-on-surface-variant'>
                   <strong className='text-on-surface'>Coordinates:</strong>{' '}
-                  {listing.location.coordinates[1].toFixed(6)}, {listing.location.coordinates[0].toFixed(6)}
+                  {lat!.toFixed(6)}, {lng!.toFixed(6)}
                 </div>
               )}
             </div>
@@ -592,7 +607,7 @@ export default function ListingDetailClient() {
                 <div className='flex items-center gap-2'>
                   <Clock className='w-4 h-4' />
                   <span>
-                    Last updated {format(new Date(listing.updatedAt), 'MMM dd, yyyy')}
+                    Last updated {format(new Date(listing.updatedAt || listing.createdAt), 'MMM dd, yyyy')}
                   </span>
                 </div>
               </div>

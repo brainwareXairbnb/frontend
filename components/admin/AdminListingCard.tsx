@@ -16,13 +16,21 @@ import {
   Home,
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { Listing } from '@/lib/types'
+
+interface AdminListingCardProps {
+  listing: Listing
+  handleApproveClick: (id: string, title: string) => void
+  handleRejectClick: (id: string, title: string) => void
+  actionLoading: string | null
+}
 
 export function AdminListingCard({
   listing,
   handleApproveClick,
   handleRejectClick,
   actionLoading,
-}: any) {
+}: AdminListingCardProps) {
   const router = useRouter()
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -78,7 +86,7 @@ export function AdminListingCard({
         className='relative aspect-[4/3] overflow-hidden cursor-pointer'
         onClick={() => router.push(`/admin/listings/${listing._id}`)}
       >
-        {listing.photos?.length > 0 ? (
+        {listing.photos && listing.photos.length > 0 ? (
           <img
             src={listing.photos[0]}
             alt={listing.title}
@@ -123,8 +131,8 @@ export function AdminListingCard({
         <div className='flex items-center gap-1 text-xs text-muted-foreground'>
           <MapPin className='w-3.5 h-3.5' />
           <span>
-            {listing.address.city}
-            {listing.address.state && `, ${listing.address.state}`}
+            {listing.address?.city}
+            {listing.address?.state && `, ${listing.address?.state}`}
           </span>
         </div>
 
@@ -154,7 +162,7 @@ export function AdminListingCard({
             <>
               <Button
                 size='sm'
-                className='flex-1'
+                className='flex-1 bg-green-600 hover:bg-green-700'
                 onClick={() => handleApproveClick(listing._id, listing.title)}
                 disabled={actionLoading === listing._id}
               >
@@ -171,7 +179,7 @@ export function AdminListingCard({
               <Button
                 size='sm'
                 variant='outline'
-                className='flex-1'
+                className='flex-1 bg-red-600 hover:bg-red-700 text-white'
                 onClick={() => handleRejectClick(listing._id, listing.title)}
                 disabled={actionLoading === listing._id}
               >

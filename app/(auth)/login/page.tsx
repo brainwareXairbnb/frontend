@@ -17,6 +17,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/Logo'
 
 function LoginForm() {
   const router = useRouter()
@@ -87,30 +88,21 @@ function LoginForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-12 lg:p-16 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-10 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Link
-            href='/'
-            className='flex items-center gap-3 mb-6 md:mb-10 group'
-          >
-            <div className='w-10 h-10 md:w-12 md:h-12 bg-primary flex items-center justify-center rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 group-hover:rotate-12 transition-transform'>
-              <Home className='w-5 h-5 md:w-6 md:h-6 text-white' />
-            </div>
-            <span className='font-headline font-black text-xl md:text-2xl tracking-tighter text-on-surface uppercase group-hover:text-primary transition-colors'>
-              Brainware <span className='text-primary/40'>Rooms</span>
-            </span>
-          </Link>
-          <div className='flex items-center gap-3 mb-3'>
+          <Logo />
+
+          <div className='flex items-center gap-2 mb-3'>
             <div className='w-6 h-6 bg-primary/5 rounded-lg flex items-center justify-center text-primary'>
               <Sparkles className='w-3 h-3' />
             </div>
-            <h2 className='text-[10px] font-black uppercase tracking-[0.2em] text-primary'>
-              Portal Access
-            </h2>
+            <h2 className='text-sm font-medium text-primary'>Login</h2>
           </div>
-          <h1 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
-            Welcome Back
+
+          <h1 className='text-3xl font-bold text-foreground mb-2'>
+            Welcome back
           </h1>
-          <p className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
-            Activate your node connection to manage your residency.
+
+          <p className='text-sm text-muted-foreground'>
+            Sign in to your account to continue.
           </p>
         </header>
 
@@ -124,7 +116,7 @@ function LoginForm() {
                 <div className='relative group/input'>
                   <Mail className='absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/20 group-focus-within/input:text-primary transition-all' />
                   <input
-                    className='w-full h-16 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl pl-16 pr-6 text-sm font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all placeholder:opacity-30'
+                    className='w-full h-14 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl pl-16 pr-6 text-sm font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all placeholder:opacity-30'
                     id='email'
                     type='email'
                     placeholder='student@brainware.edu'
@@ -151,7 +143,7 @@ function LoginForm() {
                 <div className='relative group/input'>
                   <Lock className='absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/20 group-focus-within/input:text-primary transition-all' />
                   <input
-                    className='w-full h-16 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl pl-16 pr-14 text-sm font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all placeholder:opacity-30'
+                    className='w-full h-14 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl pl-16 pr-14 text-sm font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all placeholder:opacity-30'
                     id='password'
                     type={showPassword ? 'text' : 'password'}
                     placeholder='••••••••'
@@ -198,7 +190,7 @@ function LoginForm() {
           <Button
             variant='outline'
             rounded='2xl'
-            className='w-full h-14 md:h-16 flex items-center justify-center gap-4'
+            className='w-full h-14 flex items-center justify-center gap-4'
             type='button'
           >
             <svg className='w-5 h-5' viewBox='0 0 24 24'>

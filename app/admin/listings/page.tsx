@@ -65,7 +65,7 @@ export default function AdminListingsPage() {
     try {
       setLoading(true)
       // Fetch all listings (draft listings are already filtered out on server side)
-      const response: any = await adminApi.getAllListings()
+      const response = await adminApi.getAllListings()
       const allListings = response.listings || []
       setListings(allListings)
 

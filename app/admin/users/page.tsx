@@ -26,12 +26,13 @@ import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { UserDetailModal } from '@/components/admin/UserDetailModal'
+import { User, UserProfile } from '@/lib/types'
 
 export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState('all-personnel')
   const [loading, setLoading] = useState(true)
-  const [users, setUsers] = useState<any[]>([])
-  const [upgradeRequests, setUpgradeRequests] = useState<any[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [upgradeRequests, setUpgradeRequests] = useState<UserProfile[]>([])
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   // User Detail Modal
@@ -158,7 +159,9 @@ export default function AdminUsersPage() {
           description: 'Personnel promoted to Owner status',
         })
         setUpgradeRequests((prev) =>
-          prev.filter((req) => (req._id || req.id) !== modalConfig.userId),
+          prev.filter(
+            (req) => (req._id || req.id || '') !== modalConfig.userId,
+          ),
         )
         setStats((prev) => ({
           ...prev,
@@ -174,7 +177,9 @@ export default function AdminUsersPage() {
           description: 'Identity request has been terminated',
         })
         setUpgradeRequests((prev) =>
-          prev.filter((req) => (req._id || req.id) !== modalConfig.userId),
+          prev.filter(
+            (req) => (req._id || req.id || '') !== modalConfig.userId,
+          ),
         )
         setStats((prev) => ({
           ...prev,
@@ -437,9 +442,9 @@ export default function AdminUsersPage() {
               message='No pending partner upgrade requests found in the ecosystem.'
             />
           ) : (
-            upgradeRequests.map((req) => (
+            upgradeRequests.map((req, index) => (
               <div
-                key={req._id || req.id}
+                key={req._id || req.id || index}
                 className='bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'
               >
                 <div className='flex flex-col lg:flex-row'>
@@ -463,7 +468,7 @@ export default function AdminUsersPage() {
                       <div className='flex items-center gap-3 text-xs md:text-sm'>
                         <Phone className='w-3.5 h-3.5 text-on-surface-variant shrink-0' />
                         <span className='font-medium truncate'>
-                          {req.phone}
+                          {req.phone || 'N/A'}
                         </span>
                       </div>
                       <div className='flex items-center gap-3 text-xs md:text-sm'>
@@ -493,14 +498,16 @@ export default function AdminUsersPage() {
                         </div>
                         <div className='inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-[10px] font-black uppercase text-on-surface-variant w-fit'>
                           <Calendar className='w-3 h-3' />
-                          {format(
-                            new Date(req.upgradeRequest.requestedAt),
-                            'MMM dd, yyyy',
-                          )}
+                          {req.upgradeRequest?.requestedAt
+                            ? format(
+                                new Date(req.upgradeRequest.requestedAt),
+                                'MMM dd, yyyy',
+                              )
+                            : 'N/A'}
                         </div>
                       </div>
 
-                      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 bg-surface-container-lowest/50 p-4 rounded border border-outline-variant/10'>
+                      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-surface-container-lowest/50 p-4 rounded border border-outline-variant/10'>
                         <div className='space-y-1'>
                           <p className='text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-60'>
                             Bank
@@ -525,19 +532,27 @@ export default function AdminUsersPage() {
                             {req.bankDetails?.accountHolderName || 'N/A'}
                           </p>
                         </div>
+                        <div className='space-y-1'>
+                          <p className='text-[9px] font-black text-on-surface-variant uppercase tracking-widest opacity-60'>
+                            UPI ID
+                          </p>
+                          <p className='text-xs md:text-sm font-bold break-all'>
+                            {req.bankDetails?.upiId || 'N/A'}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
                     <div className='flex flex-row gap-3'>
                       <Button
                         onClick={() =>
-                          handleApproveClick(req._id || req.id, req.name)
+                          handleApproveClick(req._id || req.id || '', req.name)
                         }
-                        disabled={actionLoading === (req._id || req.id)}
+                        disabled={actionLoading === (req._id || req.id || '')}
                         className='flex-[2] h-12 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50'
                         rounded='xl'
                       >
-                        {actionLoading === (req._id || req.id) ? (
+                        {actionLoading === (req._id || req.id || '') ? (
                           <Loader2 className='w-4 h-4 animate-spin' />
                         ) : (
                           <CheckCircle2 className='w-4 h-4' />
@@ -548,9 +563,9 @@ export default function AdminUsersPage() {
                       <Button
                         variant='outline'
                         onClick={() =>
-                          handleRejectClick(req._id || req.id, req.name)
+                          handleRejectClick(req._id || req.id || '', req.name)
                         }
-                        disabled={actionLoading === (req._id || req.id)}
+                        disabled={actionLoading === (req._id || req.id || '')}
                         className='flex-1 h-12 hover:bg-red-50 hover:text-red-600 hover:border-red-200 disabled:opacity-50'
                         rounded='xl'
                       >
@@ -599,7 +614,7 @@ export default function AdminUsersPage() {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-outline-variant/10'>
-                    {users.map((user) => (
+                    {users.map((user: any) => (
                       <tr
                         key={user._id}
                         className='hover:bg-surface-container-lowest transition-colors'
@@ -684,7 +699,7 @@ export default function AdminUsersPage() {
 
               {/* Cards for Mobile */}
               <div className='md:hidden space-y-3'>
-                {users.map((user) => (
+                {users.map((user: any) => (
                   <div
                     key={user._id}
                     className='bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'

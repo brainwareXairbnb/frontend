@@ -13,6 +13,7 @@ export type UserRole = 'student' | 'owner' | 'admin'
 
 export interface User {
   _id: string
+  id?: string
   name: string
   email: string
   role: UserRole | string
@@ -27,6 +28,7 @@ export interface User {
   isApproved?: boolean
   createdAt?: string
   updatedAt?: string
+  lastLogin?: string
 }
 
 export interface UserProfile extends User {
@@ -37,6 +39,10 @@ export interface UserProfile extends User {
   businessAddress?: string
   nidNo?: string
   isApproved?: boolean
+  upgradeRequest?: {
+    requestedAt: string
+    status: string
+  }
 }
 
 export interface BankDetails {
@@ -47,6 +53,13 @@ export interface BankDetails {
   ifsc?: string
   upiId?: string
   isVerified?: boolean
+}
+
+export interface DashboardStats {
+  totalUsers: number
+  totalRevenue: number
+  totalBookings: number
+  totalRooms: number
 }
 
 export interface Listing {
@@ -88,6 +101,10 @@ export interface Listing {
   genderPref?: string
   totalBeds?: number
   availableBeds?: number
+  bedrooms?: number
+  bathrooms?: number
+  totalArea?: number
+  genderPreference?: string
   // Status and Availability
   status: ListingStatus
   isAvailable?: boolean

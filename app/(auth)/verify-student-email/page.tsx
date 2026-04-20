@@ -12,9 +12,10 @@ import {
   ArrowLeft,
   RotateCcw,
   Loader2,
-  ShieldCheck
+  ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/Logo'
 
 function VerifyStudentEmailForm() {
   const router = useRouter()
@@ -27,16 +28,16 @@ function VerifyStudentEmailForm() {
   const [timer, setTimer] = useState(30)
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+        setTimer((prev) => prev - 1)
+      }, 1000)
     }
     return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [timer]);
+      if (interval) clearInterval(interval)
+    }
+  }, [timer])
 
   useEffect(() => {
     const emailParam = searchParams.get('email')
@@ -50,13 +51,15 @@ function VerifyStudentEmailForm() {
     setLoading(true)
 
     if (!otp || otp.length !== 6) {
-      toast.error('Identity Sequence Invalid', { description: 'Please enter the 6-digit OTP' })
+      toast.error('Identity Sequence Invalid', {
+        description: 'Please enter the 6-digit OTP',
+      })
       setLoading(false)
       return
     }
 
     try {
-      await authApi.verifyStudentEmail(otp);
+      await authApi.verifyStudentEmail(otp)
       toast.success('Scholar Identity Validated')
       setSuccess(true)
 
@@ -64,22 +67,25 @@ function VerifyStudentEmailForm() {
         router.push('/')
       }, 2000)
     } catch (err: any) {
-      toast.error('Validation Failed', { description: err.message || 'Please try again.' })
+      toast.error('Validation Failed', {
+        description: err.message || 'Please try again.',
+      })
     } finally {
       setLoading(false)
     }
   }
 
-
   const handleResendOTP = async () => {
     setResending(true)
 
     try {
-      await authApi.resendStudentOTP();
+      await authApi.resendStudentOTP()
       toast.success('New Sequence Dispatched')
       setTimer(30)
     } catch (err: any) {
-      toast.error('Dispatch Failed', { description: err.message || 'Please try again later' })
+      toast.error('Dispatch Failed', {
+        description: err.message || 'Please try again later',
+      })
     } finally {
       setResending(false)
     }
@@ -92,18 +98,25 @@ function VerifyStudentEmailForm() {
           <div className='w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-500/20'>
             <GraduationCap className='text-white w-10 h-10' />
           </div>
-          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>Scholar Verified</h2>
+          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>
+            Scholar Verified
+          </h2>
           <p className='text-sm font-medium text-on-surface-variant leading-relaxed opacity-60 mb-8'>
-            Your academic credentials have been successfully validated. Welcome to the Brainware Rooms scholar network.
+            Your academic credentials have been successfully validated. Welcome
+            to the BrainX network.
           </p>
-          <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-600 animate-progress origin-left"></div>
+          <div className='w-full h-1 bg-slate-100 rounded-full overflow-hidden'>
+            <div className='h-full bg-indigo-600 animate-progress origin-left'></div>
           </div>
         </div>
         <style jsx>{`
           @keyframes progress {
-            0% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
+            0% {
+              transform: scaleX(0);
+            }
+            100% {
+              transform: scaleX(1);
+            }
           }
           .animate-progress {
             animation: progress 2s linear forwards;
@@ -135,7 +148,8 @@ function VerifyStudentEmailForm() {
             <span className='text-primary'>Validation.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            Finalize your node activation within the university network to unlock exclusive scholar rates and priority modules.
+            Finalize your node activation within the university network to
+            unlock exclusive scholar rates and priority modules.
           </p>
         </div>
       </div>
@@ -143,39 +157,38 @@ function VerifyStudentEmailForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-10 lg:p-12 pt-6 md:pt-8 lg:pt-10 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-8 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Link href='/' className='flex items-center gap-3 mb-8 md:mb-10 group'>
-            <div className='w-12 h-12 bg-primary flex items-center justify-center rounded-2xl shadow-xl shadow-primary/20 group-hover:rotate-12 transition-transform'>
-              <Home className='w-6 h-6 text-white' />
+          <Logo heading='Institutional Check' />
+          <div className='flex items-center gap-2 mb-2'>
+            <div className='w-6 h-6 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-600'>
+              <ShieldCheck className='w-3.5 h-3.5' />
             </div>
-            <span className='font-headline font-black text-2xl tracking-tighter text-on-surface uppercase group-hover:text-primary transition-colors'>
-              Brainware <span className='text-primary/40'>Rooms</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-600">
-              <ShieldCheck className="w-3.5 h-3.5" />
-            </div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600">Scholar Verification</h2>
+            <h2 className='text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600'>
+              Scholar Verification
+            </h2>
           </div>
-          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>Institutional Check</h2>
+          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
+            Institutional Check
+          </h2>
           <p className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
-            Code sent to <span className='text-on-surface opacity-100'>{email || 'university address'}</span>
+            Code sent to{' '}
+            <span className='text-on-surface opacity-100'>
+              {email || 'university address'}
+            </span>
           </p>
         </header>
 
         <main className='w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100'>
           <form onSubmit={handleSubmit} className='space-y-4'>
-
             <div className='space-y-2'>
-              <div className="flex justify-between items-center px-1">
+              <div className='flex justify-between items-center px-1'>
                 <label className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
                   Scholar Code (OTP)
                 </label>
-                <Fingerprint className="w-4 h-4 text-primary opacity-40" />
+                <Fingerprint className='w-4 h-4 text-primary opacity-40' />
               </div>
               <div className='relative group/input'>
                 <input
-                  className='w-full h-16 md:h-20 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl px-6 text-2xl md:text-3xl font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all tracking-[0.4em] md:tracking-[0.8em] text-center placeholder:opacity-20'
+                  className='w-full h-14 md:h-16 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-2xl px-6 text-2xl md:text-3xl font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all tracking-[0.4em] md:tracking-[0.8em] text-center placeholder:opacity-20'
                   id='otp'
                   type='text'
                   placeholder='000000'
@@ -193,11 +206,15 @@ function VerifyStudentEmailForm() {
             </div>
 
             <Button
-              className='w-full h-14 md:h-16 bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-500/20'
+              className='w-full h-14 bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-500/20'
               type='submit'
               disabled={loading}
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Status'}
+              {loading ? (
+                <Loader2 className='w-4 h-4 animate-spin' />
+              ) : (
+                'Confirm Status'
+              )}
             </Button>
           </form>
 
@@ -206,13 +223,19 @@ function VerifyStudentEmailForm() {
               Scholar code not received?
             </p>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={handleResendOTP}
               disabled={resending || timer > 0}
               className='w-full h-12 rounded-2xl'
             >
-              <RotateCcw className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`} />
-              {resending ? 'DISPATCHING...' : timer > 0 ? `Resend in ${timer}s` : 'Resend Code'}
+              <RotateCcw
+                className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`}
+              />
+              {resending
+                ? 'DISPATCHING...'
+                : timer > 0
+                  ? `Resend in ${timer}s`
+                  : 'Resend Code'}
             </Button>
           </div>
 
@@ -240,11 +263,13 @@ function VerifyStudentEmailForm() {
 
 export default function VerifyStudentEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className='min-h-screen flex items-center justify-center bg-white'>
+          <div className='w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin'></div>
+        </div>
+      }
+    >
       <VerifyStudentEmailForm />
     </Suspense>
   )
