@@ -77,11 +77,12 @@ export default function StudentProfilePage() {
               Log in and start planning your next trip.
             </p>
             <Button
+              className='w-full capitalize'
               onClick={() => router.push('/login')}
-              className='w-full md:w-max md:px-12 h-14 bg-[#222222] hover:bg-black text-white rounded-lg font-bold text-[15px] shadow-lg'
             >
               Log in or sign up
             </Button>
+
             <div className='w-full h-px bg-outline-variant/10 mt-10' />
           </div>
         ) : (

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { adminApi } from '@/lib/api'
 import { toast } from 'sonner'
 import {
@@ -45,7 +45,8 @@ import { Listing } from '@/lib/types'
 export default function ListingDetailClient() {
   const router = useRouter()
   const params = useParams()
-  const listingId = params.id as string
+  const searchParams = useSearchParams()
+  const listingId = (params.id as string) || searchParams.get('id') || ''
 
   const [listing, setListing] = useState<Listing | null>(null)
   const [loading, setLoading] = useState(true)

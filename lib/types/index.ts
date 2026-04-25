@@ -253,6 +253,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   register: (role: 'student' | 'owner', data: any) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<User>
 }
 
 export interface FetchOptions extends RequestInit {

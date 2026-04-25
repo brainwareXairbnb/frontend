@@ -1,6 +1,7 @@
 "use client";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 import { fmt, ROOMS } from "@/lib/data";
 import {
   ChevronLeft,
@@ -9,12 +10,15 @@ import {
   CreditCard,
   CheckCircle2,
   Home,
-  Info
+  Info,
+  Lock
 } from "lucide-react";
+import { AuthPrompt } from "@/components/AuthPrompt";
 
 function PaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user, loading } = useAuth();
   const id = searchParams.get('id');
   const r = ROOMS.find(room => room.id.toString() === id) || ROOMS[0];
 
@@ -24,6 +28,27 @@ function PaymentContent() {
   const gross = r.rent * months;
   const sc = Math.round(gross * 0.05);
   const total = gross + r.deposit + sc;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#FF385C]/20 border-t-[#FF385C] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="bg-white min-h-screen pt-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <AuthPrompt 
+            title="Log in to complete your booking"
+            description="You need to be logged in to reserve a room and complete the payment process."
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (step === 2) return (
     <div className="bg-white min-h-screen p-8 md:p-20 flex flex-col items-center text-center max-w-2xl mx-auto">

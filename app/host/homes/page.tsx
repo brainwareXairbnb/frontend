@@ -12,7 +12,6 @@ import {
   CreditCard,
   Fingerprint,
   ShieldCheck,
-  AlertCircle,
   Loader2,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -22,10 +21,8 @@ export default function BecomeHostPage() {
   const { user, isAuthenticated, loading: authLoading } = useAuth()
   const router = useRouter()
 
-  const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [upgradeStatus, setUpgradeStatus] = useState<any>(null)
 
   const [formData, setFormData] = useState({
     phone: '',
@@ -57,7 +54,6 @@ export default function BecomeHostPage() {
   const checkUpgradeStatus = async () => {
     try {
       const status = await authApi.getUpgradeStatus()
-      setUpgradeStatus(status)
       if (
         status.hasUpgradeRequest &&
         status.upgradeRequest.status === 'pending'
@@ -390,14 +386,6 @@ export default function BecomeHostPage() {
                   </p>
                 </div>
               </div>
-            </div>
-
-            <div className='p-8 bg-[#FF385C]/5 rounded-3xl border border-[#FF385C]/10'>
-              <p className='text-sm text-[#FF385C] font-semibold italic leading-relaxed'>
-                "I listed my flat on BrainX and found 3 great student tenants
-                within a week. The verification process gives me peace of mind."
-              </p>
-              <p className='mt-4 font-bold text-sm'>— Mrs. Sen, Barasat</p>
             </div>
           </div>
         </div>

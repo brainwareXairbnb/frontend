@@ -77,6 +77,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (idToken: string) => {
+    try {
+      const response = await authApi.googleAuth(idToken);
+      // Save token to localStorage for persistence
+      if (response.accessToken) {
+        localStorage.setItem('br_access_token', response.accessToken);
+      }
+      setUser(response.user);
+      return response.user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -84,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     register,
+    loginWithGoogle,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

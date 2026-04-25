@@ -61,14 +61,14 @@ export function Navbar() {
             Explore
           </Link>
           <Link
-            href='/saved'
-            className={`text-sm font-semibold transition-colors ${pathname === '/saved' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
+            href='/student/saved'
+            className={`text-sm font-semibold transition-colors ${pathname === '/student/saved' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
             Saved
           </Link>
           <Link
-            href='/bookings'
-            className={`text-sm font-semibold transition-colors ${pathname === '/bookings' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
+            href='/student/bookings'
+            className={`text-sm font-semibold transition-colors ${pathname === '/student/bookings' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
             Bookings
           </Link>

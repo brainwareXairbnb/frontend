@@ -58,7 +58,10 @@ async function apiFetch<T>(
       }
     }
 
-    throw new Error(error.error || `HTTP ${response.status}`)
+    // Throw error with response data so it can be accessed in catch blocks
+    const apiError: any = new Error(error.error || `HTTP ${response.status}`)
+    apiError.response = { data: error, status: response.status }
+    throw apiError
   }
 
   return response.json()
@@ -196,6 +199,19 @@ export const authApi = {
     return apiFetch<{ hasUpgradeRequest: boolean; upgradeRequest: any }>(
       '/auth/upgrade-status',
       { token },
+    )
+  },
+
+  /**
+   * Google OAuth authentication
+   */
+  googleAuth: async (idToken: string, gender?: string, phone?: string) => {
+    return apiFetch<{ user: any; accessToken: string; message: string }>(
+      '/auth/google',
+      {
+        method: 'POST',
+        body: JSON.stringify({ idToken, gender, phone }),
+      },
     )
   },
 
