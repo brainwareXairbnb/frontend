@@ -6,14 +6,11 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import {
-  Home,
   Mail,
   Lock,
   Eye,
   EyeOff,
-  ArrowRight,
   Sparkles,
-  ChevronRight,
   Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -37,8 +34,8 @@ function LoginForm() {
         router.push(redirectTo)
       } else {
         if (user.role === 'student') router.push('/')
-        else if (user.role === 'owner') router.push('/owner')
-        else if (user.role === 'admin') router.push('/admin')
+        else if (user.role === 'owner') router.push('/owner/listings')
+        else if (user.role === 'admin') router.push('/admin/users')
       }
     }
   }, [user, redirectTo, router])
@@ -49,9 +46,9 @@ function LoginForm() {
 
     try {
       await login(email, password)
-      toast.success('Access Granted')
+      toast.success('Login successfull!')
     } catch (err: any) {
-      toast.error('Access Denied')
+      toast.error('Login failed! Check your credentials.')
     } finally {
       setLoading(false)
     }

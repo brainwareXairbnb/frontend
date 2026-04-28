@@ -2,8 +2,9 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { notificationsApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { RoleGuard } from '@/components/RoleGuard'
 import { NotificationBell } from '@/components/NotificationBell'
@@ -29,12 +30,13 @@ import {
 import { AdminLayoutProps } from '@/lib/types'
 
 const NAV_ITEMS = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    href: '/admin/dashboard',
-  },
+  // Phase 1: Only Listings, Users, Notifications, and Profile
+  // {
+  //   id: 'dashboard',
+  //   label: 'Dashboard',
+  //   icon: LayoutDashboard,
+  //   href: '/admin/dashboard',
+  // },
   {
     id: 'users',
     label: 'User Management',
@@ -47,42 +49,42 @@ const NAV_ITEMS = [
     icon: ClipboardCheck,
     href: '/admin/listings',
   },
-  {
-    id: 'bookings',
-    label: 'All Bookings',
-    icon: CalendarCheck,
-    href: '/admin/bookings',
-  },
-  {
-    id: 'financial',
-    label: 'Financial Dashboard',
-    icon: Landmark,
-    href: '/admin/financial',
-  },
-  {
-    id: 'payouts',
-    label: 'Payout Management',
-    icon: IndianRupee,
-    href: '/admin/payouts',
-  },
-  {
-    id: 'analytics',
-    label: 'Revenue Analytics',
-    icon: BarChart3,
-    href: '/admin/analytics',
-  },
-  {
-    id: 'reviews',
-    label: 'Flagged Reviews',
-    icon: Flag,
-    href: '/admin/reviews',
-  },
-  {
-    id: 'settings',
-    label: 'Service Charge',
-    icon: Settings,
-    href: '/admin/settings',
-  },
+  // {
+  //   id: 'bookings',
+  //   label: 'All Bookings',
+  //   icon: CalendarCheck,
+  //   href: '/admin/bookings',
+  // },
+  // {
+  //   id: 'financial',
+  //   label: 'Financial Dashboard',
+  //   icon: Landmark,
+  //   href: '/admin/financial',
+  // },
+  // {
+  //   id: 'payouts',
+  //   label: 'Payout Management',
+  //   icon: IndianRupee,
+  //   href: '/admin/payouts',
+  // },
+  // {
+  //   id: 'analytics',
+  //   label: 'Revenue Analytics',
+  //   icon: BarChart3,
+  //   href: '/admin/analytics',
+  // },
+  // {
+  //   id: 'reviews',
+  //   label: 'Flagged Reviews',
+  //   icon: Flag,
+  //   href: '/admin/reviews',
+  // },
+  // {
+  //   id: 'settings',
+  //   label: 'Service Charge',
+  //   icon: Settings,
+  //   href: '/admin/settings',
+  // },
 ]
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -90,6 +92,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter()
   const { logout, user } = useAuth()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        if (user?.role === 'admin') {
+          const res = await notificationsApi.getUnreadCount()
+          setUnreadCount(res.count)
+        }
+      } catch (err) {
+        // silently fail
+      }
+    }
+    
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [user])
 
   const handleLogout = async () => {
     try {
@@ -232,10 +252,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </div>
 
-        {/* Mobile Bottom Navigation */}
+        {/* Mobile Bottom Navigation - Phase 1: Only Listings, Users, Notifications, Profile */}
         <div className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 safe-area-inset-bottom'>
           <div className='flex items-center justify-around px-2 py-2'>
-            <Link
+            {/* <Link
               href='/admin/dashboard'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/dashboard')
@@ -245,7 +265,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <LayoutDashboard className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Dashboard</span>
-            </Link>
+            </Link> */}
             <Link
               href='/admin/listings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
@@ -268,7 +288,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Users className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Users</span>
             </Link>
-            <Link
+            {/* <Link
               href='/admin/bookings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/bookings')
@@ -278,14 +298,36 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <CalendarCheck className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Bookings</span>
-            </Link>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className='flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-on-surface-variant'
+            </Link> */}
+            <Link
+              href='/admin/notifications'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/admin/notifications')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
             >
-              <Menu className='w-6 h-6' />
-              <span className='text-[10px] font-bold'>More</span>
-            </button>
+              <div className='relative'>
+                <Bell className='w-6 h-6' />
+                {unreadCount > 0 && (
+                  <span className='absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-[8px] font-bold rounded-full flex items-center justify-center'>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </div>
+              <span className='text-[10px] font-bold'>Notifications</span>
+            </Link>
+            <Link
+              href='/admin/profile'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/admin/profile')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
+            >
+              <UserCircle className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Profile</span>
+            </Link>
           </div>
         </div>
 

@@ -56,7 +56,7 @@ export default function GoogleSignInButton({
         // Sign in to Firebase with the Google credential to get a Firebase ID Token
         const credential = FirebaseGoogleAuthProvider.credential(googleIdToken)
         const firebaseResult = await signInWithCredential(auth, credential)
-        
+
         // Get the actual Firebase ID token to send to your backend
         idToken = await firebaseResult.user.getIdToken()
       } else {
@@ -80,15 +80,15 @@ export default function GoogleSignInButton({
       // Redirect based on role
       const role = user.role
       if (role === 'admin') {
-        router.push('/admin/dashboard')
+        router.push('/admin/users')
       } else if (role === 'owner') {
         if (user.isApproved) {
-          router.push('/owner/dashboard')
+          router.push('/owner/listings')
         } else {
           router.push('/pending-approval')
         }
       } else {
-        router.push('/dashboard')
+        router.push('/')
       }
     } catch (error: any) {
       console.error('Google sign-in error:', error)
@@ -109,8 +109,12 @@ export default function GoogleSignInButton({
         errorMessage = error.response.data.error
       }
       // Handle network/fetch errors
-      else if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-        errorMessage = 'Cannot connect to server. Please check your internet connection and try again.'
+      else if (
+        error.message === 'Failed to fetch' ||
+        error.name === 'TypeError'
+      ) {
+        errorMessage =
+          'Cannot connect to server. Please check your internet connection and try again.'
       }
       // Handle errors thrown by auth context
       else if (error.message) {

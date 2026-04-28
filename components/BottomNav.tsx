@@ -26,21 +26,22 @@ export default function BottomNav() {
   )
     return null
 
+  // Phase 1: Only Explore and Profile
   const navItems = [
     { label: 'Explore', icon: Search, path: '/' },
-    { label: 'Wishlists', icon: Heart, path: '/student/saved' },
-    {
-      label: 'Bookings',
-      icon: Map,
-      path: '/student/bookings',
-      authRequired: true,
-    },
-    {
-      label: 'Notifications',
-      icon: Bell,
-      path: '/student/notifications',
-      authRequired: true,
-    },
+    // { label: 'Wishlists', icon: Heart, path: '/student/saved' },
+    // {
+    //   label: 'Bookings',
+    //   icon: Map,
+    //   path: '/student/bookings',
+    //   authRequired: true,
+    // },
+    // {
+    //   label: 'Notifications',
+    //   icon: Bell,
+    //   path: '/student/notifications',
+    //   authRequired: true,
+    // },
     {
       label: user ? 'Profile' : 'Log in',
       icon: User,
@@ -48,7 +49,9 @@ export default function BottomNav() {
     },
   ]
 
-  const visibleItems = navItems.filter((item) => !item.authRequired || user)
+  const visibleItems = navItems.filter(
+    (item: any) => !item.authRequired || user,
+  )
 
   return (
     <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant/10 px-4 py-3 pb-6 md:hidden z-50'>

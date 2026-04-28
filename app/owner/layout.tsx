@@ -24,36 +24,37 @@ import {
 import { OwnerLayoutProps } from '@/lib/types'
 
 const NAV_ITEMS = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    href: '/owner',
-  },
+  // Phase 1: Only Listings, Notifications, and Profile
+  // {
+  //   id: 'dashboard',
+  //   label: 'Dashboard',
+  //   icon: LayoutDashboard,
+  //   href: '/owner',
+  // },
   {
     id: 'listings',
     label: 'My Listings',
     icon: Building2,
     href: '/owner/listings',
   },
-  {
-    id: 'bookings',
-    label: 'Bookings',
-    icon: Calendar,
-    href: '/owner/bookings',
-  },
-  {
-    id: 'payouts',
-    label: 'Payouts',
-    icon: IndianRupee,
-    href: '/owner/payouts',
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: BarChart3,
-    href: '/owner/analytics',
-  },
+  // {
+  //   id: 'bookings',
+  //   label: 'Bookings',
+  //   icon: Calendar,
+  //   href: '/owner/bookings',
+  // },
+  // {
+  //   id: 'payouts',
+  //   label: 'Payouts',
+  //   icon: IndianRupee,
+  //   href: '/owner/payouts',
+  // },
+  // {
+  //   id: 'analytics',
+  //   label: 'Analytics',
+  //   icon: BarChart3,
+  //   href: '/owner/analytics',
+  // },
 ]
 
 export default function OwnerLayout({ children }: OwnerLayoutProps) {
@@ -198,10 +199,10 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
           </div>
         </div>
 
-        {/* Mobile Bottom Navigation */}
+        {/* Mobile Bottom Navigation - Phase 1: Only Listings, Notifications, Profile */}
         <div className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 safe-area-inset-bottom'>
           <div className='flex items-center justify-around px-2 py-2'>
-            <Link
+            {/* <Link
               href='/owner'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/owner') ? 'text-primary' : 'text-on-surface-variant'
@@ -209,7 +210,7 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             >
               <LayoutDashboard className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Dashboard</span>
-            </Link>
+            </Link> */}
             <Link
               href='/owner/listings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
@@ -221,7 +222,7 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
               <Building2 className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Listings</span>
             </Link>
-            <Link
+            {/* <Link
               href='/owner/bookings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/owner/bookings')
@@ -242,14 +243,29 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             >
               <IndianRupee className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Payouts</span>
-            </Link>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className='flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors text-on-surface-variant'
+            </Link> */}
+            <Link
+              href='/owner/notifications'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner/notifications')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
             >
-              <Menu className='w-6 h-6' />
-              <span className='text-[10px] font-bold'>More</span>
-            </button>
+              <Bell className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Notifications</span>
+            </Link>
+            <Link
+              href='/owner/profile'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/owner/profile')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+              }`}
+            >
+              <User className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Profile</span>
+            </Link>
           </div>
         </div>
 

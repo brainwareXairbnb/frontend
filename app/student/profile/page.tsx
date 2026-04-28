@@ -33,25 +33,25 @@ export default function StudentProfilePage() {
   }
 
   const sections = [
-    {
-      title: 'Account settings',
-      items: [
-        { l: 'Personal information', i: User },
-        { l: 'Payments and payouts', i: Shield },
-      ],
-    },
+    // {
+    //   title: 'Account settings',
+    //   items: [
+    //     { l: 'Personal information', i: User },
+    //     { l: 'Payments and payouts', i: Shield },
+    //   ],
+    // },
     {
       title: 'Hosting',
       items: [{ l: 'Become a Owner', i: PlusCircle, path: '/host/homes' }],
     },
-    {
-      title: 'Support',
-      items: [
-        { l: 'How BrainX works', i: HelpCircle },
-        { l: 'Get help', i: FileSearch },
-        { l: 'Terms of Service', i: FileText },
-      ],
-    },
+    // {
+    //   title: 'Support',
+    //   items: [
+    //     { l: 'How BrainX works', i: HelpCircle },
+    //     { l: 'Get help', i: FileSearch },
+    //     { l: 'Terms of Service', i: FileText },
+    //   ],
+    // },
   ]
 
   if (loading) {
@@ -106,8 +106,7 @@ export default function StudentProfilePage() {
       <main className='px-8 md:px-10 pb-32'>
         <div className='space-y-10 max-w-2xl'>
           {/* If not logged in, show simplified list matching the screenshot */}
-          {!user ? (
-            <div className='space-y-8'>
+          {/* <div className='space-y-8'>
               {[
                 { l: 'Account settings', i: Settings },
                 { l: 'Get help', i: HelpCircle },
@@ -126,34 +125,34 @@ export default function StudentProfilePage() {
                   <ChevronRight className='w-5 h-5 opacity-40' />
                 </div>
               ))}
-            </div>
-          ) : (
-            sections.map((section) => (
-              <section key={section.title}>
-                <h3 className='text-lg font-bold mb-4'>{section.title}</h3>
-                <div className='space-y-6'>
-                  {section.items.map((item: any) => (
-                    <div
-                      key={item.l}
-                      onClick={() => item.path && router.push(item.path)}
-                      className='flex items-center justify-between group cursor-pointer py-1'
-                    >
-                      <div className='flex items-center gap-4'>
-                        <item.i
-                          className='w-6 h-6 opacity-70'
-                          strokeWidth={1.5}
-                        />
-                        <span className='text-[15px] text-on-surface-variant font-medium'>
-                          {item.l}
-                        </span>
+            </div> */}
+          {!user
+            ? null
+            : sections.map((section) => (
+                <section key={section.title}>
+                  <h3 className='text-lg font-bold mb-4'>{section.title}</h3>
+                  <div className='space-y-6'>
+                    {section.items.map((item: any) => (
+                      <div
+                        key={item.l}
+                        onClick={() => item.path && router.push(item.path)}
+                        className='flex items-center justify-between group cursor-pointer py-1'
+                      >
+                        <div className='flex items-center gap-4'>
+                          <item.i
+                            className='w-6 h-6 opacity-70'
+                            strokeWidth={1.5}
+                          />
+                          <span className='text-[15px] text-on-surface-variant font-medium'>
+                            {item.l}
+                          </span>
+                        </div>
+                        <ChevronRight className='w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity' />
                       </div>
-                      <ChevronRight className='w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity' />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))
-          )}
+                    ))}
+                  </div>
+                </section>
+              ))}
 
           {user && (
             <div className='pt-4'>

@@ -308,10 +308,10 @@ export default function CreateListingDrawer({
     >
       <DrawerContent className='h-[90vh] md:h-screen w-full md:w-[600px] lg:w-[700px] md:inset-y-0 md:right-0 md:left-auto bottom-0 md:top-0 rounded-t-3xl md:rounded-none mt-0 overflow-hidden md:border-l border-outline-variant/10 flex flex-col'>
         {/* Header */}
-        <DrawerHeader className='border-b border-outline-variant/10 shrink-0 px-6 py-5'>
+        <DrawerHeader className='border-b border-outline-variant/10 shrink-0 px-6 py-5 text-left'>
           <div className='flex items-center justify-between'>
             <div>
-              <DrawerTitle className='text-xl font-bold text-on-surface mb-1'>
+              <DrawerTitle className='text-xl font-bold mb-1'>
                 {viewMode
                   ? 'Listing Details'
                   : editingListing
@@ -795,18 +795,16 @@ export default function CreateListingDrawer({
                 {amenitiesList.map((amenity) => (
                   <label
                     key={amenity}
-                    className={`flex items-center gap-3 group p-3 bg-surface-container rounded-lg border border-outline-variant/10 transition-all ${
-                      viewMode
-                        ? 'opacity-60 cursor-not-allowed'
-                        : 'cursor-pointer hover:bg-white hover:border-primary/20'
-                    }`}
+                    className={`flex items-center gap-3 group p-3 bg-surface-container rounded-lg border border-outline-variant/10 transition-all ${viewMode
+                      ? 'opacity-60 cursor-not-allowed'
+                      : 'cursor-pointer hover:bg-white hover:border-primary/20'
+                      }`}
                   >
                     <div
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                        formData.amenities.includes(amenity)
-                          ? 'border-primary bg-primary'
-                          : 'border-outline-variant/30 group-hover:border-primary/40'
-                      }`}
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${formData.amenities.includes(amenity)
+                        ? 'border-primary bg-primary'
+                        : 'border-outline-variant/30 group-hover:border-primary/40'
+                        }`}
                     >
                       {formData.amenities.includes(amenity) && (
                         <CheckCircle className='w-3 h-3 text-white' />
@@ -864,20 +862,18 @@ export default function CreateListingDrawer({
                           isAvailable: !formData.isAvailable,
                         })
                       }
-                      className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        formData.isAvailable
-                          ? 'bg-emerald-500 border-emerald-500 focus:ring-emerald-500'
-                          : 'bg-gray-200 border-gray-300 focus:ring-gray-400'
-                      }`}
+                      className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${formData.isAvailable
+                        ? 'bg-emerald-500 border-emerald-500 focus:ring-emerald-500'
+                        : 'bg-gray-200 border-gray-300 focus:ring-gray-400'
+                        }`}
                       role='switch'
                       aria-checked={formData.isAvailable}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition-all duration-300 ease-in-out ${
-                          formData.isAvailable
-                            ? 'translate-x-6'
-                            : 'translate-x-0'
-                        }`}
+                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition-all duration-300 ease-in-out ${formData.isAvailable
+                          ? 'translate-x-6'
+                          : 'translate-x-0'
+                          }`}
                       />
                     </button>
                   </div>
@@ -908,23 +904,8 @@ export default function CreateListingDrawer({
 
         {/* Footer Actions */}
         <DrawerFooter className='border-t border-outline-variant/10 px-4 py-3 shrink-0 bg-white'>
-          {viewMode ? (
-            // View Mode - Only Close Button
-            <div className='flex justify-end'>
-              <DrawerClose asChild>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  rounded='md'
-                  className='h-10 px-6 text-xs font-bold uppercase tracking-wider'
-                >
-                  Close
-                </Button>
-              </DrawerClose>
-            </div>
-          ) : editingListing ? (
-            // Edit Mode - Update and Close Buttons
+          {viewMode ? null : editingListing ? (
+            // Edit Mode - Update Button
             <div className='flex flex-col md:flex-row gap-2 w-full'>
               <Button
                 type='button'
@@ -946,20 +927,9 @@ export default function CreateListingDrawer({
                   </>
                 )}
               </Button>
-              <DrawerClose asChild>
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
-                  disabled={loading}
-                  className='w-full md:w-auto h-10 md:h-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-xs font-semibold uppercase tracking-wider md:px-6'
-                >
-                  Close
-                </Button>
-              </DrawerClose>
             </div>
           ) : (
-            // Create Mode - Save Draft, Submit, and Cancel Buttons
+            // Create Mode - Save Draft, Submit Buttons
             <div className='flex flex-col md:flex-row gap-2 w-full'>
               <Button
                 type='button'
@@ -1002,17 +972,6 @@ export default function CreateListingDrawer({
                   </>
                 )}
               </Button>
-              <DrawerClose asChild>
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
-                  disabled={loading}
-                  className='w-full md:w-auto h-10 md:h-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-xs font-semibold uppercase tracking-wider md:px-6'
-                >
-                  Cancel
-                </Button>
-              </DrawerClose>
             </div>
           )}
         </DrawerFooter>

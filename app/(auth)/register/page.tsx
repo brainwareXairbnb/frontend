@@ -75,14 +75,10 @@ export default function RegisterPage() {
 
     try {
       await register('student', formData)
-      toast.success('Registry Active', {
-        description: 'Node synchronized successfully',
-      })
+      toast.success("User created successfully. Please verify your email.")
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (err: any) {
-      toast.error('Registry Failed', {
-        description: err.message || 'Please try again.',
-      })
+      toast.error('Failed to create user. Please try again.')
     } finally {
       setLoading(false)
     }

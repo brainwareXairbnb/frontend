@@ -44,13 +44,13 @@ export default function AdminProfilePage() {
       icon: User,
       href: '/admin/profile/personal-info',
     },
-    {
-      id: 'settings',
-      title: 'Admin Settings',
-      description: 'Manage platform settings',
-      icon: Settings,
-      href: '/admin/settings',
-    },
+    // {
+    //   id: 'settings',
+    //   title: 'Admin Settings',
+    //   description: 'Manage platform settings',
+    //   icon: Settings,
+    //   href: '/admin/settings',
+    // },
     {
       id: 'login-security',
       title: 'Change Password',

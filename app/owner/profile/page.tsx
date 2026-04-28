@@ -52,15 +52,15 @@ export default function OwnerProfilePage() {
       icon: CreditCard,
       href: '/owner/profile/payments',
     },
-    {
-      id: 'verification',
-      title: 'Account Verification',
-      description: 'Get verified to list properties',
-      icon: ShieldCheck,
-      href: '/owner/profile/verification',
-      badge: profile?.isApproved ? 'Verified' : 'Pending',
-      badgeColor: profile?.isApproved ? 'emerald' : 'orange',
-    },
+    // {
+    //   id: 'verification',
+    //   title: 'Account Verification',
+    //   description: 'Get verified to list properties',
+    //   icon: ShieldCheck,
+    //   href: '/owner/profile/verification',
+    //   badge: profile?.isApproved ? 'Verified' : 'Pending',
+    //   badgeColor: profile?.isApproved ? 'emerald' : 'orange',
+    // },
     {
       id: 'login-security',
       title: 'Change Password',
@@ -158,7 +158,7 @@ export default function OwnerProfilePage() {
                       {item.description}
                     </p>
                   </div>
-                  {item.badge && (
+                  {/* {item.badge && (
                     <span
                       className={`hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 ${
                         item.badgeColor === 'emerald'
@@ -168,7 +168,7 @@ export default function OwnerProfilePage() {
                     >
                       {item.badge}
                     </span>
-                  )}
+                  )} */}
                   <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5 text-on-surface-variant/40 group-hover:text-on-surface-variant group-hover:translate-x-1 transition-all shrink-0' />
                 </button>
               )
