@@ -20,6 +20,7 @@ import {
   X,
   ChevronRight,
   ShieldCheck,
+  Eye,
 } from 'lucide-react'
 import { OwnerLayoutProps } from '@/lib/types'
 
@@ -157,6 +158,18 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                   </Link>
                 )
               })}
+
+              {/* Divider */}
+              <div className='h-px bg-outline-variant/20 my-3 mx-3' />
+
+              {/* View as Student */}
+              <Link
+                href='/'
+                className='flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+              >
+                <Eye className='w-5 h-5' />
+                <span>View as Student</span>
+              </Link>
             </nav>
 
             {/* Owner Profile - Fixed at bottom */}
@@ -320,6 +333,19 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                     </Link>
                   )
                 })}
+
+                {/* Divider */}
+                <div className='h-px bg-outline-variant/20 my-3 mx-4' />
+
+                {/* View as Student */}
+                <Link
+                  href='/'
+                  onClick={() => setIsDrawerOpen(false)}
+                  className='flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+                >
+                  <Eye className='w-6 h-6' />
+                  <span className='text-sm'>View as Student</span>
+                </Link>
               </nav>
 
               <div className='px-3 pb-6 pt-2 border-t border-outline-variant/10'>

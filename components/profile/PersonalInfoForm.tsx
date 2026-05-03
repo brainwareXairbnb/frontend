@@ -9,7 +9,7 @@ import { userApi } from '@/lib/api'
 
 interface PersonalInfoFormProps {
   backPath: string
-  userRole: 'owner' | 'admin'
+  userRole: 'owner' | 'admin' | 'student'
 }
 
 export function PersonalInfoForm({
@@ -279,7 +279,7 @@ export function PersonalInfoForm({
               </div>
 
               {/* Info box */}
-              <div className='bg-blue-50 border border-blue-100 rounded-lg p-3 sm:p-4'>
+              <div className='bg-blue-50 border border-blue-100 rounded p-3 sm:p-4'>
                 <p className='text-xs sm:text-sm text-blue-900'>
                   <strong>Note:</strong> Changing your email will require
                   verification. You'll receive a confirmation email at your new

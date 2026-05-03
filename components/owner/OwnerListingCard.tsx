@@ -67,9 +67,8 @@ export default function OwnerListingCard({
       {/* Image Section */}
       <div className='relative aspect-[4/3] overflow-hidden bg-surface-container'>
         <img
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-            listing.status !== 'approved' ? 'grayscale opacity-60' : ''
-          }`}
+          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${listing.status !== 'approved' ? 'grayscale opacity-60' : ''
+            }`}
           src={
             (listing.photos && listing.photos[0]) ||
             (listing.images && listing.images[0]) ||
@@ -138,6 +137,17 @@ export default function OwnerListingCard({
             </span>
           </div>
         </div>
+
+        {/* Rejection Reason (Short) */}
+        {listing.status === 'rejected' &&
+          listing.rejectionReason && (
+            <div className='mb-3 bg-red-50 border border-red-100 rounded p-2.5 flex items-start gap-2 shadow-sm animate-in fade-in duration-300'>
+              <AlertTriangle className='w-3.5 h-3.5 text-red-600 mt-0.5 shrink-0' />
+              <p className='text-[10px] text-red-800 line-clamp-2 leading-relaxed italic font-medium'>
+                {listing.rejectionReason}
+              </p>
+            </div>
+          )}
 
         {/* Price and Actions */}
         <div className='flex justify-between items-center'>

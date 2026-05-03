@@ -8,7 +8,7 @@ import { userApi } from '@/lib/api'
 
 interface ChangePasswordFormProps {
   backPath: string
-  userRole: 'owner' | 'admin'
+  userRole: 'owner' | 'admin' | 'student'
 }
 
 export function ChangePasswordForm({

@@ -46,9 +46,40 @@ function LoginForm() {
 
     try {
       await login(email, password)
-      toast.success('Login successfull!')
+      toast.success('Login successful!')
     } catch (err: any) {
-      toast.error('Login failed! Check your credentials.')
+      // Extract error message from the API response
+      const errorMessage = err?.message || err?.response?.data?.error || 'Login failed'
+      const errorData = err?.response?.data || {}
+
+      // Handle specific error cases with appropriate messages and actions
+      if (errorData.useGoogleAuth) {
+        toast.error('Google Account Detected', {
+          description: 'This account uses Google login. Please sign in with Google instead.',
+        })
+      } else if (errorData.requiresVerification) {
+        toast.error('Email Not Verified', {
+          description: 'Please verify your email before logging in. Check your inbox for the verification link.',
+        })
+      } else if (errorData.requiresApproval) {
+        toast.error('Account Pending Approval', {
+          description: 'Your owner account is pending admin approval. You will be notified once approved.',
+        })
+      } else if (errorData.lockUntil) {
+        toast.error('Account Locked', {
+          description: errorMessage,
+        })
+      } else if (errorMessage.includes('Account is')) {
+        // Handle account status errors (suspended, inactive, etc.)
+        toast.error('Account Issue', {
+          description: errorMessage,
+        })
+      } else {
+        // Generic error for invalid credentials or other issues
+        toast.error('Login Failed', {
+          description: errorMessage,
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -86,7 +117,9 @@ function LoginForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-12 lg:p-16 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-10 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Logo />
+          <Link href='/' className='inline-block mb-4'>
+            <Logo />
+          </Link>
 
           <div className='flex items-center gap-2 mb-3'>
             <div className='w-6 h-6 bg-primary/5 rounded-lg flex items-center justify-center text-primary'>

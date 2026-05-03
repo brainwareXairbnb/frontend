@@ -47,6 +47,7 @@ export default function AdminListingsPage() {
     confirmText: string
     requiresInput: boolean
     listingId: string | null
+    action?: 'approve' | 'reject' | 'delete' | 'unlist' | 'relist'
   }>({
     isOpen: false,
     type: 'info',
@@ -55,6 +56,7 @@ export default function AdminListingsPage() {
     confirmText: 'Confirm',
     requiresInput: false,
     listingId: null,
+    action: undefined,
   })
 
   useEffect(() => {
@@ -98,6 +100,7 @@ export default function AdminListingsPage() {
       confirmText: 'Approve Listing',
       requiresInput: false,
       listingId,
+      action: 'approve',
     })
   }
 
@@ -110,6 +113,46 @@ export default function AdminListingsPage() {
       confirmText: 'Reject Listing',
       requiresInput: true,
       listingId,
+      action: 'reject',
+    })
+  }
+
+  const handleDeleteClick = (listingId: string, listingTitle: string) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'danger',
+      title: 'Delete Listing',
+      message: `Are you sure you want to permanently delete "${listingTitle}"? This action cannot be undone. Note: Listings with active bookings cannot be deleted.`,
+      confirmText: 'Delete Listing',
+      requiresInput: false,
+      listingId,
+      action: 'delete',
+    })
+  }
+
+  const handleUnlistClick = (listingId: string, listingTitle: string) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'warning',
+      title: 'Unlist Listing',
+      message: `Are you sure you want to unlist "${listingTitle}"? This will hide it from students but keep it in the system.`,
+      confirmText: 'Unlist',
+      requiresInput: false,
+      listingId,
+      action: 'unlist',
+    })
+  }
+
+  const handleRelistClick = (listingId: string, listingTitle: string) => {
+    setModalConfig({
+      isOpen: true,
+      type: 'success',
+      title: 'Re-list Listing',
+      message: `Are you sure you want to re-list "${listingTitle}"? This will make it visible to students again.`,
+      confirmText: 'Re-list',
+      requiresInput: false,
+      listingId,
+      action: 'relist',
     })
   }
 
@@ -119,41 +162,88 @@ export default function AdminListingsPage() {
     try {
       setActionLoading(modalConfig.listingId)
 
-      if (modalConfig.type === 'success') {
-        // Approve listing
-        await adminApi.approveListing(modalConfig.listingId)
-        toast.success('Listing Approved', {
-          description: 'Property is now visible to students',
-        })
-        setListings((prev) =>
-          prev.map((l) =>
-            l._id === modalConfig.listingId ? { ...l, status: 'approved' } : l,
-          ),
-        )
-        setStats((prev) => ({
-          ...prev,
-          pending: Math.max(0, prev.pending - 1),
-          approved: prev.approved + 1,
-        }))
-      } else if (modalConfig.type === 'danger') {
-        // Reject listing
-        await adminApi.rejectListing(
-          modalConfig.listingId,
-          inputValue || 'No reason provided',
-        )
-        toast.warning('Listing Rejected', {
-          description: 'Owner has been notified',
-        })
-        setListings((prev) =>
-          prev.map((l) =>
-            l._id === modalConfig.listingId ? { ...l, status: 'rejected' } : l,
-          ),
-        )
-        setStats((prev) => ({
-          ...prev,
-          pending: Math.max(0, prev.pending - 1),
-          rejected: prev.rejected + 1,
-        }))
+      switch (modalConfig.action) {
+        case 'approve':
+          await adminApi.approveListing(modalConfig.listingId)
+          toast.success('Listing Approved', {
+            description: 'Property is now visible to students',
+          })
+          setListings((prev) =>
+            prev.map((l) =>
+              l._id === modalConfig.listingId ? { ...l, status: 'approved' } : l,
+            ),
+          )
+          setStats((prev) => ({
+            ...prev,
+            pending: Math.max(0, prev.pending - 1),
+            approved: prev.approved + 1,
+          }))
+          break
+
+        case 'reject':
+          await adminApi.rejectListing(
+            modalConfig.listingId,
+            inputValue || 'No reason provided',
+          )
+          toast.warning('Listing Rejected', {
+            description: 'Owner has been notified',
+          })
+          setListings((prev) =>
+            prev.map((l) =>
+              l._id === modalConfig.listingId ? { ...l, status: 'rejected' } : l,
+            ),
+          )
+          setStats((prev) => ({
+            ...prev,
+            pending: Math.max(0, prev.pending - 1),
+            rejected: prev.rejected + 1,
+          }))
+          break
+
+        case 'delete':
+          await adminApi.deleteListing(modalConfig.listingId)
+          toast.success('Listing Deleted', {
+            description: 'Listing has been permanently removed',
+          })
+          setListings((prev) =>
+            prev.filter((l) => l._id !== modalConfig.listingId),
+          )
+          setStats((prev) => ({
+            ...prev,
+            total: prev.total - 1,
+          }))
+          break
+
+        case 'unlist':
+          await adminApi.unlistListing(modalConfig.listingId)
+          toast.success('Listing Unlisted', {
+            description: 'Listing is now hidden from students',
+          })
+          setListings((prev) =>
+            prev.map((l) =>
+              l._id === modalConfig.listingId
+                ? { ...l, isAvailable: false, status: 'rejected' }
+                : l,
+            ),
+          )
+          break
+
+        case 'relist':
+          await adminApi.relistListing(modalConfig.listingId)
+          toast.success('Listing Re-listed', {
+            description: 'Listing is now visible to students again',
+          })
+          setListings((prev) =>
+            prev.map((l) =>
+              l._id === modalConfig.listingId
+                ? { ...l, isAvailable: true, status: 'approved' }
+                : l,
+            ),
+          )
+          break
+
+        default:
+          break
       }
 
       setModalConfig((prev) => ({ ...prev, isOpen: false }))
@@ -338,6 +428,9 @@ export default function AdminListingsPage() {
                 listing={listing}
                 handleApproveClick={handleApproveClick}
                 handleRejectClick={handleRejectClick}
+                handleDeleteClick={handleDeleteClick}
+                handleUnlistClick={handleUnlistClick}
+                handleRelistClick={handleRelistClick}
                 actionLoading={actionLoading}
               />
             ))}

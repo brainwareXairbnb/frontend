@@ -7,6 +7,7 @@ import BottomNav from '@/components/BottomNav'
 import { LayoutContainer } from '@/components/LayoutContainer'
 import { Toaster } from 'sonner'
 import ScrollToTop from '@/components/ScrollToTop'
+import { ViewingAsIndicator } from '@/components/ViewingAsIndicator'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -43,14 +44,33 @@ export default function RootLayout({
           href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200'
         />
       </head>
-      <body className='min-h-full flex flex-col'>
+
+      <body className='min-h-screen bg-slate-50 text-slate-900'>
         <AuthProvider>
           <ScrollToTop />
-          <div className='hidden md:block fixed top-0 w-full z-50'>
-            <Navbar />
+
+          {/* Fixed Top Navigation Stack */}
+          <div className='sticky top-0 z-50 flex flex-col bg-white'>
+            <ViewingAsIndicator />
+            <div className='hidden md:block'>
+              <Navbar />
+            </div>
           </div>
-          <LayoutContainer>{children}</LayoutContainer>
-          <BottomNav />
+
+          {/* App Shell */}
+          <div className='flex min-h-screen flex-col'>
+            {/* Main Content */}
+            <main className='flex-1 pb-20 md:pb-0'>
+              <LayoutContainer>{children}</LayoutContainer>
+            </main>
+
+            {/* Mobile Bottom Navigation */}
+            <div className='md:hidden'>
+              <BottomNav />
+            </div>
+          </div>
+
+          {/* Notifications */}
           <Toaster position='bottom-center' richColors />
         </AuthProvider>
       </body>

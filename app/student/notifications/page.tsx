@@ -56,7 +56,7 @@ export default function StudentNotificationsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <main className="px-5 md:px-10 pb-32 pt-6 max-w-2xl mx-auto">
+      <div className="px-5 md:px-10 pb-32 pt-2 max-w-2xl mx-auto">
         {!user ? (
           <AuthPrompt
             title="Log in to see notifications"
@@ -98,7 +98,7 @@ export default function StudentNotificationsPage() {
             </p>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

@@ -58,6 +58,15 @@ async function apiFetch<T>(
       }
     }
 
+    // Handle 403 Forbidden (role mismatch) - don't redirect, let components handle it
+    if (response.status === 403) {
+      const apiError: any = new Error(error.error || 'Access forbidden')
+      apiError.response = { data: error, status: response.status }
+      apiError.status = 403
+      apiError.isForbidden = true
+      throw apiError
+    }
+
     // Throw error with response data so it can be accessed in catch blocks
     const apiError: any = new Error(error.error || `HTTP ${response.status}`)
     apiError.response = { data: error, status: response.status }
@@ -319,7 +328,7 @@ export const roomsApi = {
    */
   updateListing: async (id: string, data: any, token?: string) => {
     return apiFetch(`/owner/listings/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(data),
       token,
     })
@@ -543,14 +552,14 @@ export const userApi = {
    * Get saved rooms (student)
    */
   getSavedRooms: async (token?: string) => {
-    return apiFetch('/users/bookmarks', { token })
+    return apiFetch('/student/bookmarks', { token })
   },
 
   /**
    * Add room to saved (student)
    */
   saveRoom: async (listingId: string, token?: string) => {
-    return apiFetch(`/users/bookmarks/${listingId}`, {
+    return apiFetch(`/student/bookmarks/${listingId}`, {
       method: 'POST',
       token,
     })
@@ -560,7 +569,7 @@ export const userApi = {
    * Remove room from saved (student)
    */
   unsaveRoom: async (listingId: string, token?: string) => {
-    return apiFetch(`/users/bookmarks/${listingId}`, {
+    return apiFetch(`/student/bookmarks/${listingId}`, {
       method: 'DELETE',
       token,
     })
@@ -662,6 +671,36 @@ export const adminApi = {
     return apiFetch(`/admin/listings/${listingId}/reject`, {
       method: 'PATCH',
       body: JSON.stringify({ reason }),
+      token,
+    })
+  },
+
+  /**
+   * Delete listing (admin)
+   */
+  deleteListing: async (listingId: string, token?: string) => {
+    return apiFetch(`/admin/listings/${listingId}`, {
+      method: 'DELETE',
+      token,
+    })
+  },
+
+  /**
+   * Unlist listing (mark as unavailable)
+   */
+  unlistListing: async (listingId: string, token?: string) => {
+    return apiFetch(`/admin/listings/${listingId}/unlist`, {
+      method: 'PATCH',
+      token,
+    })
+  },
+
+  /**
+   * Re-list listing (mark as available)
+   */
+  relistListing: async (listingId: string, token?: string) => {
+    return apiFetch(`/admin/listings/${listingId}/relist`, {
+      method: 'PATCH',
       token,
     })
   },

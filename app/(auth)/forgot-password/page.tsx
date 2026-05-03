@@ -57,17 +57,17 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className='space-y-2 mb-8'>
-            <h2 className='text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600 mb-2'>
+            <h2 className='text-[10px] font-black tracking-[0.4em] text-emerald-600 mb-2'>
               Check your email
             </h2>
-            <h1 className='text-3xl font-headline font-black text-on-surface tracking-tighter uppercase leading-none'>
+            <h1 className='text-3xl font-headline font-black text-on-surface tracking-tighter leading-none'>
               Reset link <br />
               <span className='text-primary/40'>sent</span>
             </h1>
           </div>
 
-          <p className='text-[11px] font-medium text-on-surface-variant leading-relaxed opacity-60 mb-12 max-w-[280px] mx-auto uppercase tracking-widest'>
-            We’ve sent a password reset link to your email.
+          <p className='text-[11px] font-medium text-on-surface-variant leading-relaxed opacity-60 mb-12 max-w-[280px] mx-auto tracking-widest'>
+            We&apos;ve sent a password reset link to your email.
             <span className='text-on-surface opacity-100 font-bold'>
               {email}
             </span>
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
 
             <Link
               href='/login'
-              className='inline-flex items-center gap-2 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] hover:text-primary transition-all group'
+              className='inline-flex items-center gap-2 text-[10px] font-black text-on-surface-variant tracking-[0.3em] hover:text-primary transition-all group'
             >
               <ArrowLeft className='w-3 h-3 group-hover:-translate-x-1 transition-transform' />
               Return to Login
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
         <div className='relative z-20 mt-auto p-20 max-w-2xl animate-in slide-in-from-left duration-1000'>
           <div className='mb-8 flex items-center gap-4'>
             <div className='h-0.5 w-16 bg-primary'></div>
-            <span className='font-headline font-black uppercase tracking-[0.3em] text-surface text-[10px] opacity-60'>
+            <span className='font-headline font-black tracking-[0.3em] text-surface text-[10px] opacity-60'>
               Identity Recovery
             </span>
           </div>
@@ -123,7 +123,7 @@ export default function ForgotPasswordPage() {
             Secure Key <br />
             <span className='text-primary'>Restoration.</span>
           </h1>
-          <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
+          <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md tracking-widest text-[12px]'>
             We'll transmit a secure encrypted link to recalibrate your account
             credentials and restore access.
           </p>
@@ -139,16 +139,16 @@ export default function ForgotPasswordPage() {
               <ShieldAlert className='w-4 h-4' />
             </div>
             <div className='h-[1px] flex-1 bg-outline-variant/10'></div>
-            <h2 className='text-[9px] font-black uppercase tracking-[0.4em] text-red-500'>
+            <h2 className='text-[9px] font-black tracking-[0.4em] text-red-500'>
               Reset your password
             </h2>
           </div>
 
-          <h2 className='text-5xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase leading-[0.9]'>
+          <h2 className='text-5xl font-headline font-black text-on-surface tracking-tighter mb-4 leading-[0.9]'>
             Forgot your <br />
             <span className='text-primary'>password?</span>
           </h2>
-          <p className='text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant opacity-40 ml-1 leading-relaxed'>
+          <p className='text-[10px] font-black tracking-[0.3em] text-on-surface-variant opacity-40 ml-1 leading-relaxed'>
             Enter your email address and we’ll send you a link to reset your
             password.
           </p>
@@ -158,7 +158,7 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className='space-y-6 md:space-y-10'>
             <div className='space-y-4'>
               <div className='flex justify-between items-center px-1'>
-                <label className='text-[9px] font-black uppercase tracking-[0.3em] text-on-surface-variant opacity-40'>
+                <label className='text-[9px] font-black tracking-[0.3em] text-on-surface-variant opacity-40'>
                   Email Address
                 </label>
                 <div className='w-1.5 h-1.5 rounded-full bg-primary/20'></div>
@@ -166,7 +166,7 @@ export default function ForgotPasswordPage() {
               <div className='relative group/input'>
                 <Mail className='absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/20 group-focus-within/input:text-primary transition-all duration-300' />
                 <input
-                  className='w-full h-14 bg-[#FAFAFA] border-2 border-outline-variant/10 rounded pl-16 pr-6 text-sm font-black text-on-surface focus:border-primary focus:bg-white focus:shadow-xl focus:shadow-primary/5 outline-none transition-all duration-300 placeholder:opacity-30 uppercase tracking-widest'
+                  className='w-full h-14 bg-[#FAFAFA] border-2 border-outline-variant/10 rounded pl-16 pr-6 text-sm font-black text-on-surface focus:border-primary focus:bg-white focus:shadow-xl focus:shadow-primary/5 outline-none transition-all duration-300 placeholder:opacity-30 tracking-widest'
                   id='email'
                   type='email'
                   placeholder='Enter your email'
@@ -193,7 +193,7 @@ export default function ForgotPasswordPage() {
           <div className='text-center mt-12'>
             <Link
               href='/login'
-              className='text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
+              className='text-[10px] font-black text-on-surface-variant tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
             >
               <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
               Return to Login

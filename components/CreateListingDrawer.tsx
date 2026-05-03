@@ -25,6 +25,7 @@ import {
   ToggleLeft,
   ToggleRight,
   Power,
+  AlertTriangle,
 } from 'lucide-react'
 import { roomsApi } from '@/lib/api'
 import { toast } from 'sonner'
@@ -163,7 +164,7 @@ export default function CreateListingDrawer({
       if (editingListing) {
         // Update existing listing
         await roomsApi.updateListing(editingListing._id, listingData)
-        toast.success('Listing saved as draft!')
+        toast.success('Listing updated successfully!')
       } else {
         // Create new listing as draft
         await roomsApi.createListing(listingData)
@@ -337,6 +338,27 @@ export default function CreateListingDrawer({
         {/* Scrollable Form Content */}
         <div className='flex-1 overflow-y-auto px-6 py-6'>
           <form className='space-y-8'>
+            {/* Rejection / Changes Required Reason Alert */}
+            {editingListing?.status === 'rejected' &&
+              editingListing?.rejectionReason && (
+                <div className='bg-red-50 border border-red-200 rounded p-4 mb-8 animate-in fade-in slide-in-from-top-2'>
+                  <div className='flex items-center gap-3 mb-2'>
+                    <AlertTriangle className='w-5 h-5 text-red-600' />
+                    <h4 className='font-bold text-red-900 text-sm'>
+                      {editingListing.status === 'rejected'
+                        ? 'Listing Rejected'
+                        : 'Changes Required'}
+                    </h4>
+                  </div>
+                  <p className='text-sm text-red-800 leading-relaxed bg-white/50 p-3 rounded border border-red-100 italic'>
+                    &quot;{editingListing.rejectionReason}&quot;
+                  </p>
+                  <p className='text-[11px] text-red-600 mt-2 font-medium tracking-wider'>
+                    Please address the issues mentioned above and update to resubmit for approval.
+                  </p>
+                </div>
+              )}
+
             {/* Basic Information */}
             <section className='space-y-4'>
               <div className='flex items-center gap-3 mb-4'>
@@ -903,78 +925,105 @@ export default function CreateListingDrawer({
         </div>
 
         {/* Footer Actions */}
-        <DrawerFooter className='border-t border-outline-variant/10 px-4 py-3 shrink-0 bg-white'>
-          {viewMode ? null : editingListing ? (
-            // Edit Mode - Update Button
-            <div className='flex flex-col md:flex-row gap-2 w-full'>
-              <Button
-                type='button'
-                size='sm'
-                rounded='md'
-                onClick={handleSaveAsDraft}
-                disabled={loading}
-                className='w-full md:flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className='w-3.5 h-3.5 mr-1.5' />
-                    Update
-                  </>
-                )}
-              </Button>
-            </div>
-          ) : (
-            // Create Mode - Save Draft, Submit Buttons
-            <div className='flex flex-col md:flex-row gap-2 w-full'>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                rounded='md'
-                onClick={handleSaveAsDraft}
-                disabled={loading}
-                className='w-full md:flex-1 h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className='w-3.5 h-3.5 mr-1.5' />
-                    Save Draft
-                  </>
-                )}
-              </Button>
-              <Button
-                type='button'
-                size='sm'
-                rounded='md'
-                onClick={handleSubmitForApproval}
-                disabled={loading}
-                className='w-full md:flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <ImagePlus className='w-3.5 h-3.5 mr-1.5' />
-                    Submit
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </DrawerFooter>
+        {!viewMode && (
+          <DrawerFooter className='border-t border-outline-variant/10 px-4 py-3 shrink-0 bg-white'>
+            {editingListing ? (
+              // Edit Mode - Update and/or Submit Buttons
+              <div className='flex flex-col md:flex-row gap-2 w-full'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  rounded='md'
+                  onClick={handleSaveAsDraft}
+                  disabled={loading}
+                  className='w-full md:flex-1 h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className='w-3.5 h-3.5 mr-1.5' />
+                      Save
+                    </>
+                  )}
+                </Button>
+                {(editingListing.status === 'draft' ||
+                  editingListing.status === 'rejected') && (
+                    <Button
+                      type='button'
+                      size='sm'
+                      rounded='md'
+                      onClick={handleSubmitForApproval}
+                      disabled={loading}
+                      className='w-full md:flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <ImagePlus className='w-3.5 h-3.5 mr-1.5' />
+                          Re-Submit
+                        </>
+                      )}
+                    </Button>
+                  )}
+              </div>
+            ) : (
+              // Create Mode - Save Draft, Submit Buttons
+              <div className='flex flex-col md:flex-row gap-2 w-full'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  rounded='md'
+                  onClick={handleSaveAsDraft}
+                  disabled={loading}
+                  className='w-full md:flex-1 h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className='w-3.5 h-3.5 mr-1.5' />
+                      Save Draft
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type='button'
+                  size='sm'
+                  rounded='md'
+                  onClick={handleSubmitForApproval}
+                  disabled={loading}
+                  className='w-full md:flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className='w-3.5 h-3.5 mr-1.5' />
+                      Submit
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </DrawerFooter>
+        )}
+
       </DrawerContent>
     </Drawer>
   )

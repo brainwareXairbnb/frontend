@@ -1,9 +1,46 @@
-/**
- * Central Type Definitions for Brainware Rooms
- * All interfaces and types are organized here for better maintainability
- */
-
-import { Room } from '@/data/rooms'
+// Room type — decoupled from static data, represents both API and legacy shapes
+export interface Room {
+  id: string | number
+  title: string
+  location: string
+  area?: string
+  distanceToCampus?: string
+  transportMode?: 'walk' | 'bus'
+  price: number
+  type?: string
+  gender?: string
+  genderPref?: string
+  verified?: boolean
+  rating: number
+  reviewCount: number
+  badge?: string
+  amenities: string[]
+  description?: string
+  images: string[]
+  photos?: string[]
+  isBookmarked?: boolean
+  createdAt?: string | Date
+  owner: {
+    _id?: string
+    name: string
+    rating?: number
+    responseTime?: string
+    profilePicUrl?: string
+    phone?: string
+    email?: string
+  }
+  deposit?: number
+  rent?: number
+  adminFee?: number
+  features?: { icon: string; label: string }[]
+  reviews?: {
+    author: string
+    initials: string
+    institution: string
+    date: string
+    content: string
+  }[]
+}
 
 // ============================================================================
 // Domain Models
@@ -128,13 +165,13 @@ export interface Listing {
 
 export type ListingStatus =
   | 'draft'
+  | 'submitted'
   | 'under_review'
   | 'approved'
   | 'rejected'
+  | 'changes_required'
   | 'inactive'
 
-// Re-export Room from data/rooms.ts to maintain compatibility
-export type { Room } from '@/data/rooms'
 
 // ============================================================================
 // Component Props
@@ -160,7 +197,7 @@ export interface ConfirmationModalProps {
 }
 
 export interface RoomCardProps {
-  room: Room
+  room: Room | any
   imageIndex?: number
   subtitle?: React.ReactNode
   dateStr?: React.ReactNode

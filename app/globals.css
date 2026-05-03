@@ -7,8 +7,8 @@
 
 :root {
   /* === PRIMARY COLORS === */
-  --primary: #b6212f;
-  --primary-container: #ff5a5f;
+  --primary: #FF385C;
+  --primary-container: #FF5A5F;
   --on-primary: #ffffff;
 
   /* === TERTIARY (Success/Available States) === */
@@ -60,7 +60,7 @@
   --glass-blur: 20px;
 
   /* === GRADIENT === */
-  --gradient-primary: linear-gradient(135deg, #b6212f 0%, #ff5a5f 100%);
+  --gradient-primary: linear-gradient(135deg, #FF385C 0%, #FF5A5F 100%);
 }
 
 @theme inline {
@@ -73,9 +73,9 @@
   --color-popover-foreground: #1a1c1c;
 
   /* Primary Brand */
-  --color-primary: #b6212f;
+  --color-primary: #FF385C;
   --color-primary-foreground: #ffffff;
-  --color-primary-container: #ff5a5f;
+  --color-primary-container: #FF5A5F;
 
   /* Secondary Brand */
   --color-secondary: #5e5e5e;
@@ -92,7 +92,7 @@
   --color-muted-foreground: #5a403f;
 
   /* Accent */
-  --color-accent: #006c4c;
+  --color-accent: #FF385C;
   --color-accent-foreground: #ffffff;
 
   /* Destructive/Error */
@@ -102,11 +102,11 @@
   --color-error-container: #ffdad6;
 
   /* Border */
-  --color-border: #e2bebc;
-  --color-input: #e2bebc;
-  --color-ring: #b6212f;
-  --color-outline: #8e706f;
-  --color-outline-variant: #e2bebc;
+  --color-border: #FF385C;
+  --color-input: #FF385C;
+  --color-ring: #FF385C;
+  --color-outline: #FF385C;
+  --color-outline-variant: #f3f3f3;
 
   /* Stitch Design System - Surface Colors */
   --color-surface: #f9f9f9;
@@ -171,6 +171,34 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
+/* Hide number input spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* minimal rdp color overrides */
+.rdp-day_selected {
+  background-color: #FF385C !important;
+  color: white !important;
+}
+
+.rdp-day_today {
+  color: #FF385C !important;
+  font-weight: 900 !important;
+  text-decoration: underline !important;
+}
+
+::selection {
+  background-color: #FF385C;
+  color: white;
+}
+
 /* === HORIZON ETHOS CUSTOM STYLES === */
 
 /* Display Typography - Manrope */
@@ -192,7 +220,7 @@ body {
 
 /* Gradient Button/CTA */
 .gradient-primary {
-  background: linear-gradient(135deg, #b6212f 0%, #ff5a5f 100%);
+  background: linear-gradient(135deg, #FF385C 0%, #FF5A5F 100%);
 }
 
 /* No-Line Rule - Use background shifts instead of borders */
@@ -214,7 +242,7 @@ body {
 
 /* Premium Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, #b6212f 0%, #ff5a5f 100%);
+  background: linear-gradient(135deg, #FF385C 0%, #FF5A5F 100%);
   color: #ffffff;
   border-radius: 9999px;
   padding: 0.75rem 1.5rem;
@@ -326,8 +354,8 @@ body {
 
 /* Focus Styles */
 *:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--surface-level-0), 0 0 0 4px var(--primary);
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Auth Specific Animations */
@@ -338,4 +366,13 @@ body {
 
 .animate-bounce-subtle {
   animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }

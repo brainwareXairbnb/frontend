@@ -184,7 +184,9 @@ export default function OwnerListingsPage() {
                               ? 'Approved'
                               : filterStatus === 'rejected'
                                 ? 'Rejected'
-                                : 'All Status'}
+                                : filterStatus === 'changes_required'
+                                  ? 'Changes Req'
+                                  : 'All Status'}
                     </span>
                     <span className='sm:hidden'>
                       {filterStatus === 'all'
@@ -197,7 +199,9 @@ export default function OwnerListingsPage() {
                               ? 'Approved'
                               : filterStatus === 'rejected'
                                 ? 'Rejected'
-                                : 'All'}
+                                : filterStatus === 'changes_required'
+                                  ? 'Changes'
+                                  : 'All'}
                     </span>
                     <ChevronDown className='w-3 h-3' />
                   </button>
@@ -248,6 +252,15 @@ export default function OwnerListingsPage() {
                   >
                     <span className='text-sm font-bold'>Rejected</span>
                     {filterStatus === 'rejected' && (
+                      <Check className='w-4 h-4 text-primary' />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setFilterStatus('changes_required')}
+                    className='cursor-pointer px-3 py-2.5 rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-between'
+                  >
+                    <span className='text-sm font-bold'>Changes Required</span>
+                    {filterStatus === 'changes_required' && (
                       <Check className='w-4 h-4 text-primary' />
                     )}
                   </DropdownMenuItem>

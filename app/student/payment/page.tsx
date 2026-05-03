@@ -1,8 +1,9 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { fmt, ROOMS } from "@/lib/data";
+import { toast } from "sonner";
 import {
   ChevronLeft,
   Calendar,
@@ -25,9 +26,28 @@ function PaymentContent() {
   const [months, setMonths] = useState(3);
   const [moveIn, setMoveIn] = useState("");
   const [step, setStep] = useState(1);
+  const [roleWarning, setRoleWarning] = useState(false);
+
+  // Check if user is a student
+  useEffect(() => {
+    if (user && user.role !== 'student') {
+      setRoleWarning(true);
+    }
+  }, [user]);
   const gross = r.rent * months;
   const sc = Math.round(gross * 0.05);
   const total = gross + r.deposit + sc;
+
+  const handleBooking = () => {
+    // Prevent non-students from booking
+    if (user?.role !== 'student') {
+      toast.error('Booking Failed', {
+        description: 'Only student accounts can make bookings.',
+      });
+      return;
+    }
+    setStep(2);
+  };
 
   if (loading) {
     return (
@@ -81,8 +101,21 @@ function PaymentContent() {
       </div>
 
       <div className="w-full flex flex-col md:flex-row gap-4">
-        <button onClick={() => router.push("/student/bookings")} className="w-full h-14 bg-[#222222] text-white rounded-lg font-bold text-[15px] transition-all">
-          View your stays
+        <button
+          onClick={() => {
+            if (user?.role === 'student') {
+              router.push("/student/bookings");
+            } else if (user?.role === 'owner') {
+              router.push("/owner/listings");
+            } else if (user?.role === 'admin') {
+              router.push("/admin");
+            } else {
+              router.push("/");
+            }
+          }}
+          className="w-full h-14 bg-[#222222] text-white rounded-lg font-bold text-[15px] transition-all"
+        >
+          {user?.role === 'student' ? 'View your stays' : 'Go to Dashboard'}
         </button>
         <button onClick={() => router.push("/")} className="w-full h-14 bg-white border border-outline-variant/30 rounded-lg font-bold text-[15px] text-on-surface">
           Back to home
@@ -138,8 +171,18 @@ function PaymentContent() {
               </div>
             </section>
 
+            {roleWarning && (
+              <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-blue-900 mb-1">Viewing as {user?.role}</p>
+                  <p className="text-blue-700">Only student accounts can complete bookings. This is a preview of the booking flow.</p>
+                </div>
+              </div>
+            )}
+
             <button
-              onClick={() => setStep(2)}
+              onClick={handleBooking}
               className="hidden md:block w-full py-4 bg-[#FF385C] text-white rounded-xl font-bold text-lg shadow-lg hover:brightness-95 transition-all mt-6"
             >
               Confirm and pay
@@ -190,7 +233,7 @@ function PaymentContent() {
           <span className="text-[11px] underline">Aug 1</span>
         </div>
         <button
-          onClick={() => setStep(2)}
+          onClick={handleBooking}
           className="h-12 px-10 bg-[#FF385C] text-white rounded-lg font-bold text-sm tracking-wide shadow-lg active:scale-95 transition-all"
         >
           Confirm

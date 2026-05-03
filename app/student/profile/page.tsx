@@ -13,6 +13,7 @@ import {
   PlusCircle,
   Building2,
   FileSearch,
+  Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -33,17 +34,22 @@ export default function StudentProfilePage() {
   }
 
   const sections = [
-    // {
-    //   title: 'Account settings',
-    //   items: [
-    //     { l: 'Personal information', i: User },
-    //     { l: 'Payments and payouts', i: Shield },
-    //   ],
-    // },
     {
-      title: 'Hosting',
-      items: [{ l: 'Become a Owner', i: PlusCircle, path: '/host/homes' }],
+      title: 'Account settings',
+      items: [
+        { l: 'Personal information', i: User, path: '/student/profile/personal-info' },
+        { l: 'Change Password', i: Lock, path: '/student/profile/security' },
+      ],
     },
+    // Only show "Become a Owner" if user is not already an admin or owner
+    ...(user && user.role !== 'admin' && user.role !== 'owner'
+      ? [
+          {
+            title: 'Hosting',
+            items: [{ l: 'Become a Owner', i: PlusCircle, path: '/host/homes' }],
+          },
+        ]
+      : []),
     // {
     //   title: 'Support',
     //   items: [
@@ -103,7 +109,7 @@ export default function StudentProfilePage() {
         )}
       </header>
 
-      <main className='px-8 md:px-10 pb-32'>
+      <div className='px-8 md:px-10 pb-32 pt-2'>
         <div className='space-y-10 max-w-2xl'>
           {/* If not logged in, show simplified list matching the screenshot */}
           {/* <div className='space-y-8'>
@@ -170,7 +176,7 @@ export default function StudentProfilePage() {
             Version 0.0.1
           </p>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

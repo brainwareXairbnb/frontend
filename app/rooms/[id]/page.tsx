@@ -1,10 +1,8 @@
 import RoomDetailClient from "./RoomDetailClient";
-import { rooms as staticRooms } from "@/data/rooms";
 
 export async function generateStaticParams() {
-  return staticRooms.map((room: any) => ({
-    id: room.id.toString(),
-  }));
+  // Return a placeholder for build - actual rooms are loaded dynamically
+  return [{ id: 'placeholder' }];
 }
 
 export default function RoomDetailPage() {

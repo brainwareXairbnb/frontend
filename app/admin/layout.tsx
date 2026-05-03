@@ -26,6 +26,7 @@ import {
   X,
   UserCircle,
   Building2,
+  Eye,
 } from 'lucide-react'
 import { AdminLayoutProps } from '@/lib/types'
 
@@ -105,7 +106,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         // silently fail
       }
     }
-    
+
     fetchUnreadCount()
     const interval = setInterval(fetchUnreadCount, 30000)
     return () => clearInterval(interval)
@@ -158,7 +159,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <NotificationBell />
               <Link
                 href='/admin/profile'
-                className='w-10 h-10 rounded-full overflow-hidden bg-primary'
+                className='w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden bg-primary'
               >
                 <img
                   alt='Admin User'
@@ -210,6 +211,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </Link>
                 )
               })}
+
+              {/* Divider */}
+              <div className='h-px bg-outline-variant/20 my-3 mx-3' />
+
+              {/* View as Student */}
+              <Link
+                href='/'
+                className='flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+              >
+                <Eye className='w-5 h-5' />
+                <span>View as Student</span>
+              </Link>
             </nav>
 
             {/* Admin Profile - Fixed at bottom */}
@@ -317,17 +330,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               </div>
               <span className='text-[10px] font-bold'>Notifications</span>
             </Link>
-            <Link
-              href='/admin/profile'
+            <div
+              onClick={() => setIsDrawerOpen(true)}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/profile')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
               }`}
             >
-              <UserCircle className='w-6 h-6' />
-              <span className='text-[10px] font-bold'>Profile</span>
-            </Link>
+              <Menu className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>More</span>
+            </div>
           </div>
         </div>
 
@@ -382,30 +395,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </Link>
                   )
                 })}
+
+                {/* View as Student */}
+                <Link
+                  href='/'
+                  onClick={() => setIsDrawerOpen(false)}
+                  className='flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+                >
+                  <Eye className='w-6 h-6' />
+                  <span className='text-sm'>View as Student</span>
+                </Link>
               </nav>
 
               <div className='px-3 pb-6 pt-2 border-t border-outline-variant/10'>
-                <div className='flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-3 mt-3'>
-                  <div className='w-12 h-12 rounded-full overflow-hidden bg-primary shrink-0'>
-                    <img
-                      alt='Admin User'
-                      className='w-full h-full object-cover'
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
-                    />
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <p className='text-sm font-bold text-on-surface truncate'>
-                      {user?.name || 'Admin User'}
-                    </p>
-                    <p className='text-xs text-on-surface-variant'>
-                      {user?.email || 'admin@brainwarerooms.com'}
-                    </p>
-                    <p className='text-[10px] text-on-surface-variant mt-0.5'>
-                      System Administrator
-                    </p>
-                  </div>
-                </div>
-
                 <div className='space-y-2'>
                   <Link
                     href='/admin/profile'

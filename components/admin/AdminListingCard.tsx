@@ -14,6 +14,10 @@ import {
   Loader2,
   AlertCircle,
   Home,
+  Trash2,
+  EyeOff,
+  RefreshCw,
+  MoreVertical,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Listing } from '@/lib/types'
@@ -22,6 +26,9 @@ interface AdminListingCardProps {
   listing: Listing
   handleApproveClick: (id: string, title: string) => void
   handleRejectClick: (id: string, title: string) => void
+  handleDeleteClick?: (id: string, title: string) => void
+  handleUnlistClick?: (id: string, title: string) => void
+  handleRelistClick?: (id: string, title: string) => void
   actionLoading: string | null
 }
 
@@ -29,6 +36,9 @@ export function AdminListingCard({
   listing,
   handleApproveClick,
   handleRejectClick,
+  handleDeleteClick,
+  handleUnlistClick,
+  handleRelistClick,
   actionLoading,
 }: AdminListingCardProps) {
   const router = useRouter()
@@ -157,9 +167,9 @@ export function AdminListingCard({
         </div>
 
         {/* Actions */}
-        <div className='flex gap-2 pt-2'>
+        <div className='flex flex-col gap-2 pt-2'>
           {listing.status === 'under_review' ? (
-            <>
+            <div className='flex gap-2'>
               <Button
                 size='sm'
                 className='flex-1 bg-green-600 hover:bg-green-700'
@@ -186,7 +196,7 @@ export function AdminListingCard({
                 <X className='w-4 h-4 mr-1' />
                 Reject
               </Button>
-            </>
+            </div>
           ) : (
             <Button
               size='sm'
@@ -198,6 +208,48 @@ export function AdminListingCard({
               View Details
             </Button>
           )}
+
+          {/* Additional Admin Actions */}
+          <div className='flex gap-2'>
+            {listing.isAvailable === false && handleRelistClick && (
+              <Button
+                size='sm'
+                variant='outline'
+                className='flex-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
+                onClick={() => handleRelistClick(listing._id, listing.title)}
+                disabled={actionLoading === listing._id}
+              >
+                <RefreshCw className='w-3.5 h-3.5 mr-1' />
+                Re-list
+              </Button>
+            )}
+
+            {listing.isAvailable !== false && handleUnlistClick && (
+              <Button
+                size='sm'
+                variant='outline'
+                className='flex-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                onClick={() => handleUnlistClick(listing._id, listing.title)}
+                disabled={actionLoading === listing._id}
+              >
+                <EyeOff className='w-3.5 h-3.5 mr-1' />
+                Unlist
+              </Button>
+            )}
+
+            {handleDeleteClick && (
+              <Button
+                size='sm'
+                variant='outline'
+                className='flex-1 text-red-600 hover:text-red-700 hover:bg-red-50'
+                onClick={() => handleDeleteClick(listing._id, listing.title)}
+                disabled={actionLoading === listing._id}
+              >
+                <Trash2 className='w-3.5 h-3.5 mr-1' />
+                Delete
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
