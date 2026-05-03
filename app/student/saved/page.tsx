@@ -79,7 +79,7 @@ export default function StudentSavedPage() {
   }
 
   return (
-    <div className='bg-white min-h-screen'>
+    <div className='bg-white min-h-full'>
       <div className='px-8 md:px-10 pb-32 pt-2'>
         {!user ? (
           <AuthPrompt

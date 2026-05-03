@@ -45,7 +45,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className='min-h-screen bg-slate-50 text-slate-900'>
+      <body className='min-h-screen bg-slate-50 text-slate-900 flex flex-col'>
         <AuthProvider>
           <ScrollToTop />
 
@@ -58,7 +58,7 @@ export default function RootLayout({
           </div>
 
           {/* App Shell */}
-          <div className='flex min-h-screen flex-col'>
+          <div className='flex flex-1 flex-col'>
             {/* Main Content */}
             <main className='flex-1 pb-20 md:pb-0'>
               <LayoutContainer>{children}</LayoutContainer>

@@ -94,7 +94,7 @@ export function AdminListingCard({
       {/* Image */}
       <div
         className='relative aspect-[4/3] overflow-hidden cursor-pointer'
-        onClick={() => router.push(`/admin/listings/view?id=${listing._id}`)}
+        onClick={() => router.push(`/admin/listings/details?id=${listing._id}`)}
       >
         {listing.photos && listing.photos.length > 0 ? (
           <img
@@ -132,7 +132,7 @@ export function AdminListingCard({
         {/* Title */}
         <h3
           className='font-semibold text-sm line-clamp-1 cursor-pointer hover:text-primary transition-colors'
-          onClick={() => router.push(`/admin/listings/view?id=${listing._id}`)}
+          onClick={() => router.push(`/admin/listings/details?id=${listing._id}`)}
         >
           {listing.title}
         </h3>
@@ -202,7 +202,7 @@ export function AdminListingCard({
               size='sm'
               variant='outline'
               className='w-full'
-              onClick={() => router.push(`/admin/listings/view?id=${listing._id}`)}
+              onClick={() => router.push(`/admin/listings/details?id=${listing._id}`)}
             >
               <Eye className='w-4 h-4 mr-1' />
               View Details

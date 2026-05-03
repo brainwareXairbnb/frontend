@@ -94,7 +94,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-full bg-white'>
       <FeeBadge />
       {/* Desktop Search Bar (Centered) - Now integrated closer to Navbar */}
       <div className='hidden md:flex justify-center px-10 pb-2 pt-0 relative bg-white border-b border-outline-variant/10'>

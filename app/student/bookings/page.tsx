@@ -67,7 +67,7 @@ export default function StudentBookingsPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-full">
       {user && (
         <header className="p-8 pb-2 sticky top-0 bg-white z-40 border-b border-outline-variant/10 md:px-10">
           <h1 className="text-2xl font-bold mb-4 md:pt-4">Bookings</h1>
@@ -119,7 +119,7 @@ export default function StudentBookingsPage() {
               return (
                 <div
                   key={b._id}
-                  onClick={() => router.push(`/rooms/${listing?._id}`)}
+                  onClick={() => router.push(`/rooms/details?id=${listing?._id}`)}
                   className="flex flex-col gap-4 group cursor-pointer"
                 >
                   <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-sm">

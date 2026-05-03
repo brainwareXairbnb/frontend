@@ -21,21 +21,23 @@ export function RoomCard({
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
 
+  // Debug: Check if room.id exists
+  if (!room.id) {
+    console.error('RoomCard: Missing room.id', room)
+  }
+
   // Calculate if listing is new (created within last 7 days)
   const isNewListing = () => {
-    console.log(room)
     if (!room.createdAt) return false
     const createdDate = new Date(room.createdAt)
     const now = new Date()
     const daysDiff =
       (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
-    console.log({ daysDiff })
     return daysDiff <= 7
   }
 
   // Determine badge to show
   const getBadgeInfo = () => {
-    console.log('Arijit')
     if (isNewListing()) {
       return {
         text: 'New Listing',
@@ -99,8 +101,24 @@ export function RoomCard({
     }
   }
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('RoomCard clicked, id:', room.id);
+    if (!room.id) {
+      console.error('Cannot navigate: room.id is undefined');
+      toast.error('Cannot open room details - Invalid room ID');
+      return;
+    }
+    router.push(`/rooms/details?id=${room.id}`);
+  };
+
   return (
-    <Link href={`/rooms/${room.id}`} className='group cursor-pointer block'>
+    <div
+      role='button'
+      className='group cursor-pointer block'
+      onClick={handleCardClick}
+    >
       <div className='relative rounded overflow-hidden mb-2 sm:mb-3 aspect-[20/19]'>
         <img
           className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]'
@@ -118,15 +136,17 @@ export function RoomCard({
             </span>
           </div>
         )}
-        <button
-          className='absolute top-2 right-2 sm:top-3 sm:right-3 z-10 hover:scale-110 transition-transform bg-transparent outline-none p-1 pointer-events-auto'
+        <div
+          role='button'
+          aria-label={isSaved ? 'Remove from saved' : 'Save listing'}
+          className='absolute top-2 right-2 sm:top-3 sm:right-3 z-10 hover:scale-110 transition-transform bg-transparent outline-none p-1 pointer-events-auto cursor-pointer'
           onClick={handleToggleSave}
         >
           <Heart
             className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${isSaved ? 'fill-[#FF385C] stroke-[#FF385C]' : 'fill-black/50 stroke-white'}`}
             strokeWidth={2}
           />
-        </button>
+        </div>
       </div>
       <div className='flex justify-between items-start'>
         <div className='overflow-hidden pr-2'>
@@ -166,6 +186,6 @@ export function RoomCard({
           </span>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

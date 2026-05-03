@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   trailingSlash: false,
+  reactStrictMode: false,
+  // Ensure proper base path for Capacitor apps
+  assetPrefix: '',
 }
 
 export default nextConfig
