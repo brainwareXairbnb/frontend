@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { authApi } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import {
   CheckCircle2,
@@ -18,6 +19,7 @@ import Logo from '@/components/Logo'
 
 function VerifyEmailForm() {
   const router = useRouter()
+  const { verifyEmail } = useAuth()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
@@ -68,7 +70,7 @@ function VerifyEmailForm() {
     }
 
     try {
-      const response = await authApi.verifyEmail(email, otp)
+      const response = await verifyEmail(email, otp)
       toast.success('Identity Verified', {
         description: 'Node synchronized successfully',
       })

@@ -198,7 +198,7 @@ export function UserDetailModal({ userId, isOpen, onClose }: Props) {
                       <Separator />
 
                       <div>
-                        <div className='flex items-center justify-between mb-3'>
+                        <div className='flex items-center gap-2 mb-3'>
                           <h4 className='text-sm font-medium flex items-center gap-2'>
                             <CreditCard className='w-4 h-4' />
                             Bank Details
@@ -207,14 +207,13 @@ export function UserDetailModal({ userId, isOpen, onClose }: Props) {
                             </Badge>
                           </h4>
                           {!user.bankDetails.isVerified && (
-                            <Button
-                              size='sm'
+                            <button
                               onClick={handleVerifyBank}
-                              className='h-7 sm:h-8 px-3 text-[10px] sm:text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-all flex items-center gap-1.5 shadow-sm hover:shadow active:scale-95'
+                              className='h-7 sm:h-8 px-4 text-[10px] sm:text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-all flex items-center gap-1.5 shadow-sm hover:shadow active:scale-95'
                             >
                               <CheckCircle2 className='w-3 h-3 sm:w-3.5 sm:h-3.5' strokeWidth={2.5} />
                               Verify
-                            </Button>
+                            </button>
                           )}
                         </div>
 

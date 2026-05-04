@@ -291,6 +291,8 @@ export interface AuthContextType {
   logout: () => Promise<void>
   register: (role: 'student' | 'owner', data: any) => Promise<void>
   loginWithGoogle: (idToken: string) => Promise<User>
+  verifyEmail: (email: string, otp: string) => Promise<{ user: User; accessToken: string; message: string }>
+  verifyStudentEmail: (otp: string) => Promise<{ user: User; message: string }>
 }
 
 export interface FetchOptions extends RequestInit {

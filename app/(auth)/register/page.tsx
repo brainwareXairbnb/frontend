@@ -78,7 +78,8 @@ export default function RegisterPage() {
       toast.success("User created successfully. Please verify your email.")
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (err: any) {
-      toast.error('Failed to create user. Please try again.')
+      const errorMessage = err?.message || err?.response?.data?.error || 'Failed to create user. Please try again.'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

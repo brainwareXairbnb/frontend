@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { authApi } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import {
   GraduationCap,
@@ -19,6 +20,7 @@ import Logo from '@/components/Logo'
 
 function VerifyStudentEmailForm() {
   const router = useRouter()
+  const { verifyStudentEmail } = useAuth()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
@@ -59,7 +61,7 @@ function VerifyStudentEmailForm() {
     }
 
     try {
-      await authApi.verifyStudentEmail(otp)
+      await verifyStudentEmail(otp)
       toast.success('Scholar Identity Validated')
       setSuccess(true)
 

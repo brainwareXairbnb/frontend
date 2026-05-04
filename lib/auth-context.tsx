@@ -91,6 +91,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const verifyEmail = async (email: string, otp: string) => {
+    try {
+      const response = await authApi.verifyEmail(email, otp);
+      // Save token if returned
+      if (response.accessToken) {
+        localStorage.setItem('br_access_token', response.accessToken);
+        setUser(response.user);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const verifyStudentEmail = async (otp: string) => {
+    try {
+      const response = await authApi.verifyStudentEmail(otp);
+      // Update user state if returned
+      if (response.user) {
+        setUser(response.user);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -99,6 +126,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout,
     register,
     loginWithGoogle,
+    verifyEmail,
+    verifyStudentEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

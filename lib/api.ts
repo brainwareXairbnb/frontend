@@ -228,7 +228,7 @@ export const authApi = {
    * Verify email with OTP
    */
   verifyEmail: async (email: string, otp: string) => {
-    return apiFetch<{ user: any; accessToken: string; message: string }>(
+    return apiFetch<{ user: User; accessToken: string; message: string }>(
       '/auth/verify-email',
       {
         method: 'POST',
@@ -270,7 +270,9 @@ export const authApi = {
    * Verify student email with OTP
    */
   verifyStudentEmail: async (otp: string) => {
-    return apiFetch('/auth/verify-student-email', {
+    return apiFetch<{ user: User; message: string }>(
+      '/auth/verify-student-email',
+      {
       method: 'POST',
       body: JSON.stringify({ otp }),
     })
