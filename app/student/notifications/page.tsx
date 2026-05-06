@@ -8,6 +8,7 @@ import {
   Calendar
 } from "lucide-react";
 import { AuthPrompt } from "@/components/AuthPrompt";
+import NotificationSkeleton from "@/components/skeletons/NotificationSkeleton";
 
 export default function StudentNotificationsPage() {
   const router = useRouter();
@@ -48,8 +49,10 @@ export default function StudentNotificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#FF385C]/20 border-t-[#FF385C] rounded-full animate-spin"></div>
+      <div className="bg-white min-h-screen">
+        <div className="px-5 md:px-10 pb-32 pt-6 max-w-2xl mx-auto">
+          <NotificationSkeleton />
+        </div>
       </div>
     );
   }

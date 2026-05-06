@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   X,
   AlertCircle,
-  Loader2,
   Home,
   Users,
   IndianRupee,
@@ -22,6 +21,7 @@ import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { EmptyState } from '@/components/EmptyState'
 import { AdminListingCard } from '@/components/admin/AdminListingCard'
 import { Listing, ModalConfig, FilterStatus } from '@/lib/types'
+import AdminListingsSkeleton from '@/components/skeletons/AdminListingsSkeleton'
 
 export default function AdminListingsPage() {
   const [activeFilter, setActiveFilter] = useState('all')
@@ -170,7 +170,9 @@ export default function AdminListingsPage() {
           })
           setListings((prev) =>
             prev.map((l) =>
-              l._id === modalConfig.listingId ? { ...l, status: 'approved' } : l,
+              l._id === modalConfig.listingId
+                ? { ...l, status: 'approved' }
+                : l,
             ),
           )
           setStats((prev) => ({
@@ -190,7 +192,9 @@ export default function AdminListingsPage() {
           })
           setListings((prev) =>
             prev.map((l) =>
-              l._id === modalConfig.listingId ? { ...l, status: 'rejected' } : l,
+              l._id === modalConfig.listingId
+                ? { ...l, status: 'rejected' }
+                : l,
             ),
           )
           setStats((prev) => ({
@@ -257,8 +261,6 @@ export default function AdminListingsPage() {
     }
   }
 
-
-
   // Filter listings based on active filter and search query
   const filteredListings = listings.filter((listing) => {
     // Map 'pending' filter to 'under_review' status
@@ -276,6 +278,10 @@ export default function AdminListingsPage() {
 
     return matchesFilter && matchesSearch
   })
+
+  if (loading) {
+    return <AdminListingsSkeleton />
+  }
 
   return (
     <div className='px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 max-w-[1600px] mx-auto'>
@@ -330,19 +336,19 @@ export default function AdminListingsPage() {
         ].map((stat, index) => (
           <div
             key={index}
-            className={`bg-white p-4 sm:p-5 rounded-2xl border ${stat.border} shadow-sm hover:shadow-md transition-shadow`}
+            className='bg-white p-4 md:p-6 rounded-2xl border border-outline-variant/10 shadow-sm'
           >
-            <div className='flex items-center justify-between mb-3'>
-              <div className={`p-2.5 rounded-xl ${stat.bg}`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
-              </div>
+            <div className='flex items-center justify-between mb-2'>
+              <span className={`p-2 rounded-lg ${stat} ${stat.color}`}>
+                <stat.icon className='w-4 h-4 md:w-5 md:h-5' />
+              </span>
+              <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                {stat.label}
+              </p>
             </div>
-            <h3 className='text-2xl sm:text-3xl font-bold text-on-surface mb-1'>
+            <h3 className='text-xl md:text-2xl font-bold text-on-surface'>
               {stat.value}
             </h3>
-            <p className='text-xs font-bold uppercase tracking-wider text-on-surface-variant'>
-              {stat.label}
-            </p>
           </div>
         ))}
       </section>
@@ -401,14 +407,7 @@ export default function AdminListingsPage() {
         </div>
       </div>
 
-      {loading ? (
-        <div className='h-96 flex flex-col items-center justify-center gap-4'>
-          <Loader2 className='w-10 h-10 animate-spin text-primary' />
-          <p className='text-sm text-on-surface-variant font-medium'>
-            Loading listings...
-          </p>
-        </div>
-      ) : filteredListings.length === 0 ? (
+      {filteredListings.length === 0 ? (
         <EmptyState
           icon={Home}
           title='No Listings Found'

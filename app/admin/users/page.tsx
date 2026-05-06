@@ -13,13 +13,13 @@ import {
   CreditCard,
   MapPin,
   Fingerprint,
-  Loader2,
   AlertCircle,
   Calendar,
   Ban,
   Pause,
   Trash2,
   Landmark,
+  Loader2,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -28,6 +28,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { UserDetailModal } from '@/components/admin/UserDetailModal'
 import { User, UserProfile } from '@/lib/types'
+import AdminUsersSkeleton from '@/components/skeletons/AdminUsersSkeleton'
 
 export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState('all-personnel')
@@ -89,7 +90,7 @@ export default function AdminUsersPage() {
         console.error('Failed to fetch initial upgrade requests count', err)
       }
     }
-    
+
     if (activeTab !== 'upgrade-requests') {
       fetchInitialStats()
     }
@@ -235,10 +236,7 @@ export default function AdminUsersPage() {
         })
       } else if (modalConfig.action === 'activate') {
         // Activate user
-        await adminApi.updateUserStatus(
-          modalConfig.userId,
-          'active',
-        )
+        await adminApi.updateUserStatus(modalConfig.userId, 'active')
         toast.success('User Activated', {
           description: 'User account has been activated',
         })
@@ -377,491 +375,539 @@ export default function AdminUsersPage() {
         </p>
       </header>
 
-      {/* KPI Cards - Better Mobile Layout */}
-      <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8'>
-        {[
-          {
-            label: 'TOTAL',
-            value: stats.total,
-            icon: UserIcon,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
-          },
-          {
-            label: 'STUDENTS',
-            value: stats.students,
-            icon: UserIcon,
-            color: 'text-purple-600',
-            bg: 'bg-purple-50',
-          },
-          {
-            label: 'OWNERS',
-            value: stats.owners,
-            icon: Building2,
-            color: 'text-emerald-600',
-            bg: 'bg-emerald-50',
-          },
-          {
-            label: 'UPGRADES',
-            value: stats.pendingUpgrades,
-            icon: AlertCircle,
-            color: 'text-orange-600',
-            bg: 'bg-orange-50',
-          },
-        ].map((kpi, index) => (
-          <div
-            key={index}
-            className='bg-white p-4 md:p-6 rounded-2xl border border-outline-variant/10 shadow-sm'
-          >
-            <div className='flex items-center justify-between mb-2'>
-              <span className={`p-2 rounded-lg ${kpi.bg} ${kpi.color}`}>
-                <kpi.icon className='w-4 h-4 md:w-5 md:h-5' />
-              </span>
-              <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                {kpi.label}
-              </p>
-            </div>
-            <h3 className='text-xl md:text-2xl font-bold text-on-surface'>
-              {kpi.value}
-            </h3>
-          </div>
-        ))}
-      </section>
-
-      {/* Tabs - Mobile Scrollable */}
-      <div className='mb-6 border-b border-outline-variant/10 overflow-x-auto scrollbar-hide'>
-        <div className='flex min-w-max'>
-          {[
-            { id: 'all-personnel', label: 'All Personnel' },
-            { id: 'students', label: 'Students' },
-            { id: 'owners', label: 'Owners' },
-            {
-              id: 'upgrade-requests',
-              label: 'Upgrade Requests',
-              count: stats.pendingUpgrades,
-            },
-          ].map((tab) => (
-            <Button
-              key={tab.id}
-              variant='ghost'
-              onClick={() => setActiveTab(tab.id)}
-              className={`!w-auto shrink-0 whitespace-nowrap px-4 md:px-6 py-6 h-auto text-xs md:text-sm font-bold transition-all relative flex items-center gap-2 rounded-none hover:bg-transparent ${activeTab === tab.id
-                ? '!text-[#b6212f]'
-                : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-            >
-              {tab.label}
-              {tab.count !== undefined && tab.count > 0 && (
-                <span
-                  className={`px-1.5 py-0.5 rounded-full text-[9px] md:text-[10px] font-black ${activeTab === tab.id ? 'bg-[#b6212f] text-white' : 'bg-surface-container text-on-surface-variant'}`}
-                >
-                  {tab.count}
-                </span>
-              )}
-              {activeTab === tab.id && (
-                <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#b6212f]'></div>
-              )}
-            </Button>
-          ))}
-        </div>
-      </div>
-
       {loading ? (
-        <div className='h-64 flex flex-col items-center justify-center gap-4'>
-          <Loader2 className='w-8 h-8 animate-spin text-primary' />
-          <p className='text-sm text-on-surface-variant font-medium'>
-            Fetching records...
-          </p>
-        </div>
-      ) : activeTab === 'upgrade-requests' ? (
-        /* Upgrade Requests Card View */
-        <div className='space-y-6'>
-          {upgradeRequests.length === 0 ? (
-            <EmptyState
-              icon={CheckCircle2}
-              title='Queue Clear'
-              message='No pending partner upgrade requests found in the ecosystem.'
-            />
-          ) : (
-            upgradeRequests.map((req, index) => (
-              <div
-                key={req._id || req.id || index}
-                className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="grid grid-cols-1 xl:grid-cols-[300px_1fr]">
-                  {/* LEFT PANEL */}
-                  <div className="relative border-b border-zinc-100 bg-zinc-50 p-4 xl:border-b-0 xl:border-r">
-                    {/* top user */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-500 text-sm font-bold text-white">
-                        {req.name?.charAt(0)}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-sm font-semibold text-zinc-900">
-                          {req.name}
-                        </h3>
-                        <p className="truncate text-xs text-zinc-500">{req.email}</p>
-                      </div>
-                    </div>
-
-                    {/* compact info */}
-                    <div className="mt-6 space-y-3">
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-4 w-4 text-sky-600 shrink-0" />
-                        <span className="truncate text-sm font-medium text-zinc-700">
-                          {req.phone || 'N/A'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Fingerprint className="h-4 w-4 text-violet-600 shrink-0" />
-                        <span className="truncate text-sm font-medium text-zinc-700">
-                          {req.nidNo || 'N/A'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <MapPin className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-                        <span className="text-sm text-zinc-700 line-clamp-2">
-                          {req.businessAddress || 'No address provided'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* RIGHT PANEL */}
-                  <div className="flex flex-col p-5 md:p-6 justify-between">
-                    <div>
-                      {/* header */}
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shrink-0">
-                          <CreditCard className="h-5 w-5 text-emerald-600" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold text-zinc-900">
-                            Banking Info
-                          </h4>
-                          <p className="text-xs text-zinc-500">Payout details</p>
-                        </div>
-                      </div>
-
-                      {/* banking info inline */}
-                      <div className="grid grid-cols-2 gap-y-5 gap-x-4 sm:grid-cols-3 lg:grid-cols-5">
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-medium text-zinc-400">Date</p>
-                          <p className="truncate text-xs font-semibold text-zinc-900">
-                            {req.upgradeRequest?.requestedAt
-                              ? format(new Date(req.upgradeRequest.requestedAt), 'MMM dd, yyyy')
-                              : 'N/A'}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-medium text-zinc-400">Bank</p>
-                          <p className="truncate text-xs font-semibold text-zinc-900">
-                            {req.bankDetails?.bankName || 'N/A'}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-medium text-zinc-400">IFSC</p>
-                          <p className="truncate text-xs font-semibold text-zinc-900 uppercase">
-                            {req.bankDetails?.ifsc || 'N/A'}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-medium text-zinc-400">Holder</p>
-                          <p className="truncate text-xs font-semibold text-zinc-900">
-                            {req.bankDetails?.accountHolderName || 'N/A'}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-medium text-zinc-400">UPI</p>
-                          <p className="truncate text-xs font-semibold text-zinc-900">
-                            {req.bankDetails?.upiId || 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* actions */}
-                    <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                      <Button
-                        variant="default"
-                        onClick={() => handleApproveClick(req._id || req.id || '', req.name)}
-                        disabled={actionLoading === (req._id || req.id || '')}
-                      >
-                        {actionLoading === (req._id || req.id || '') ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="h-4 w-4" />
-                        )}
-                        Approve Request
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        onClick={() => handleRejectClick(req._id || req.id || '', req.name)}
-                        disabled={actionLoading === (req._id || req.id || '')}
-                        className="w-full sm:w-auto"
-                      >
-                        <XCircle className="h-4 w-4" />
-                        Reject
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <AdminUsersSkeleton />
       ) : (
-        /* Standard Users - Mobile Cards & Table */
-        <div className='space-y-3'>
-          {users.length === 0 ? (
-            <div className='text-center py-20 bg-surface-container/20 rounded-3xl border-2 border-dashed border-outline-variant/10'>
-              <UserIcon className='w-10 h-10 text-on-surface-variant/20 mx-auto mb-3' />
-              <p className='font-bold text-on-surface-variant italic'>
-                No {activeTab} found
-              </p>
+        <>
+          {/* KPI Cards - Better Mobile Layout */}
+          <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8'>
+            {[
+              {
+                label: 'TOTAL',
+                value: stats.total,
+                icon: UserIcon,
+                color: 'text-blue-600',
+                bg: 'bg-blue-50',
+              },
+              {
+                label: 'STUDENTS',
+                value: stats.students,
+                icon: UserIcon,
+                color: 'text-purple-600',
+                bg: 'bg-purple-50',
+              },
+              {
+                label: 'OWNERS',
+                value: stats.owners,
+                icon: Building2,
+                color: 'text-emerald-600',
+                bg: 'bg-emerald-50',
+              },
+              {
+                label: 'UPGRADES',
+                value: stats.pendingUpgrades,
+                icon: AlertCircle,
+                color: 'text-orange-600',
+                bg: 'bg-orange-50',
+              },
+            ].map((kpi, index) => (
+              <div
+                key={index}
+                className='bg-white p-4 md:p-6 rounded-2xl border border-outline-variant/10 shadow-sm'
+              >
+                <div className='flex items-center justify-between mb-2'>
+                  <span className={`p-2 rounded-lg ${kpi.bg} ${kpi.color}`}>
+                    <kpi.icon className='w-4 h-4 md:w-5 md:h-5' />
+                  </span>
+                  <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                    {kpi.label}
+                  </p>
+                </div>
+                <h3 className='text-xl md:text-2xl font-bold text-on-surface'>
+                  {kpi.value}
+                </h3>
+              </div>
+            ))}
+          </section>
+
+          {/* Tabs - Mobile Scrollable */}
+          <div className='mb-6 border-b border-outline-variant/10 overflow-x-auto scrollbar-hide'>
+            <div className='flex min-w-max'>
+              {[
+                { id: 'all-personnel', label: 'All Personnel' },
+                { id: 'students', label: 'Students' },
+                { id: 'owners', label: 'Owners' },
+                {
+                  id: 'upgrade-requests',
+                  label: 'Upgrade Requests',
+                  count: stats.pendingUpgrades,
+                },
+              ].map((tab) => (
+                <Button
+                  key={tab.id}
+                  variant='ghost'
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`!w-auto shrink-0 whitespace-nowrap px-4 md:px-6 py-6 h-auto text-xs md:text-sm font-bold transition-all relative flex items-center gap-2 rounded-none hover:bg-transparent ${
+                    activeTab === tab.id
+                      ? '!text-[#b6212f]'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count !== undefined && tab.count > 0 && (
+                    <span
+                      className={`px-1.5 py-0.5 rounded-full text-[9px] md:text-[10px] font-black ${activeTab === tab.id ? 'bg-[#b6212f] text-white' : 'bg-surface-container text-on-surface-variant'}`}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
+                  {activeTab === tab.id && (
+                    <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#b6212f]'></div>
+                  )}
+                </Button>
+              ))}
             </div>
-          ) : (
-            <>
-              {/* Table for Desktop */}
-              <div className='hidden md:block bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'>
-                <table className='w-full'>
-                  <thead>
-                    <tr className='border-b border-outline-variant/10 bg-surface-container-lowest'>
-                      <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                        User
-                      </th>
-                      <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                        Role
-                      </th>
-                      <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                        Status
-                      </th>
-                      <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                        Joined
-                      </th>
-                      <th className='text-right px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className='divide-y divide-outline-variant/10'>
-                    {users.map((user: any) => (
-                      <tr
-                        key={user._id}
-                        className='hover:bg-surface-container-lowest transition-colors'
-                      >
-                        <td className='px-6 py-4'>
+          </div>
+
+          {activeTab === 'upgrade-requests' ? (
+            /* Upgrade Requests Card View */
+            <div className='space-y-6'>
+              {upgradeRequests.length === 0 ? (
+                <EmptyState
+                  icon={CheckCircle2}
+                  title='Queue Clear'
+                  message='No pending partner upgrade requests found in the ecosystem.'
+                />
+              ) : (
+                upgradeRequests.map((req, index) => (
+                  <div
+                    key={req._id || req.id || index}
+                    className='group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg'
+                  >
+                    <div className='grid grid-cols-1 xl:grid-cols-[300px_1fr]'>
+                      {/* LEFT PANEL */}
+                      <div className='relative border-b border-zinc-100 bg-zinc-50 p-4 xl:border-b-0 xl:border-r'>
+                        {/* top user */}
+                        <div className='flex items-center gap-3'>
+                          <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-500 text-sm font-bold text-white'>
+                            {req.name?.charAt(0)}
+                          </div>
+
+                          <div className='min-w-0 flex-1'>
+                            <h3 className='truncate text-sm font-semibold text-zinc-900'>
+                              {req.name}
+                            </h3>
+                            <p className='truncate text-xs text-zinc-500'>
+                              {req.email}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* compact info */}
+                        <div className='mt-6 space-y-3'>
                           <div className='flex items-center gap-3'>
-                            <div className='w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant font-black'>
-                              {user.name.charAt(0)}
+                            <Phone className='h-4 w-4 text-sky-600 shrink-0' />
+                            <span className='truncate text-sm font-medium text-zinc-700'>
+                              {req.phone || 'N/A'}
+                            </span>
+                          </div>
+
+                          <div className='flex items-center gap-3'>
+                            <Fingerprint className='h-4 w-4 text-violet-600 shrink-0' />
+                            <span className='truncate text-sm font-medium text-zinc-700'>
+                              {req.nidNo || 'N/A'}
+                            </span>
+                          </div>
+
+                          <div className='flex items-start gap-3'>
+                            <MapPin className='h-4 w-4 text-amber-600 mt-0.5 shrink-0' />
+                            <span className='text-sm text-zinc-700 line-clamp-2'>
+                              {req.businessAddress || 'No address provided'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* RIGHT PANEL */}
+                      <div className='flex flex-col p-5 md:p-6 justify-between'>
+                        <div>
+                          {/* header */}
+                          <div className='flex items-center gap-3 mb-6'>
+                            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shrink-0'>
+                              <CreditCard className='h-5 w-5 text-emerald-600' />
                             </div>
-                            <div className='min-w-0'>
-                              <p className='text-sm font-bold text-on-surface truncate'>
-                                {user.name}
-                              </p>
-                              <p className='text-[10px] text-on-surface-variant truncate'>
-                                {user.email}
+                            <div>
+                              <h4 className='text-sm font-semibold text-zinc-900'>
+                                Banking Info
+                              </h4>
+                              <p className='text-xs text-zinc-500'>
+                                Payout details
                               </p>
                             </div>
                           </div>
-                        </td>
-                        <td className='px-6 py-4 text-xs font-bold capitalize'>
-                          {user.role}
-                        </td>
-                        <td className='px-6 py-4'>
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-tighter ${getStatusColor(user.status || 'active')}`}
+
+                          {/* banking info inline */}
+                          <div className='grid grid-cols-2 gap-y-5 gap-x-4 sm:grid-cols-3 lg:grid-cols-5'>
+                            <div className='space-y-1'>
+                              <p className='text-[10px] uppercase font-medium text-zinc-400'>
+                                Date
+                              </p>
+                              <p className='truncate text-xs font-semibold text-zinc-900'>
+                                {req.upgradeRequest?.requestedAt
+                                  ? format(
+                                      new Date(req.upgradeRequest.requestedAt),
+                                      'MMM dd, yyyy',
+                                    )
+                                  : 'N/A'}
+                              </p>
+                            </div>
+                            <div className='space-y-1'>
+                              <p className='text-[10px] uppercase font-medium text-zinc-400'>
+                                Bank
+                              </p>
+                              <p className='truncate text-xs font-semibold text-zinc-900'>
+                                {req.bankDetails?.bankName || 'N/A'}
+                              </p>
+                            </div>
+                            <div className='space-y-1'>
+                              <p className='text-[10px] uppercase font-medium text-zinc-400'>
+                                IFSC
+                              </p>
+                              <p className='truncate text-xs font-semibold text-zinc-900 uppercase'>
+                                {req.bankDetails?.ifsc || 'N/A'}
+                              </p>
+                            </div>
+                            <div className='space-y-1'>
+                              <p className='text-[10px] uppercase font-medium text-zinc-400'>
+                                Holder
+                              </p>
+                              <p className='truncate text-xs font-semibold text-zinc-900'>
+                                {req.bankDetails?.accountHolderName || 'N/A'}
+                              </p>
+                            </div>
+                            <div className='space-y-1'>
+                              <p className='text-[10px] uppercase font-medium text-zinc-400'>
+                                UPI
+                              </p>
+                              <p className='truncate text-xs font-semibold text-zinc-900'>
+                                {req.bankDetails?.upiId || 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* actions */}
+                        <div className='mt-8 flex flex-col sm:flex-row gap-3'>
+                          <Button
+                            variant='default'
+                            onClick={() =>
+                              handleApproveClick(
+                                req._id || req.id || '',
+                                req.name,
+                              )
+                            }
+                            disabled={
+                              actionLoading === (req._id || req.id || '')
+                            }
                           >
-                            {user.status || 'Active'}
-                          </span>
-                        </td>
-                        <td className='px-6 py-4 text-xs text-on-surface-variant font-medium'>
-                          {format(new Date(user.createdAt), 'MMM dd, yyyy')}
-                        </td>
-                        <td className='px-6 py-4'>
-                          <div className='flex justify-end gap-1'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='h-8 w-8 text-blue-600'
-                              onClick={() => handleViewUser(user._id)}
-                              title='View Details'
-                            >
-                              <Eye size={16} />
-                            </Button>
-                            {user.status === 'suspended' || user.status === 'banned' ? (
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='h-8 w-8 text-emerald-600'
-                                onClick={() => handleActivateUser(user._id, user.name)}
-                                title='Activate Account'
-                              >
-                                <CheckCircle2 size={16} />
-                              </Button>
+                            {actionLoading === (req._id || req.id || '') ? (
+                              <Loader2 className='h-4 w-4 animate-spin' />
                             ) : (
-                              <>
+                              <CheckCircle2 className='h-4 w-4' />
+                            )}
+                            Approve Request
+                          </Button>
+
+                          <Button
+                            variant='outline'
+                            onClick={() =>
+                              handleRejectClick(
+                                req._id || req.id || '',
+                                req.name,
+                              )
+                            }
+                            disabled={
+                              actionLoading === (req._id || req.id || '')
+                            }
+                            className='w-full sm:w-auto'
+                          >
+                            <XCircle className='h-4 w-4' />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            /* Standard Users - Mobile Cards & Table */
+            <div className='space-y-3'>
+              {users.length === 0 ? (
+                <div className='text-center py-20 bg-surface-container/20 rounded-3xl border-2 border-dashed border-outline-variant/10'>
+                  <UserIcon className='w-10 h-10 text-on-surface-variant/20 mx-auto mb-3' />
+                  <p className='font-bold text-on-surface-variant italic'>
+                    No {activeTab} found
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Table for Desktop */}
+                  <div className='hidden md:block bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'>
+                    <table className='w-full'>
+                      <thead>
+                        <tr className='border-b border-outline-variant/10 bg-surface-container-lowest'>
+                          <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                            User
+                          </th>
+                          <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                            Role
+                          </th>
+                          <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                            Status
+                          </th>
+                          <th className='text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                            Joined
+                          </th>
+                          <th className='text-right px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className='divide-y divide-outline-variant/10'>
+                        {users.map((user: any) => (
+                          <tr
+                            key={user._id}
+                            className='hover:bg-surface-container-lowest transition-colors'
+                          >
+                            <td className='px-6 py-4'>
+                              <div className='flex items-center gap-3'>
+                                <div className='w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant font-black'>
+                                  {user.name.charAt(0)}
+                                </div>
+                                <div className='min-w-0'>
+                                  <p className='text-sm font-bold text-on-surface truncate'>
+                                    {user.name}
+                                  </p>
+                                  <p className='text-[10px] text-on-surface-variant truncate'>
+                                    {user.email}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className='px-6 py-4 text-xs font-bold capitalize'>
+                              {user.role}
+                            </td>
+                            <td className='px-6 py-4'>
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-tighter ${getStatusColor(user.status || 'active')}`}
+                              >
+                                {user.status || 'Active'}
+                              </span>
+                            </td>
+                            <td className='px-6 py-4 text-xs text-on-surface-variant font-medium'>
+                              {format(new Date(user.createdAt), 'MMM dd, yyyy')}
+                            </td>
+                            <td className='px-6 py-4'>
+                              <div className='flex justify-end gap-1'>
                                 <Button
                                   variant='ghost'
                                   size='icon'
-                                  className='h-8 w-8 text-orange-600'
+                                  className='h-8 w-8 text-blue-600'
+                                  onClick={() => handleViewUser(user._id)}
+                                  title='View Details'
+                                >
+                                  <Eye size={16} />
+                                </Button>
+                                {user.status === 'suspended' ||
+                                user.status === 'banned' ? (
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    className='h-8 w-8 text-emerald-600'
+                                    onClick={() =>
+                                      handleActivateUser(user._id, user.name)
+                                    }
+                                    title='Activate Account'
+                                  >
+                                    <CheckCircle2 size={16} />
+                                  </Button>
+                                ) : (
+                                  <>
+                                    <Button
+                                      variant='ghost'
+                                      size='icon'
+                                      className='h-8 w-8 text-orange-600'
+                                      onClick={() =>
+                                        handleSuspendUser(user._id, user.name)
+                                      }
+                                      title='Suspend Account'
+                                    >
+                                      <Pause size={16} />
+                                    </Button>
+                                    <Button
+                                      variant='ghost'
+                                      size='icon'
+                                      className='h-8 w-8 text-red-600'
+                                      onClick={() =>
+                                        handleBanUser(user._id, user.name)
+                                      }
+                                      title='Ban Account'
+                                    >
+                                      <Ban size={16} />
+                                    </Button>
+                                  </>
+                                )}
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  className='h-8 w-8 text-error'
+                                  onClick={() =>
+                                    handleDeleteUser(user._id, user.name)
+                                  }
+                                  title='Delete Account'
+                                >
+                                  <Trash2 size={16} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Cards for Mobile */}
+                  <div className='md:hidden space-y-3'>
+                    {users.map((user: any) => (
+                      <div
+                        key={user._id}
+                        className='bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'
+                      >
+                        {/* User Info Header */}
+                        <div className='p-4 bg-gradient-to-br from-surface-container-lowest to-white'>
+                          <div className='flex items-start gap-3'>
+                            <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg shrink-0'>
+                              {user.name.charAt(0)}
+                            </div>
+                            <div className='flex-1 min-w-0'>
+                              <p className='text-base font-bold text-on-surface mb-1'>
+                                {user.name}
+                              </p>
+                              <p className='text-[10px] text-on-surface-variant truncate mb-2'>
+                                {user.email}
+                              </p>
+                              <div className='flex items-center gap-2'>
+                                <span className='px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-surface-container text-on-surface-variant'>
+                                  {user.role}
+                                </span>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-tighter ${getStatusColor(user.status || 'active')}`}
+                                >
+                                  {user.status || 'Active'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Joined Date */}
+                          <div className='mt-3 pt-3 border-t border-outline-variant/10'>
+                            <div className='flex items-center gap-2'>
+                              <Calendar className='w-3.5 h-3.5 text-on-surface-variant' />
+                              <span className='text-[10px] text-on-surface-variant font-medium'>
+                                Joined{' '}
+                                {format(
+                                  new Date(user.createdAt),
+                                  'MMM dd, yyyy',
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className='p-3 bg-surface-container-lowest/30'>
+                          <div className='grid grid-cols-4 gap-2'>
+                            <button
+                              onClick={() => handleViewUser(user._id)}
+                              className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
+                            >
+                              <div className='w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center'>
+                                <Eye className='w-4 h-4 text-blue-600' />
+                              </div>
+                              <span className='text-[9px] font-bold text-blue-600'>
+                                View
+                              </span>
+                            </button>
+                            {user.status === 'suspended' ||
+                            user.status === 'banned' ? (
+                              <button
+                                onClick={() =>
+                                  handleActivateUser(user._id, user.name)
+                                }
+                                className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
+                              >
+                                <div className='w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center'>
+                                  <CheckCircle2 className='w-4 h-4 text-emerald-600' />
+                                </div>
+                                <span className='text-[9px] font-bold text-emerald-600'>
+                                  Activate
+                                </span>
+                              </button>
+                            ) : (
+                              <>
+                                <button
                                   onClick={() =>
                                     handleSuspendUser(user._id, user.name)
                                   }
-                                  title='Suspend Account'
+                                  className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
                                 >
-                                  <Pause size={16} />
-                                </Button>
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  className='h-8 w-8 text-red-600'
-                                  onClick={() => handleBanUser(user._id, user.name)}
-                                  title='Ban Account'
+                                  <div className='w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center'>
+                                    <Pause className='w-4 h-4 text-orange-600' />
+                                  </div>
+                                  <span className='text-[9px] font-bold text-orange-600'>
+                                    Suspend
+                                  </span>
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBanUser(user._id, user.name)
+                                  }
+                                  className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
                                 >
-                                  <Ban size={16} />
-                                </Button>
+                                  <div className='w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center'>
+                                    <Ban className='w-4 h-4 text-red-600' />
+                                  </div>
+                                  <span className='text-[9px] font-bold text-red-600'>
+                                    Ban
+                                  </span>
+                                </button>
                               </>
                             )}
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='h-8 w-8 text-error'
+                            <button
                               onClick={() =>
                                 handleDeleteUser(user._id, user.name)
                               }
-                              title='Delete Account'
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Cards for Mobile */}
-              <div className='md:hidden space-y-3'>
-                {users.map((user: any) => (
-                  <div
-                    key={user._id}
-                    className='bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'
-                  >
-                    {/* User Info Header */}
-                    <div className='p-4 bg-gradient-to-br from-surface-container-lowest to-white'>
-                      <div className='flex items-start gap-3'>
-                        <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg shrink-0'>
-                          {user.name.charAt(0)}
-                        </div>
-                        <div className='flex-1 min-w-0'>
-                          <p className='text-base font-bold text-on-surface mb-1'>
-                            {user.name}
-                          </p>
-                          <p className='text-[10px] text-on-surface-variant truncate mb-2'>
-                            {user.email}
-                          </p>
-                          <div className='flex items-center gap-2'>
-                            <span className='px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-surface-container text-on-surface-variant'>
-                              {user.role}
-                            </span>
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-tighter ${getStatusColor(user.status || 'active')}`}
-                            >
-                              {user.status || 'Active'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Joined Date */}
-                      <div className='mt-3 pt-3 border-t border-outline-variant/10'>
-                        <div className='flex items-center gap-2'>
-                          <Calendar className='w-3.5 h-3.5 text-on-surface-variant' />
-                          <span className='text-[10px] text-on-surface-variant font-medium'>
-                            Joined{' '}
-                            {format(new Date(user.createdAt), 'MMM dd, yyyy')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className='p-3 bg-surface-container-lowest/30'>
-                      <div className='grid grid-cols-4 gap-2'>
-                        <button
-                          onClick={() => handleViewUser(user._id)}
-                          className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
-                        >
-                          <div className='w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center'>
-                            <Eye className='w-4 h-4 text-blue-600' />
-                          </div>
-                          <span className='text-[9px] font-bold text-blue-600'>
-                            View
-                          </span>
-                        </button>
-                        {user.status === 'suspended' || user.status === 'banned' ? (
-                          <button
-                            onClick={() => handleActivateUser(user._id, user.name)}
-                            className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
-                          >
-                            <div className='w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center'>
-                              <CheckCircle2 className='w-4 h-4 text-emerald-600' />
-                            </div>
-                            <span className='text-[9px] font-bold text-emerald-600'>
-                              Activate
-                            </span>
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleSuspendUser(user._id, user.name)}
-                              className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
-                            >
-                              <div className='w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center'>
-                                <Pause className='w-4 h-4 text-orange-600' />
-                              </div>
-                              <span className='text-[9px] font-bold text-orange-600'>
-                                Suspend
-                              </span>
-                            </button>
-                            <button
-                              onClick={() => handleBanUser(user._id, user.name)}
                               className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
                             >
                               <div className='w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center'>
-                                <Ban className='w-4 h-4 text-red-600' />
+                                <Trash2 className='w-4 h-4 text-red-600' />
                               </div>
                               <span className='text-[9px] font-bold text-red-600'>
-                                Ban
+                                Delete
                               </span>
                             </button>
-                          </>
-                        )}
-                        <button
-                          onClick={() => handleDeleteUser(user._id, user.name)}
-                          className='flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white active:scale-95 transition-transform'
-                        >
-                          <div className='w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center'>
-                            <Trash2 className='w-4 h-4 text-red-600' />
                           </div>
-                          <span className='text-[9px] font-bold text-red-600'>
-                            Delete
-                          </span>
-                        </button>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </>
+                </>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   )

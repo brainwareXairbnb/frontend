@@ -8,11 +8,7 @@ import { useState } from 'react'
 import { RoleGuard } from '@/components/RoleGuard'
 import { NotificationBell } from '@/components/NotificationBell'
 import {
-  LayoutDashboard,
   Building2,
-  Calendar,
-  IndianRupee,
-  BarChart3,
   LogOut,
   Bell,
   User,
@@ -268,17 +264,17 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
               <Bell className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Notifications</span>
             </Link>
-            <Link
-              href='/owner/profile'
+            <div
+              onClick={() => setIsDrawerOpen(true)}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/owner/profile')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
               }`}
             >
-              <User className='w-6 h-6' />
-              <span className='text-[10px] font-bold'>Profile</span>
-            </Link>
+              <Menu className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>More</span>
+            </div>
           </div>
         </div>
 
@@ -301,7 +297,7 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                         Owner Portal
                       </h2>
                       <p className='text-xs text-on-surface-variant'>
-                        Property Management
+                        {user?.name}
                       </p>
                     </div>
                   </div>
@@ -334,9 +330,6 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                   )
                 })}
 
-                {/* Divider */}
-                <div className='h-px bg-outline-variant/20 my-3 mx-4' />
-
                 {/* View as Student */}
                 <Link
                   href='/'
@@ -349,27 +342,6 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
               </nav>
 
               <div className='px-3 pb-6 pt-2 border-t border-outline-variant/10'>
-                <div className='flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-3 mt-3'>
-                  <div className='w-12 h-12 rounded-full overflow-hidden bg-primary shrink-0'>
-                    <img
-                      alt='Owner'
-                      className='w-full h-full object-cover'
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
-                    />
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <p className='text-sm font-bold text-on-surface truncate'>
-                      {user?.name || 'Owner'}
-                    </p>
-                    <p className='text-xs text-on-surface-variant'>
-                      {user?.email || 'owner@brainwarerooms.com'}
-                    </p>
-                    <p className='text-[10px] text-on-surface-variant mt-0.5'>
-                      Property Owner
-                    </p>
-                  </div>
-                </div>
-
                 <div className='space-y-2'>
                   <Link
                     href='/owner/profile'

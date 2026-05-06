@@ -363,7 +363,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         Admin Portal
                       </h2>
                       <p className='text-xs text-on-surface-variant'>
-                        System Management
+                        {user?.name}
                       </p>
                     </div>
                   </div>

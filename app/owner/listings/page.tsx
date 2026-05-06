@@ -12,7 +12,6 @@ import {
   Plus,
   Star,
   Activity,
-  Loader2,
   Eye,
   Building2,
   ChevronDown,
@@ -27,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import ListingsSkeleton from '@/components/skeletons/ListingsSkeleton'
 
 export default function OwnerListingsPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -128,14 +128,6 @@ export default function OwnerListingsPage() {
             listings.length
           ).toFixed(1)
         : '0.0',
-  }
-
-  if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
   }
 
   return (
@@ -298,80 +290,86 @@ export default function OwnerListingsPage() {
           </div>
         </header>
 
-        {/* Stats Grid */}
-        <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10'>
-          <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Building2 className='w-4 h-4 md:w-5 md:h-5 text-on-surface-variant/40' />
-              <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
-                Total
-              </p>
-            </div>
-            <p className='text-2xl md:text-3xl font-headline font-black text-on-surface'>
-              {statsData.totalListings}
-            </p>
-          </div>
-          <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Activity className='w-4 h-4 md:w-5 md:h-5 text-emerald-600/60' />
-              <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
-                Live
-              </p>
-            </div>
-            <p className='text-2xl md:text-3xl font-headline font-black text-emerald-600'>
-              {statsData.approved}
-            </p>
-          </div>
-          <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Eye className='w-4 h-4 md:w-5 md:h-5 text-primary/60' />
-              <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
-                Views
-              </p>
-            </div>
-            <p className='text-2xl md:text-3xl font-headline font-black text-primary'>
-              {statsData.totalViews}
-            </p>
-          </div>
-          <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Star className='w-4 h-4 md:w-5 md:h-5 fill-yellow-500 text-yellow-500' />
-              <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
-                Rating
-              </p>
-            </div>
-            <p className='text-2xl md:text-3xl font-headline font-black text-on-surface'>
-              {statsData.avgRating}
-            </p>
-          </div>
-        </section>
-
-        {/* Listings Grid */}
-        {filteredListings.length === 0 ? (
-          <div className='text-center py-12 md:py-20 bg-surface-container/20 rounded-2xl md:rounded-3xl border-2 border-dashed border-outline-variant/10'>
-            <Activity className='w-10 h-10 md:w-12 md:h-12 text-on-surface-variant/20 mx-auto mb-3 md:mb-4' />
-            <p className='font-bold text-sm md:text-base text-on-surface-variant px-4'>
-              No listings found
-            </p>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className='mt-3 md:mt-4 bg-primary text-on-primary px-5 md:px-6 py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm hover:brightness-110 transition-all'
-            >
-              Create Your First Listing
-            </button>
-          </div>
+        {loading ? (
+          <ListingsSkeleton />
         ) : (
-          <section className='grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 md:gap-6'>
-            {filteredListings.map((listing) => (
-              <OwnerListingCard
-                key={listing._id}
-                listing={listing}
-                onDelete={handleDeleteListing}
-                onEdit={handleEditListing}
-                onView={handleViewListing}
-              />
-            ))}
-          </section>
+          <>
+            {/* Stats Grid */}
+            <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10'>
+              <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
+                <div className='flex items-center gap-2 mb-2'>
+                  <Building2 className='w-4 h-4 md:w-5 md:h-5 text-on-surface-variant/40' />
+                  <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                    Total
+                  </p>
+                </div>
+                <p className='text-2xl md:text-3xl font-headline font-black text-on-surface'>
+                  {statsData.totalListings}
+                </p>
+              </div>
+              <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
+                <div className='flex items-center gap-2 mb-2'>
+                  <Activity className='w-4 h-4 md:w-5 md:h-5 text-emerald-600/60' />
+                  <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                    Live
+                  </p>
+                </div>
+                <p className='text-2xl md:text-3xl font-headline font-black text-emerald-600'>
+                  {statsData.approved}
+                </p>
+              </div>
+              <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
+                <div className='flex items-center gap-2 mb-2'>
+                  <Eye className='w-4 h-4 md:w-5 md:h-5 text-primary/60' />
+                  <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                    Views
+                  </p>
+                </div>
+                <p className='text-2xl md:text-3xl font-headline font-black text-primary'>
+                  {statsData.totalViews}
+                </p>
+              </div>
+              <div className='bg-white p-4 md:p-6 rounded border border-outline-variant/10 shadow-sm'>
+                <div className='flex items-center gap-2 mb-2'>
+                  <Star className='w-4 h-4 md:w-5 md:h-5 fill-yellow-500 text-yellow-500' />
+                  <p className='text-[9px] md:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                    Rating
+                  </p>
+                </div>
+                <p className='text-2xl md:text-3xl font-headline font-black text-on-surface'>
+                  {statsData.avgRating}
+                </p>
+              </div>
+            </section>
+
+            {/* Listings Grid */}
+            {filteredListings.length === 0 ? (
+              <div className='text-center py-12 md:py-20 bg-surface-container/20 rounded-2xl md:rounded-3xl border-2 border-dashed border-outline-variant/10'>
+                <Activity className='w-10 h-10 md:w-12 md:h-12 text-on-surface-variant/20 mx-auto mb-3 md:mb-4' />
+                <p className='font-bold text-sm md:text-base text-on-surface-variant px-4'>
+                  No listings found
+                </p>
+                <button
+                  onClick={() => setIsDrawerOpen(true)}
+                  className='mt-3 md:mt-4 bg-primary text-on-primary px-5 md:px-6 py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm hover:brightness-110 transition-all'
+                >
+                  Create Your First Listing
+                </button>
+              </div>
+            ) : (
+              <section className='grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 md:gap-6'>
+                {filteredListings.map((listing) => (
+                  <OwnerListingCard
+                    key={listing._id}
+                    listing={listing}
+                    onDelete={handleDeleteListing}
+                    onEdit={handleEditListing}
+                    onView={handleViewListing}
+                  />
+                ))}
+              </section>
+            )}
+          </>
         )}
       </div>
 

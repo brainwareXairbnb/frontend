@@ -56,17 +56,30 @@ export function PhotoUpload({
         const formData = new FormData()
         formData.append('photo', file)
 
+        // Get auth token from localStorage
+        const authToken =
+          typeof window !== 'undefined'
+            ? localStorage.getItem('br_access_token')
+            : null
+
+        const headers: Record<string, string> = {}
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`
+        }
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/owner/upload-photo`,
           {
             method: 'POST',
             credentials: 'include',
+            headers,
             body: formData,
           }
         )
 
         if (!response.ok) {
-          throw new Error(`Failed to upload ${file.name}`)
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || `Failed to upload ${file.name}`)
         }
 
         const data = await response.json()
