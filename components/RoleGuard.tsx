@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
-import { Loader2 } from 'lucide-react'
+import { AirbnbLoader } from '@/components/ui/spinner'
 import { RoleGuardProps } from '@/lib/types'
 
 export function RoleGuard({
@@ -45,11 +45,8 @@ export function RoleGuard({
   // Show loading state
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-[#fafafa]'>
-        <div className='flex flex-col items-center gap-4'>
-          <Loader2 className='w-8 h-8 animate-spin text-primary' />
-          <p className='text-sm text-on-surface-variant'>Verifying access...</p>
-        </div>
+      <div className='min-h-screen flex items-center justify-center bg-white'>
+        <AirbnbLoader />
       </div>
     )
   }

@@ -100,12 +100,12 @@ function VerifyStudentEmailForm() {
           <div className='w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-500/20'>
             <GraduationCap className='text-white w-10 h-10' />
           </div>
-          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>
-            Scholar Verified
+          <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4'>
+            Verification successful
           </h2>
           <p className='text-sm font-medium text-on-surface-variant leading-relaxed opacity-60 mb-8'>
-            Your academic credentials have been successfully validated. Welcome
-            to the BrainX network.
+            Your student email has been verified successfully. Redirecting you
+            to your account...
           </p>
           <div className='w-full h-1 bg-slate-100 rounded-full overflow-hidden'>
             <div className='h-full bg-indigo-600 animate-progress origin-left'></div>
@@ -141,17 +141,17 @@ function VerifyStudentEmailForm() {
         <div className='relative z-20 mt-auto p-20 max-w-2xl animate-in slide-in-from-left duration-1000'>
           <div className='mb-8 flex items-center gap-4'>
             <div className='h-0.5 w-16 bg-primary'></div>
-            <span className='font-headline font-black uppercase tracking-[0.3em] text-surface text-[10px] opacity-60'>
-              Academic Protocol
+            <span className='font-headline font-black tracking-[0.3em] text-surface text-[10px] opacity-60'>
+              Student Verification
             </span>
           </div>
           <h1 className='font-headline text-6xl lg:text-8xl font-black text-surface leading-[0.95] tracking-tighter mb-10'>
-            Scholar <br />
-            <span className='text-primary'>Validation.</span>
+            Verify your <br />
+            <span className='text-primary'>Student account.</span>
           </h1>
-          <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            Finalize your node activation within the university network to
-            unlock exclusive scholar rates and priority modules.
+          <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md tracking-widest text-[12px]'>
+            Confirm your university email to access student benefits, exclusive
+            offers, and verified residency features.
           </p>
         </div>
       </div>
@@ -159,22 +159,22 @@ function VerifyStudentEmailForm() {
       {/* Right Side */}
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-10 lg:p-12 pt-6 md:pt-8 lg:pt-10 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-8 animate-in fade-in slide-in-from-top-4 duration-700'>
-          <Logo heading='Institutional Check' />
+          <Logo />
           <div className='flex items-center gap-2 mb-2'>
             <div className='w-6 h-6 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-600'>
               <ShieldCheck className='w-3.5 h-3.5' />
             </div>
-            <h2 className='text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600'>
-              Scholar Verification
+            <h2 className='text-[10px] font-black tracking-[0.2em] text-indigo-600'>
+              Email Verification
             </h2>
           </div>
-          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
-            Institutional Check
+          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3'>
+            Verify your email
           </h2>
-          <p className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
-            Code sent to{' '}
-            <span className='text-on-surface opacity-100'>
-              {email || 'university address'}
+          <p className='text-sm text-muted-foreground'>
+            We sent a 6-digit verification code to
+            <span className='text-foreground font-medium ml-1'>
+              {email || 'your email'}
             </span>
           </p>
         </header>
@@ -183,8 +183,8 @@ function VerifyStudentEmailForm() {
           <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='space-y-2'>
               <div className='flex justify-between items-center px-1'>
-                <label className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
-                  Scholar Code (OTP)
+                <label className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-40'>
+                  Verification Code
                 </label>
                 <Fingerprint className='w-4 h-4 text-primary opacity-40' />
               </div>
@@ -202,8 +202,8 @@ function VerifyStudentEmailForm() {
                   autoFocus
                 />
               </div>
-              <p className='text-[9px] text-center font-black uppercase tracking-widest text-on-surface-variant opacity-30'>
-                Code expires in 15 minutes
+              <p className='text-[9px] text-center font-black tracking-widest text-on-surface-variant opacity-30'>
+                This code will expire in 15 minutes.
               </p>
             </div>
 
@@ -215,14 +215,14 @@ function VerifyStudentEmailForm() {
               {loading ? (
                 <Loader2 className='w-4 h-4 animate-spin' />
               ) : (
-                'Confirm Status'
+                'Verify Email'
               )}
             </Button>
           </form>
 
           <div className='text-center mt-6 space-y-2'>
-            <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40'>
-              Scholar code not received?
+            <p className='text-[10px] font-black tracking-widest text-on-surface-variant opacity-40'>
+              Didn't receive the code?
             </p>
             <Button
               variant='outline'
@@ -234,7 +234,7 @@ function VerifyStudentEmailForm() {
                 className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`}
               />
               {resending
-                ? 'DISPATCHING...'
+                ? 'Sending...'
                 : timer > 0
                   ? `Resend in ${timer}s`
                   : 'Resend Code'}
@@ -244,18 +244,17 @@ function VerifyStudentEmailForm() {
           <div className='text-center mt-6'>
             <Link
               href='/student/profile'
-              className='text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
+              className='text-[10px] font-black text-on-surface-variant tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
             >
               <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
-              Return to Profile
+              Back to Profile
             </Link>
           </div>
         </main>
 
         <footer className='w-full max-w-md mt-10 md:mt-12 text-center opacity-40 border-t border-outline-variant/5 pt-6'>
-          <p className='text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant leading-relaxed'>
-            Secured via Brainware Rooms Identity Service <br />
-            &copy; 2026 BWU Ecosytem Node
+          <p className='text-[9px] font-black tracking-[0.2em] text-on-surface-variant leading-relaxed'>
+            © 2026 Brainware Rooms. All rights reserved.
           </p>
         </footer>
       </div>

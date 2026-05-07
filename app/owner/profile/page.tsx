@@ -9,11 +9,12 @@ import {
   CreditCard,
   Lock,
   ChevronRight,
-  Loader2,
   Calendar,
-  BadgeCheck,
   LogOut,
+  Mail,
+  Shield,
 } from 'lucide-react'
+import { ProfileSkeleton } from '@/components/ui/skeleton/profile-skeleton'
 
 export default function OwnerProfilePage() {
   const router = useRouter()
@@ -30,168 +31,155 @@ export default function OwnerProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen bg-[#fafafa]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
+    return <ProfileSkeleton />
   }
 
-  const menuItems = [
+  const accountSections = [
     {
       id: 'personal-info',
-      title: 'Personal Info',
-      description: 'Update your name, email, and phone number',
+      title: 'Personal info',
+      description: 'Provide personal details and how we can reach you',
       icon: User,
-      href: '/owner/profile/personal-info',
+      path: '/owner/profile/personal-info',
     },
     {
       id: 'bank-details',
-      title: 'Bank Details',
+      title: 'Payment & payouts',
       description: 'Manage your bank account for payouts',
       icon: CreditCard,
-      href: '/owner/profile/payments',
+      path: '/owner/profile/payments',
     },
-    // {
-    //   id: 'verification',
-    //   title: 'Account Verification',
-    //   description: 'Get verified to list properties',
-    //   icon: ShieldCheck,
-    //   href: '/owner/profile/verification',
-    //   badge: profile?.isApproved ? 'Verified' : 'Pending',
-    //   badgeColor: profile?.isApproved ? 'emerald' : 'orange',
-    // },
     {
       id: 'login-security',
-      title: 'Change Password',
-      description: 'Update your login password',
+      title: 'Login & security',
+      description: 'Update your password and secure your account',
       icon: Lock,
-      href: '/owner/profile/security',
+      path: '/owner/profile/security',
     },
   ]
 
   return (
-    <div className='min-h-screen bg-[#fafafa]'>
-      {/* Profile Overview Card */}
-      <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-        <div className='bg-white rounded sm:rounded-2xl border border-outline-variant/10 p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm hover:shadow-md transition-shadow'>
-          <div className='flex items-center gap-4'>
-            {/* Avatar */}
-            <div className='relative shrink-0'>
-              <div className='w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border-3 border-white shadow-md'>
-                <span className='text-2xl sm:text-3xl font-bold text-primary'>
-                  {profile?.name?.charAt(0).toUpperCase() || 'O'}
-                </span>
-              </div>
-              {profile?.isApproved && (
-                <div className='absolute -bottom-0.5 -right-0.5 w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 rounded-full flex items-center justify-center border-3 border-white shadow-md'>
-                  <BadgeCheck className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-white' />
+    <div className='min-h-screen bg-white'>
+      <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12'>
+        {/* Profile Card */}
+        <div className='bg-white border border-gray-200 rounded p-4 sm:p-6 mb-6 sm:mb-8 hover:shadow-lg transition-shadow'>
+          <div className='flex items-start justify-between gap-3'>
+            <div className='flex items-start gap-3 sm:gap-5 flex-1 min-w-0'>
+              {/* Avatar */}
+              <div className='relative shrink-0'>
+                <div className='w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center shadow-md'>
+                  <span className='text-xl sm:text-2xl font-semibold text-white'>
+                    {profile?.name?.[0]?.toUpperCase()}
+                  </span>
                 </div>
-              )}
+                {profile?.isApproved && (
+                  <div className='absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow'>
+                    <ShieldCheck className='w-3 h-3 sm:w-3.5 sm:h-3.5 text-white' />
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className='flex-1 min-w-0'>
+                <h2 className='text-lg sm:text-xl font-semibold text-gray-900 mb-1 truncate'>
+                  {profile?.name}
+                </h2>
+                <div className='flex flex-col gap-1 sm:gap-1.5 text-xs sm:text-sm text-gray-600'>
+                  <div className='flex items-center gap-2'>
+                    <Mail className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0' />
+                    <span className='truncate'>{profile?.email}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Calendar className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0' />
+                    <span>
+                      Joined{' '}
+                      {new Date(
+                        profile?.createdAt || Date.now(),
+                      ).toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Profile Info */}
-            <div className='flex-1 min-w-0'>
-              <h2 className='text-lg sm:text-xl font-bold text-on-surface mb-1 truncate'>
-                {profile?.name || 'Owner'}
-              </h2>
-              <p className='text-xs sm:text-sm text-on-surface-variant mb-2 flex items-center gap-1.5'>
-                <Calendar className='w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0' />
-                <span className='truncate'>
-                  Joined{' '}
-                  {new Date(
-                    profile?.createdAt || Date.now(),
-                  ).toLocaleDateString('en-US', {
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
-              </p>
+            {/* Badge */}
+            <div className='hidden sm:flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full border border-purple-200 shrink-0'>
+              <Shield className='w-4 h-4' />
+              <span className='text-sm font-medium capitalize'>
+                {profile?.role}
+              </span>
+            </div>
+          </div>
 
-              {/* Badges */}
-              <div className='flex flex-wrap gap-1.5'>
-                {profile?.isApproved ? (
-                  <span className='inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] sm:text-xs font-semibold border border-emerald-100'>
-                    <ShieldCheck className='w-2.5 h-2.5 sm:w-3 sm:h-3' />
-                    <span className='hidden sm:inline'>Verified Partner</span>
-                    <span className='sm:hidden'>Verified</span>
-                  </span>
-                ) : (
-                  <span className='inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] sm:text-xs font-semibold border border-orange-100'>
-                    <span className='hidden sm:inline'>
-                      Verification Pending
-                    </span>
-                    <span className='sm:hidden'>Pending</span>
+          {/* Verification Status Badges */}
+          {(profile?.isApproved || profile?.bankDetails?.isVerified) && (
+            <div className='mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200'>
+              <div className='flex flex-wrap gap-2'>
+                {profile?.isApproved && (
+                  <span className='inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] sm:text-xs font-semibold border border-emerald-200'>
+                    <ShieldCheck className='w-3 h-3 sm:w-3.5 sm:h-3.5' />
+                    Verified Partner
                   </span>
                 )}
                 {profile?.bankDetails?.isVerified && (
-                  <span className='inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-semibold border border-blue-100'>
-                    <CreditCard className='w-2.5 h-2.5 sm:w-3 sm:h-3' />
-                    <span className='hidden sm:inline'>Bank Verified</span>
-                    <span className='sm:hidden'>Bank</span>
+                  <span className='inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-semibold border border-blue-200'>
+                    <CreditCard className='w-3 h-3 sm:w-3.5 sm:h-3.5' />
+                    Bank Verified
                   </span>
                 )}
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Menu Items */}
-        <div className='space-y-4'>
-          <div className='bg-white rounded sm:rounded-2xl border border-outline-variant/10 divide-y divide-outline-variant/10 shadow-sm overflow-hidden'>
-            {menuItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => router.push(item.href)}
-                  className='w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-surface-container-low/50 transition-all group text-left'
-                >
-                  <div className='w-9 h-9 sm:w-10 sm:h-10 bg-surface-container-low rounded-lg sm:rounded flex items-center justify-center text-on-surface-variant group-hover:bg-primary/10 group-hover:text-primary transition-all shrink-0'>
-                    <Icon className='w-4 h-4 sm:w-5 sm:h-5' />
+        {/* Account Settings Section */}
+        <div className='space-y-3 sm:space-y-6'>
+          {accountSections.map((section) => {
+            const Icon = section.icon
+            return (
+              <button
+                key={section.id}
+                onClick={() => router.push(section.path)}
+                className='w-full bg-white border border-gray-200 rounded p-4 sm:p-6 hover:shadow-lg transition-all duration-200 group text-left'
+              >
+                <div className='flex items-center justify-between gap-3'>
+                  <div className='flex items-center gap-3 sm:gap-4 flex-1 min-w-0'>
+                    <div className='w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:bg-[#FF385C]/10 transition-colors shrink-0'>
+                      <Icon className='w-5 h-5 sm:w-6 sm:h-6 text-gray-700 group-hover:text-[#FF385C] transition-colors' />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <h3 className='text-base sm:text-lg font-medium text-gray-900 mb-0.5 sm:mb-1'>
+                        {section.title}
+                      </h3>
+                      <p className='text-xs sm:text-sm text-gray-600 line-clamp-1'>
+                        {section.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className='flex-1 min-w-0'>
-                    <h3 className='text-sm sm:text-base font-semibold text-on-surface mb-0.5'>
-                      {item.title}
-                    </h3>
-                    <p className='text-xs text-on-surface-variant line-clamp-1'>
-                      {item.description}
-                    </p>
-                  </div>
-                  {/* {item.badge && (
-                    <span
-                      className={`hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 ${
-                        item.badgeColor === 'emerald'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                          : 'bg-orange-50 text-orange-700 border border-orange-100'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )} */}
-                  <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5 text-on-surface-variant/40 group-hover:text-on-surface-variant group-hover:translate-x-1 transition-all shrink-0' />
-                </button>
-              )
-            })}
-          </div>
+                  <ChevronRight className='w-5 h-5 text-gray-400 group-hover:text-gray-900 group-hover:translate-x-1 transition-all shrink-0' />
+                </div>
+              </button>
+            )
+          })}
+        </div>
 
-          {/* Logout */}
-          <div className='bg-white rounded sm:rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden'>
-            <button
-              onClick={handleLogout}
-              className='w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-red-50 transition-all group text-left'
-            >
-              <div className='w-9 h-9 sm:w-10 sm:h-10 bg-red-50 rounded-lg sm:rounded flex items-center justify-center text-red-600 group-hover:bg-red-100 transition-all shrink-0'>
-                <LogOut className='w-4 h-4 sm:w-5 sm:h-5' />
-              </div>
-              <div className='flex-1'>
-                <h3 className='text-sm sm:text-base font-semibold text-red-600'>
-                  Log out
-                </h3>
-              </div>
-              <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5 text-red-600/40 group-hover:text-red-600 group-hover:translate-x-1 transition-all shrink-0' />
-            </button>
-          </div>
+        {/* Logout Section */}
+        <div className='mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-gray-200'>
+          <button
+            onClick={handleLogout}
+            className='flex items-center gap-2.5 sm:gap-3 text-gray-900 hover:text-red-600 transition-colors group'
+          >
+            <LogOut className='w-4.5 h-4.5 sm:w-5 sm:h-5' />
+            <span className='text-sm sm:text-base font-medium'>Log out</span>
+          </button>
+        </div>
+
+        {/* Version Footer */}
+        <div className='mt-8 sm:mt-12 pt-6 sm:pt-8 text-center'>
+          <p className='text-xs text-gray-400'>Version 0.0.1</p>
         </div>
       </div>
     </div>

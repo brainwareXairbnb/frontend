@@ -8,6 +8,7 @@ import { LayoutContainer } from '@/components/LayoutContainer'
 import { Toaster } from 'sonner'
 import ScrollToTop from '@/components/ScrollToTop'
 import { ViewingAsIndicator } from '@/components/ViewingAsIndicator'
+import { AppInitializer } from '@/components/AppInitializer'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -46,33 +47,35 @@ export default function RootLayout({
       </head>
 
       <body className='min-h-screen bg-slate-50 text-slate-900 flex flex-col'>
-        <AuthProvider>
-          <ScrollToTop />
+        <AppInitializer>
+          <AuthProvider>
+            <ScrollToTop />
 
-          {/* Fixed Top Navigation Stack */}
-          <div className='sticky top-0 z-50 flex flex-col bg-white'>
-            <ViewingAsIndicator />
-            <div className='hidden md:block'>
-              <Navbar />
+            {/* Fixed Top Navigation Stack */}
+            <div className='sticky top-0 z-50 flex flex-col bg-white'>
+              <ViewingAsIndicator />
+              <div className='hidden md:block'>
+                <Navbar />
+              </div>
             </div>
-          </div>
 
-          {/* App Shell */}
-          <div className='flex flex-1 flex-col'>
-            {/* Main Content */}
-            <main className='flex-1 pb-20 md:pb-0'>
-              <LayoutContainer>{children}</LayoutContainer>
-            </main>
+            {/* App Shell */}
+            <div className='flex flex-1 flex-col'>
+              {/* Main Content */}
+              <main className='flex-1 pb-20 md:pb-0'>
+                <LayoutContainer>{children}</LayoutContainer>
+              </main>
 
-            {/* Mobile Bottom Navigation */}
-            <div className='md:hidden'>
-              <BottomNav />
+              {/* Mobile Bottom Navigation */}
+              <div className='md:hidden'>
+                <BottomNav />
+              </div>
             </div>
-          </div>
 
-          {/* Notifications */}
-          <Toaster position='bottom-center' richColors />
-        </AuthProvider>
+            {/* Notifications */}
+            <Toaster position='bottom-center' richColors />
+          </AuthProvider>
+        </AppInitializer>
       </body>
     </html>
   )

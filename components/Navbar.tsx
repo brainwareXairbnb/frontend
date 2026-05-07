@@ -36,6 +36,8 @@ export function Navbar() {
 
   const isAlreadyOwnerOrAdmin = user?.role === 'admin' || user?.role === 'owner'
 
+  console.log(user)
+
   if (isAdminOrOwner || isAuthPath) return null
 
   const hideOnMobile = isRoomDetails ? 'hidden md:block' : ''
@@ -80,7 +82,7 @@ export function Navbar() {
 
         {/* Right Nav */}
         <div className='flex items-center gap-2 relative'>
-          {!isAlreadyOwnerOrAdmin && (
+          {user !== null && !isAlreadyOwnerOrAdmin && (
             <Link
               href='/host/homes'
               className='text-sm font-semibold hover:bg-surface-container py-2.5 px-4 rounded-full transition-colors hidden lg:block text-on-surface'
@@ -89,16 +91,14 @@ export function Navbar() {
             </Link>
           )}
 
-          <Button
-            variant='outline'
-            size='sm'
+          <div
             onClick={() => setShowDropdown(!showDropdown)}
-            className='flex items-center gap-2 px-2 py-1.5 rounded-full hover:shadow-md transition-all bg-white ml-2 active:scale-95'
+            className='cursor-pointer'
           >
-            <div className='w-8 h-8 rounded-full bg-[#717171] flex items-center justify-center overflow-hidden'>
+            <div className='w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden'>
               <User className='w-5 h-5 text-white' strokeWidth={2.5} />
             </div>
-          </Button>
+          </div>
 
           {/* Desktop/Mobile Dropdown */}
           {showDropdown && (

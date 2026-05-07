@@ -14,6 +14,7 @@ export default function BottomNav() {
     '/verify-student-email',
     '/forgot-password',
     '/reset-password',
+    '/student/verify-student-email',
   ]
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path))
 

@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyStudentEmail = async (otp: string) => {
     try {
       const response = await authApi.verifyStudentEmail(otp);
-      // Update user state if returned
+      // Update user state with verified student data
       if (response.user) {
         setUser(response.user);
       }

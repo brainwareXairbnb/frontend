@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
-import { User, Mail, Phone, ChevronLeft, Loader2, KeyRound } from 'lucide-react'
+import { User, Mail, Phone, Loader2, KeyRound } from 'lucide-react'
 import { userApi } from '@/lib/api'
 
 interface PersonalInfoFormProps {
@@ -117,13 +117,6 @@ export function PersonalInfoForm({
       {/* Header */}
       <div className='bg-white border-b border-outline-variant/10'>
         <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
-          <button
-            onClick={() => router.push(backPath)}
-            className='flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors mb-3 sm:mb-4'
-          >
-            <ChevronLeft className='w-4 h-4 sm:w-5 sm:h-5' />
-            <span className='text-sm sm:text-base font-medium'>Back</span>
-          </button>
           <h1 className='text-xl sm:text-2xl font-bold text-on-surface'>
             Personal Info
           </h1>
