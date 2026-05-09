@@ -27,6 +27,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'BrainX - Student Housing for Brainware University',
   description: 'Find and book quality rooms near Brainware University campus',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    // Prevent viewport resizing when keyboard opens on mobile
+    interactiveWidget: 'resizes-content',
+  },
 }
 
 export default function RootLayout({

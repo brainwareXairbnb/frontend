@@ -308,7 +308,13 @@ export default function CreateListingDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction={isMobile ? 'bottom' : 'right'}>
-      <DrawerContent className='h-[90vh] md:h-screen w-full md:w-[600px] lg:w-[700px] md:inset-y-0 md:right-0 md:left-auto bottom-0 md:top-0 rounded-t-3xl md:rounded-none mt-0 overflow-hidden md:border-l border-outline-variant/10 flex flex-col'>
+      <DrawerContent
+        className='h-[90dvh] md:h-screen w-full md:w-[600px] lg:w-[700px] md:inset-y-0 md:right-0 md:left-auto bottom-0 md:top-0 rounded-t-3xl md:rounded-none mt-0 overflow-hidden md:border-l border-outline-variant/10 flex flex-col'
+        style={{
+          maxHeight: isMobile ? '90dvh' : '100vh',
+          height: isMobile ? '90dvh' : '100vh'
+        }}
+      >
         {/* Header */}
         <DrawerHeader className='border-b border-outline-variant/10 shrink-0 px-6 py-5 text-left'>
           <div className='flex items-center justify-between mb-4'>

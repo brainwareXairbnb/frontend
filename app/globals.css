@@ -386,3 +386,13 @@ input[type=number] {
 .animate-spin-slow {
   animation: spin-slow 3s linear infinite;
 }
+
+/* === MOBILE KEYBOARD FIX === */
+/* Use dynamic viewport height for consistent mobile drawer height */
+/* dvh (dynamic viewport height) adjusts for browser UI but not keyboard */
+@supports (height: 100dvh) {
+  [data-vaul-drawer][data-vaul-drawer-direction="bottom"] {
+    height: 90dvh !important;
+    max-height: 90dvh !important;
+  }
+}
