@@ -28,12 +28,12 @@ export default function ForgotPasswordPage() {
 
     try {
       await authApi.forgotPassword(email)
-      toast.success('Restoration Initialized', {
-        description: 'Success sequence dispatched',
+      toast.success('Password reset email sent', {
+        description: 'Check your inbox to continue.',
       })
       setSuccess(true)
     } catch (err: any) {
-      toast.error('Initialization Failed', {
+      toast.error('Failed to send reset link', {
         description: err.message || 'Please try again.',
       })
     } finally {
@@ -116,16 +116,16 @@ export default function ForgotPasswordPage() {
           <div className='mb-8 flex items-center gap-4'>
             <div className='h-0.5 w-16 bg-primary'></div>
             <span className='font-headline font-black tracking-[0.3em] text-surface text-[10px] opacity-60'>
-              Identity Recovery
+              Password Recovery
             </span>
           </div>
           <h1 className='font-headline text-6xl lg:text-8xl font-black text-surface leading-[0.95] tracking-tighter mb-10'>
-            Secure Key <br />
-            <span className='text-primary'>Restoration.</span>
+            Reset your <br />
+            <span className='text-primary'>password.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md tracking-widest text-[12px]'>
-            We'll transmit a secure encrypted link to recalibrate your account
-            credentials and restore access.
+            We’ll send you a secure link to reset your password and regain
+            access to your account.
           </p>
         </div>
       </div>
@@ -196,7 +196,7 @@ export default function ForgotPasswordPage() {
               className='text-[10px] font-black text-on-surface-variant tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
             >
               <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
-              Return to Login
+              Back to Login
             </Link>
           </div>
         </main>

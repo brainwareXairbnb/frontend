@@ -12,13 +12,8 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowRight,
-  Home,
-  Sparkles,
-  ChevronRight,
   UserPlus,
   Fingerprint,
-  CheckCircle2,
   Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -58,16 +53,16 @@ export default function RegisterPage() {
     setLoading(true)
 
     if (!formData.gender) {
-      toast.error('Identity Config Incomplete', {
-        description: 'Please select your gender Identification',
+      toast.error('Gender is required', {
+        description: 'Please select your gender.',
       })
       setLoading(false)
       return
     }
 
     if (formData.password.length < 8) {
-      toast.error('Security Protocol Violation', {
-        description: 'Minimum sequence length: 8 characters',
+      toast.error('Password is too short', {
+        description: 'Password must be at least 8 characters long.',
       })
       setLoading(false)
       return
@@ -75,10 +70,13 @@ export default function RegisterPage() {
 
     try {
       await register('student', formData)
-      toast.success("User created successfully. Please verify your email.")
+      toast.success('User created successfully. Please verify your email.')
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (err: any) {
-      const errorMessage = err?.message || err?.response?.data?.error || 'Failed to create user. Please try again.'
+      const errorMessage =
+        err?.message ||
+        err?.response?.data?.error ||
+        'Failed to create user. Please try again.'
       toast.error(errorMessage)
     } finally {
       setLoading(false)
@@ -227,7 +225,7 @@ export default function RegisterPage() {
                       key={g}
                       variant={formData.gender === g ? 'default' : 'outline'}
                       rounded='xl'
-                      className={`flex-1 h-12 text-xs ${formData.gender !== g ? 'opacity-40 hover:opacity-100' : ''}`}
+                      className={`flex-1 h-12 capitalize text-xs ${formData.gender !== g ? 'opacity-40 hover:opacity-100' : ''}`}
                       type='button'
                       onClick={() => handleGenderSelect(g)}
                       disabled={loading}

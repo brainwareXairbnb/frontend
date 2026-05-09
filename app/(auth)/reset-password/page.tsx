@@ -44,30 +44,30 @@ function ResetPasswordForm() {
     setLoading(true)
 
     if (!email) {
-      toast.error('Identity Identification Missing')
+      toast.error('Email is required')
       setLoading(false)
       return
     }
 
     if (!otp || otp.length !== 6) {
-      toast.error('Identity Sequence Invalid', {
-        description: 'Please enter the 6-digit OTP',
+      toast.error('Invalid code', {
+        description: 'Please enter the 6-digit code.',
       })
       setLoading(false)
       return
     }
 
     if (password.length < 8) {
-      toast.error('Security Protocol Violation', {
-        description: 'Minimum sequence length: 8 characters',
+      toast.error('Password is too short', {
+        description: 'Password must be at least 8 characters long.',
       })
       setLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
-      toast.error('Encryption Mismatch', {
-        description: 'New credentials do not match',
+      toast.error('Passwords do not match', {
+        description: 'Please make sure both passwords are the same.',
       })
       setLoading(false)
       return
@@ -75,8 +75,8 @@ function ResetPasswordForm() {
 
     try {
       await authApi.resetPassword(email, otp, password)
-      toast.success('Protocol Restored', {
-        description: 'Credentials synchronized successfully',
+      toast.success('Password updated', {
+        description: 'You can now log in with your new password.',
       })
       setSuccess(true)
       setTimeout(() => {
@@ -99,11 +99,11 @@ function ResetPasswordForm() {
             <CheckCircle2 className='text-white w-10 h-10' />
           </div>
           <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>
-            Protocol Restored
+            Password reset successful
           </h2>
           <p className='text-sm font-medium text-on-surface-variant leading-relaxed opacity-60 mb-8'>
-            Your cryptographic credentials have been successfully synchronized.
-            Redirecting to initialization portal...
+            Y Your password has been updated successfully. Redirecting you to
+            login...
           </p>
           <div className='w-full h-1 bg-slate-100 rounded-full overflow-hidden'>
             <div className='h-full bg-emerald-500 animate-progress origin-left'></div>
@@ -140,16 +140,15 @@ function ResetPasswordForm() {
           <div className='mb-8 flex items-center gap-4'>
             <div className='h-0.5 w-16 bg-primary'></div>
             <span className='font-headline font-black uppercase tracking-[0.3em] text-surface text-[10px] opacity-60'>
-              Identity Matrix
+              Account Security
             </span>
           </div>
           <h1 className='font-headline text-6xl lg:text-8xl font-black text-surface leading-[0.95] tracking-tighter mb-10'>
-            Secure Your <br />
-            <span className='text-primary'>Ecosystem.</span>
+            Create a <br />
+            <span className='text-primary'>new password.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            Initialize a high-entropy key to protect your managed assets and
-            student telemetry.
+            Choose a strong password to keep your account secure and protected.
           </p>
         </div>
       </div>
@@ -187,7 +186,7 @@ function ResetPasswordForm() {
                 <input
                   className='w-full h-14 bg-[#FAFAFA] border-2 border-outline-variant/5 rounded-[1.2rem] px-6 text-sm font-black text-on-surface focus:border-primary focus:bg-white outline-none transition-all placeholder:opacity-30 tracking-widest'
                   type='email'
-                  placeholder='name@ecosystem.node'
+                  placeholder='Enter your email'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -274,7 +273,7 @@ function ResetPasswordForm() {
               {loading ? (
                 <Loader2 className='w-4 h-4 animate-spin' />
               ) : (
-                'Submit'
+                'Reset Password'
               )}
             </Button>
           </form>
@@ -285,15 +284,14 @@ function ResetPasswordForm() {
               className='text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
             >
               <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
-              Return to Login
+              Back to login
             </Link>
           </div>
         </main>
 
         <footer className='w-full max-w-md mt-10 md:mt-12 text-center opacity-40 border-t border-outline-variant/5 pt-8'>
           <p className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant leading-relaxed'>
-            Secured via BrainX Identity Service <br />
-            &copy; 2026 BWX Ecosytem
+            © 2026 BrainX. All rights reserved.
           </p>
         </footer>
       </div>

@@ -53,8 +53,8 @@ function VerifyStudentEmailForm() {
     setLoading(true)
 
     if (!otp || otp.length !== 6) {
-      toast.error('Identity Sequence Invalid', {
-        description: 'Please enter the 6-digit OTP',
+      toast.error('Invalid verification code', {
+        description: 'Please enter the 6-digit verification code.',
       })
       setLoading(false)
       return
@@ -62,7 +62,7 @@ function VerifyStudentEmailForm() {
 
     try {
       await verifyStudentEmail(otp)
-      toast.success('Scholar Identity Validated')
+      toast.success('Student verification successful')
       setSuccess(true)
 
       setTimeout(() => {
@@ -82,10 +82,10 @@ function VerifyStudentEmailForm() {
 
     try {
       await authApi.resendStudentOTP()
-      toast.success('New Sequence Dispatched')
+      toast.success('We’ve sent a new verification code')
       setTimer(30)
     } catch (err: any) {
-      toast.error('Dispatch Failed', {
+      toast.error('Unable to send verification code', {
         description: err.message || 'Please try again later',
       })
     } finally {

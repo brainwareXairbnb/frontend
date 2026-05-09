@@ -8,7 +8,6 @@ import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import {
   CheckCircle2,
-  Home,
   Fingerprint,
   ArrowLeft,
   RotateCcw,
@@ -45,8 +44,8 @@ function VerifyEmailForm() {
     if (emailParam) {
       setEmail(emailParam)
     } else {
-      toast.error('Identity Identification Missing', {
-        description: 'Email parameter could not be recovered',
+      toast.error('Email not found', {
+        description: 'Please enter your email address again.',
       })
     }
   }, [searchParams])
@@ -56,14 +55,17 @@ function VerifyEmailForm() {
     setLoading(true)
 
     if (!email) {
-      toast.error('Identity Identification Missing')
+      toast.error('Missing email address', {
+        description: 'Please enter your email address.',
+      })
+
       setLoading(false)
       return
     }
 
     if (!otp || otp.length !== 6) {
-      toast.error('Identity Sequence Invalid', {
-        description: 'Please enter the 6-digit OTP',
+      toast.error('Invalid verification code', {
+        description: 'Please enter the 6-digit verification code.',
       })
       setLoading(false)
       return
@@ -71,8 +73,8 @@ function VerifyEmailForm() {
 
     try {
       const response = await verifyEmail(email, otp)
-      toast.success('Identity Verified', {
-        description: 'Node synchronized successfully',
+      toast.success('Verification successful', {
+        description: 'Your email has been verified successfully.',
       })
       setSuccess(true)
 
@@ -107,7 +109,7 @@ function VerifyEmailForm() {
 
     try {
       await authApi.resendOTP(email)
-      toast.success('New Sequence Dispatched')
+      toast.success('OTP sent successfully')
       setTimer(30)
     } catch (err: any) {
       toast.error('Dispatch Failed', {
@@ -126,11 +128,11 @@ function VerifyEmailForm() {
             <CheckCircle2 className='text-white w-10 h-10' />
           </div>
           <h2 className='text-3xl font-headline font-black text-on-surface tracking-tighter mb-4 uppercase'>
-            Identity Validated
+            Verification successful
           </h2>
           <p className='text-sm font-medium text-on-surface-variant leading-relaxed opacity-60 mb-8'>
-            Your node connection has been successfully verified. Synchronizing
-            with the ecosystem hub...
+            Your email has been verified successfully. Redirecting you to your
+            account...
           </p>
           <div className='w-full h-1 bg-slate-100 rounded-full overflow-hidden'>
             <div className='h-full bg-emerald-500 animate-progress origin-left'></div>
@@ -167,16 +169,16 @@ function VerifyEmailForm() {
           <div className='mb-8 flex items-center gap-4'>
             <div className='h-0.5 w-16 bg-primary'></div>
             <span className='font-headline font-black uppercase tracking-[0.3em] text-surface text-[10px] opacity-60'>
-              Sync Pending
+              Email Verification
             </span>
           </div>
           <h1 className='font-headline text-6xl lg:text-8xl font-black text-surface leading-[0.95] tracking-tighter mb-10'>
             Verify Your <br />
-            <span className='text-primary'>Connection.</span>
+            <span className='text-primary'>account.</span>
           </h1>
           <p className='text-xl font-medium text-surface/60 leading-relaxed max-w-md uppercase tracking-widest text-[12px]'>
-            A 6-digit verification sequence has been dispatched to your primary
-            identifier.
+            We have sent a 6-digit verification code to your email address to
+            confirm your account.
           </p>
         </div>
       </div>
@@ -186,11 +188,12 @@ function VerifyEmailForm() {
         <header className='w-full max-w-md mb-6 md:mb-8 animate-in fade-in slide-in-from-top-4 duration-700'>
           <Logo />
 
-          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3 uppercase'>
-            Verification Check
+          <h2 className='text-4xl font-headline font-black text-on-surface tracking-tighter mb-3'>
+            Enter verification code
           </h2>
           <p className='text-[12px] font-black tracking-[0.2em] text-on-surface-variant opacity-60'>
-            Sent to <span className='text-on-surface opacity-100'>{email}</span>
+            We sent a code to{' '}
+            <span className='text-on-surface opacity-100'>{email}</span>
           </p>
         </header>
 
@@ -199,7 +202,7 @@ function VerifyEmailForm() {
             <div className='space-y-2'>
               <div className='flex justify-between items-center px-1'>
                 <label className='text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40'>
-                  Verification Code (OTP)
+                  Verification code
                 </label>
                 <Fingerprint className='w-4 h-4 text-primary opacity-40' />
               </div>
@@ -218,7 +221,7 @@ function VerifyEmailForm() {
                 />
               </div>
               <p className='text-[9px] text-center font-black uppercase tracking-widest text-on-surface-variant opacity-30'>
-                Code lifecycle terminates in 15 minutes
+                This code will expire in 15 minutes.
               </p>
             </div>
 
@@ -232,8 +235,8 @@ function VerifyEmailForm() {
           </form>
 
           <div className='text-center mt-6 space-y-2'>
-            <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40'>
-              OTP not received?
+            <p className='text-[10px] font-black tracking-widest text-on-surface-variant opacity-40'>
+              Did not receive the code?
             </p>
             <Button
               variant='outline'
@@ -245,7 +248,7 @@ function VerifyEmailForm() {
                 className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`}
               />
               {resending
-                ? 'DISPATCHING...'
+                ? 'Sending...'
                 : timer > 0
                   ? `Resend in ${timer}s`
                   : 'Resend Code'}
@@ -255,18 +258,17 @@ function VerifyEmailForm() {
           <div className='text-center mt-6'>
             <Link
               href='/login'
-              className='text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
+              className='text-[10px] font-black text-on-surface-variant tracking-[0.2em] hover:text-primary transition-all inline-flex items-center gap-2 group'
             >
               <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
-              Return to Login
+              Back to login
             </Link>
           </div>
         </main>
 
         <footer className='w-full max-w-md mt-10 md:mt-12 text-center opacity-40 border-t border-outline-variant/5 pt-6'>
-          <p className='text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant leading-relaxed'>
-            Secured via Brainware Rooms Identity Service <br />
-            &copy; 2026 BWU Ecosytem Node
+          <p className='text-[9px] font-black tracking-[0.2em] text-on-surface-variant leading-relaxed'>
+            © 2026 Brainware Rooms. All rights reserved.
           </p>
         </footer>
       </div>
