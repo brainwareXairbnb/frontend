@@ -16,18 +16,24 @@ interface BasicInfoStepProps {
   disabled?: boolean
 }
 
-export function BasicInfoStep({ formData, onChange, disabled = false }: BasicInfoStepProps) {
+export function BasicInfoStep({
+  formData,
+  onChange,
+  disabled = false,
+}: BasicInfoStepProps) {
   return (
     <section className='space-y-4'>
       <div className='flex items-center gap-3 mb-4'>
         <div className='w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center'>
           <Home className='w-4 h-4 text-primary' />
         </div>
-        <h3 className='text-base font-bold text-on-surface'>Basic Information</h3>
+        <h3 className='text-base font-bold text-on-surface'>
+          Basic Information
+        </h3>
       </div>
 
       <div className='space-y-2'>
-        <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+        <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
           Property Title *
         </label>
         <input
@@ -42,7 +48,7 @@ export function BasicInfoStep({ formData, onChange, disabled = false }: BasicInf
       </div>
 
       <div className='space-y-2'>
-        <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+        <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
           Description
         </label>
         <textarea
@@ -57,7 +63,7 @@ export function BasicInfoStep({ formData, onChange, disabled = false }: BasicInf
 
       <div className='grid grid-cols-2 gap-4'>
         <div className='space-y-2'>
-          <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+          <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
             Room Type
           </label>
           <select
@@ -77,7 +83,7 @@ export function BasicInfoStep({ formData, onChange, disabled = false }: BasicInf
         </div>
 
         <div className='space-y-2'>
-          <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+          <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
             Preferred Gender
           </label>
           <select
@@ -95,7 +101,7 @@ export function BasicInfoStep({ formData, onChange, disabled = false }: BasicInf
       </div>
 
       <div className='space-y-2'>
-        <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+        <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
           Total Beds / Capacity *
         </label>
         <div className='relative'>

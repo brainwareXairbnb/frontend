@@ -67,7 +67,7 @@ export function PricingAmenitiesStep({
 
         <div className='grid grid-cols-2 gap-4'>
           <div className='space-y-2'>
-            <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+            <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
               Monthly Rent *
             </label>
             <div className='relative'>
@@ -88,7 +88,7 @@ export function PricingAmenitiesStep({
           </div>
 
           <div className='space-y-2'>
-            <label className='text-xs font-semibold text-on-surface-variant uppercase tracking-wider'>
+            <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
               Security Deposit
             </label>
             <div className='relative'>
@@ -146,7 +146,9 @@ export function PricingAmenitiesStep({
                 onChange={() => toggleAmenity(amenity)}
                 disabled={disabled}
               />
-              <span className='text-xs font-semibold text-on-surface'>{amenity}</span>
+              <span className='text-xs font-semibold text-on-surface'>
+                {amenity}
+              </span>
             </label>
           ))}
         </div>
@@ -159,7 +161,9 @@ export function PricingAmenitiesStep({
             <div className='w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center'>
               <Power className='w-4 h-4 text-emerald-600' />
             </div>
-            <h3 className='text-base font-bold text-on-surface'>Availability Status</h3>
+            <h3 className='text-base font-bold text-on-surface'>
+              Availability Status
+            </h3>
           </div>
 
           <div className='bg-gradient-to-br from-white to-gray-50 rounded-2xl p-5 border-2 border-outline-variant/20 shadow-sm'>
@@ -168,7 +172,9 @@ export function PricingAmenitiesStep({
                 <div className='flex items-center gap-2 mb-1.5'>
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      availability.isAvailable ? 'bg-emerald-500' : 'bg-gray-400'
+                      availability.isAvailable
+                        ? 'bg-emerald-500'
+                        : 'bg-gray-400'
                     } animate-pulse`}
                   />
                   <h4 className='text-sm font-bold text-on-surface'>
