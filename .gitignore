@@ -45,3 +45,6 @@ next-env.d.ts
 
 AGENTS.md
 CLAUDE.md
+
+# Claude Code temp files
+tmpclaude*

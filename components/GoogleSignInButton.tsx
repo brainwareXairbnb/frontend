@@ -80,10 +80,10 @@ export default function GoogleSignInButton({
       // Redirect based on role
       const role = user.role
       if (role === 'admin') {
-        router.push('/admin/users')
+        router.push('/admin/dashboard')
       } else if (role === 'owner') {
         if (user.isApproved) {
-          router.push('/owner/listings')
+          router.push('/owner')
         } else {
           router.push('/pending-approval')
         }

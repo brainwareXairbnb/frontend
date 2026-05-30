@@ -293,6 +293,7 @@ export interface AuthContextType {
   loginWithGoogle: (idToken: string) => Promise<User>
   verifyEmail: (email: string, otp: string) => Promise<{ user: User; accessToken: string; message: string }>
   verifyStudentEmail: (otp: string) => Promise<{ user: User; message: string }>
+  refreshUser: () => Promise<User>
 }
 
 export interface FetchOptions extends RequestInit {
@@ -399,4 +400,193 @@ export interface SearchParams {
   maxPrice?: number
   roomType?: string
   gender?: string
+}
+
+// ============================================================================
+// Payment & Notification Types
+// ============================================================================
+
+export interface PaymentSchedule {
+  _id: string
+  listing: {
+    _id: string
+    title: string
+    photos: string[]
+  }
+  owner: {
+    _id: string
+    name: string
+  }
+  monthlyRent: number
+  schedules: Array<{
+    month: number
+    dueDate: string
+    amount: number
+    status: 'pending' | 'processing' | 'paid' | 'failed'
+    failedAttempts: number
+  }>
+  autoPayEnabled: boolean
+  monthsPaid: number
+  totalMonths: number
+}
+
+export type NotificationType =
+  | 'booking_request'
+  | 'booking_accepted'
+  | 'booking_rejected'
+  | 'booking_cancelled'
+  | 'payment_confirmed'
+  | 'payout_processing'
+  | 'payout_settled'
+  | 'payout_failed'
+  | 'listing_approved'
+  | 'listing_rejected'
+  | 'listing_changes_required'
+  | 'listing_submitted'
+  | 'listing_resubmitted'
+  | 'listing_deleted'
+  | 'listing_unlisted'
+  | 'listing_relisted'
+  | 'owner_approved'
+  | 'owner_rejected'
+  | 'owner_upgrade_approved'
+  | 'owner_upgrade_rejected'
+  | 'owner_upgrade_requested'
+  | 'new_review'
+  | 'review_flagged'
+  | 'account_warned'
+  | 'account_suspended'
+  | 'account_banned'
+  | 'bookmark_unavailable'
+  | 'payment_failed'
+  | 'booking_dispute'
+  | 'refund_request'
+  | 'new_user_registered'
+  | 'system_alert'
+
+export interface Notification {
+  _id: string
+  user: string
+  type: NotificationType
+  title: string
+  message: string
+  reference?: {
+    model: string
+    id: string
+  }
+  isRead: boolean
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface NotificationConfig {
+  icon: any // LucideIcon type
+  color: string
+  bg: string
+}
+
+// ============================================================================
+// Booking Types
+// ============================================================================
+
+export type BookingStatus =
+  | 'pending'
+  | 'accepted'
+  | 'rejected'
+  | 'cancelled'
+  | 'payment_confirmed'
+  | 'completed'
+
+export interface Booking {
+  _id: string
+  student: {
+    _id: string
+    name: string
+    email: string
+    phone: string
+    isStudentVerified?: boolean
+    studentEmail?: string
+  }
+  listing: {
+    _id: string
+    title: string
+    photos: string[]
+    address: {
+      street: string
+      city: string
+      state?: string
+    }
+    rent: number
+    deposit?: number
+  }
+  moveInDate: string
+  durationMonths: number
+  message: string
+  status: BookingStatus
+  createdAt: string
+  updatedAt?: string
+  ownerReply?: string
+  paymentId?: string
+  hasReview?: boolean
+}
+
+// ============================================================================
+// Additional Component Props Types
+// ============================================================================
+
+export interface GoogleSignInButtonProps {
+  onSuccess: (credential: string) => void
+  onError?: (error: any) => void
+}
+
+export interface ImageModalProps {
+  isOpen: boolean
+  onClose: () => void
+  images: string[]
+  initialIndex?: number
+}
+
+export interface PhotoUploadProps {
+  photos: string[]
+  onPhotosChange: (photos: string[]) => void
+  maxPhotos?: number
+}
+
+export interface SplashScreenProps {
+  onComplete?: () => void
+}
+
+export interface AppInitializerProps {
+  children: React.ReactNode
+}
+
+// Notification Component Props
+export interface NotificationCardProps {
+  notification: Notification
+  onClick?: () => void
+}
+
+export interface NotificationEmptyStateProps {
+  message?: string
+}
+
+export interface NotificationFilterHeaderProps {
+  activeFilter: string
+  onFilterChange: (filter: string) => void
+  unreadCount?: number
+}
+
+export interface NotificationListProps {
+  notifications: Notification[]
+  onNotificationClick?: (notification: Notification) => void
+}
+
+// Profile Component Props
+export interface PersonalInfoFormProps {
+  user: User
+  onSuccess?: () => void
+}
+
+export interface ChangePasswordFormProps {
+  onSuccess?: () => void
 }

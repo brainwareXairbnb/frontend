@@ -1,294 +1,484 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { 
-  Search, 
-  Filter, 
-  ArrowUpDown, 
-  Home, 
-  MoreVertical, 
-  ChevronLeft, 
+import { useState, useEffect } from 'react'
+import {
+  Search,
+  Filter,
+  ArrowUpDown,
+  Home,
+  MoreVertical,
+  ChevronLeft,
   ChevronRight,
   Calendar,
   Clock,
   User,
   Building2,
-  FileText
-} from 'lucide-react';
+  FileText,
+  Loader2,
+  AlertCircle,
+  IndianRupee,
+  Eye,
+} from 'lucide-react'
+import { adminApi } from '@/lib/api'
+import { toast } from 'sonner'
+import { format, addMonths } from 'date-fns'
+import { EmptyState } from '@/components/EmptyState'
+import { Button } from '@/components/ui/button'
 
 export default function AdminBookingsPage() {
-  const [activeView, setActiveView] = useState('list');
+  const [activeView, setActiveView] = useState('list')
+  const [loading, setLoading] = useState(true)
+  const [bookings, setBookings] = useState<any[]>([])
+  const [pagination, setPagination] = useState<any>(null)
+  const [statusFilter, setStatusFilter] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [stats, setStats] = useState<any>(null)
 
-  const bookings = [
-    {
-      id: 'BR-88218',
-      property: 'The Scholar Suite',
-      propertyImage: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=400&h=300&fit=crop',
-      student: 'Arnesh Maheshwari',
-      owner: 'Priya Chatterjee',
-      checkIn: 'Feb 12, 2024',
-      checkOut: 'Jul 30, 2024',
-      duration: '169 days',
-      amount: '₹82,400',
-      status: 'Accepted',
-      badge: 'ONGOING',
-    },
-    {
-      id: 'BR-88220',
-      property: 'Urban Retreat',
-      propertyImage: 'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=400&h=300&fit=crop',
-      student: 'Rohit Kumar',
-      owner: 'Ankit Verma',
-      checkIn: 'Feb 20, 2024',
-      checkOut: 'Jun 18, 2024',
-      duration: '119 days',
-      amount: '₹54,200',
-      status: 'Payment Confirmed',
-      badge: null,
-    },
-    {
-      id: 'BR-88225',
-      property: 'Heritage Loft',
-      propertyImage: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
-      student: 'Sneha Roy',
-      owner: 'Arjun Das',
-      checkIn: 'Feb 08, 2024',
-      checkOut: 'June 20, 2024',
-      duration: '133 days',
-      amount: '₹68,900',
-      status: 'Pending',
-      badge: null,
-    },
-    {
-      id: 'BR-87910',
-      property: 'Smart Haven',
-      propertyImage: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
-      student: 'Priya Sharma',
-      owner: 'Rohit Saha',
-      checkIn: 'Jan 15, 2024',
-      checkOut: 'Jul 15, 2024',
-      duration: '182 days',
-      amount: '₹91,200',
-      status: 'Completed',
-      badge: null,
-    },
-  ];
+  useEffect(() => {
+    fetchAnalytics()
+  }, [])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Accepted':
-      case 'Completed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'Payment Confirmed':
-        return 'bg-blue-50 text-blue-600 border border-blue-100';
-      case 'Pending':
-        return 'bg-orange-50 text-orange-600 border border-orange-100';
-      case 'Cancelled':
-        return 'bg-red-50 text-red-600 border border-red-100';
-      default:
-        return 'bg-gray-50 text-gray-600 border border-gray-100';
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchBookings()
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [statusFilter, searchQuery, page])
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await adminApi.getAnalytics()
+      setStats(response.bookings)
+    } catch (error: any) {
+      console.error('Failed to load analytics:', error)
     }
-  };
+  }
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true)
+      const response = await adminApi.getBookings({
+        status: statusFilter || undefined,
+        page,
+        limit: 10,
+      })
+      setBookings(response.bookings)
+      setPagination(response.pagination)
+    } catch (error: any) {
+      toast.error('Failed to load bookings', { description: error.message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return {
+          label: 'Reviewing',
+          color: 'bg-orange-50 text-orange-600 border-orange-100',
+        }
+      case 'accepted':
+        return {
+          label: 'Confirmed',
+          color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+        }
+      case 'rejected':
+        return {
+          label: 'Rejected',
+          color: 'bg-red-50 text-red-600 border-red-100',
+        }
+      case 'cancelled':
+        return {
+          label: 'Cancelled',
+          color: 'bg-gray-50 text-gray-600 border-gray-100',
+        }
+      case 'payment_confirmed':
+        return {
+          label: 'Paid',
+          color: 'bg-blue-50 text-blue-600 border-blue-100',
+        }
+      case 'completed':
+        return {
+          label: 'Finished',
+          color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+        }
+      default:
+        return {
+          label: status,
+          color: 'bg-gray-50 text-gray-600 border-gray-100',
+        }
+    }
+  }
+
+  const calculateMoveOut = (moveIn: string, months: number) => {
+    try {
+      return format(addMonths(new Date(moveIn), months), 'MMM dd, yyyy')
+    } catch (e) {
+      return 'N/A'
+    }
+  }
+
+  if (loading && bookings.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
+        <Loader2 className='w-10 h-10 text-primary animate-spin' />
+        <p className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-40'>
+          Loading platform bookings...
+        </p>
+      </div>
+    )
+  }
 
   return (
-    <div className="px-6 md:px-12 py-6 pb-20">
-      {/* Header Section */}
-      <header className="mb-8">
-        <h2 className="text-xl font-headline font-bold text-on-surface mb-1">Booking Management</h2>
-        <p className="text-on-surface-variant font-body text-sm leading-relaxed mb-6 max-w-2xl">
-          Comprehensive overview of all platform bookings with real-time status tracking and management.
-        </p>
-        <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-          <div className="flex-1 bg-white border border-outline-variant/10 rounded-xl px-4 py-3 flex items-center gap-3 w-full max-w-md shadow-sm focus-within:border-primary transition-all">
-            <Search className="text-on-surface-variant w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by student, owner, or Booking ID..."
-              className="flex-1 bg-transparent border-none focus:outline-none text-sm placeholder:text-on-surface-variant/40"
-            />
+    <div className='min-h-screen bg-[#fafafa] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24'>
+      {/* Header */}
+      <header className='mb-6 sm:mb-8'>
+        <div className='flex items-center gap-2 mb-3'>
+          <div className='w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center'>
+            <Calendar className='w-4 h-4 text-primary' />
           </div>
-          <div className="flex flex-wrap gap-3">
-            <button className="h-12 px-4 bg-white border border-outline-variant/10 rounded-xl text-xs font-black uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 shadow-sm">
-              <Filter className="w-4 h-4" />
-              Filter
-            </button>
-            <button className="h-12 px-4 bg-white border border-outline-variant/10 rounded-xl text-xs font-black uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 shadow-sm">
-              <ArrowUpDown className="w-4 h-4" />
-              Sort
-            </button>
-            <button className="h-12 px-6 bg-primary text-on-primary rounded-xl font-black text-xs uppercase tracking-[0.15em] hover:brightness-110 active:scale-95 transition-all shadow-md shadow-primary/20">
-              Apply
-            </button>
+
+          <span className='text-xs font-semibold tracking-wide text-primary uppercase'>
+            Booking Overview
+          </span>
+        </div>
+
+        <div className='flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4'>
+          <div>
+            <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-on-surface'>
+              Booking Management
+            </h1>
+
+            <p className='mt-2 text-sm text-on-surface-variant max-w-2xl leading-relaxed'>
+              Manage reservations, payment statuses, tenants, and property
+              bookings across the platform.
+            </p>
           </div>
         </div>
       </header>
 
-      {/* View Toggle */}
-      <div className="mb-8 flex gap-3 p-1 bg-surface-container-lowest w-fit rounded-2xl border border-outline-variant/10">
-        <button
-          onClick={() => setActiveView('list')}
-          className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-            activeView === 'list'
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-on-surface-variant hover:text-on-surface'
-          }`}
-        >
-          List View
-        </button>
-        <button
-          onClick={() => setActiveView('calendar')}
-          className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-            activeView === 'calendar'
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-on-surface-variant hover:text-on-surface'
-          }`}
-        >
-          Calendar
-        </button>
+      {/* Stats */}
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-2'>Total Bookings</p>
+          <h3 className='text-2xl font-bold'>{stats?.total || 0}</h3>
+        </div>
+
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-2'>Confirmed</p>
+          <h3 className='text-2xl font-bold text-blue-600'>
+            {stats?.paymentConfirmed || 0}
+          </h3>
+        </div>
+
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-2'>Pending</p>
+          <h3 className='text-2xl font-bold text-amber-500'>
+            {bookings.filter((b) => b.status === 'pending').length}
+          </h3>
+        </div>
+
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-2'>Completed</p>
+          <h3 className='text-2xl font-bold text-emerald-600'>
+            {stats?.completed || 0}
+          </h3>
+        </div>
       </div>
 
-      {/* Bookings List */}
-      <section className="space-y-4">
-        {bookings.map((booking) => (
-          <div
-            key={booking.id}
-            className="group bg-white rounded-3xl border border-outline-variant/10 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-          >
-            <div className="p-6 flex flex-col lg:flex-row gap-6">
-              {/* Property Image */}
-              <div className="relative w-full lg:w-40 h-40 rounded-2xl overflow-hidden bg-surface-container shrink-0">
-                {booking.badge && (
-                  <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm text-on-primary px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest z-10 border border-primary/20">
-                    {booking.badge}
-                  </div>
-                )}
-                <img
-                  alt={booking.property}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  src={booking.propertyImage}
-                />
-              </div>
+      {/* Filters */}
+      <div className='sticky top-0 z-20 bg-[#fafafa]/90 backdrop-blur-xl pb-4 mb-6'>
+        <div className='flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between'>
+          {/* Search */}
+          <div className='relative flex-1 max-w-xl'>
+            <Search className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/50' />
 
-              {/* Booking Details */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
-                {/* Booking ID & Property */}
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60 mb-1">
-                      Booking ID
-                    </p>
-                    <p className="text-xl font-headline font-black text-on-surface tracking-tight group-hover:text-primary transition-colors">
-                      #{booking.id}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-on-surface-variant">
-                    <Home className="w-3.5 h-3.5" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider truncate">{booking.property}</span>
-                  </div>
-                </div>
-
-                {/* Student & Owner */}
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">
-                    Parties Involved
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-primary/5 flex items-center justify-center">
-                      <User className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <p className="text-sm font-bold text-on-surface">{booking.student}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center">
-                      <Building2 className="w-3.5 h-3.5 text-on-surface-variant" />
-                    </div>
-                    <p className="text-[11px] font-bold text-on-surface-variant truncate">Owner: {booking.owner}</p>
-                  </div>
-                </div>
-
-                {/* Duration */}
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">
-                    Stay Duration
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-on-surface-variant" />
-                    <p className="text-xs font-bold text-on-surface">{booking.checkIn}</p>
-                  </div>
-                  <div className="flex items-center gap-2 pl-[1.125rem] border-l border-outline-variant/30 ml-[0.4375rem] py-1">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      <p className="text-[11px] font-black text-primary uppercase tracking-wider">{booking.duration}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 font-medium">
-                    <p className="text-[10px] text-on-surface-variant opacity-60 uppercase pl-[1.125rem]">to</p>
-                    <p className="text-xs font-bold text-on-surface">{booking.checkOut}</p>
-                  </div>
-                </div>
-
-                {/* Status & Actions */}
-                <div className="flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">
-                      Current Status
-                    </p>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${getStatusColor(booking.status)}`}>
-                      {booking.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-4">
-                    <button className="flex-1 bg-surface-container hover:bg-surface-container-high h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-on-surface transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2">
-                      <FileText className="w-3.5 h-3.5" />
-                      Details
-                    </button>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-lowest border border-outline-variant/10 hover:bg-surface-container active:scale-95 transition-all">
-                      <MoreVertical className="w-4 h-4 text-on-surface-variant" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div className="lg:border-l lg:border-outline-variant/10 lg:pl-6 flex flex-col justify-center items-start lg:items-end lg:min-w-[140px]">
-                <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60 mb-2">
-                  Total Revenue
-                </p>
-                <p className="text-2xl font-headline font-black text-primary tracking-tighter">
-                  {booking.amount}
-                </p>
-                <div className="mt-2 flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
-                  <span className="text-[8px] font-black uppercase tracking-widest">PAID</span>
-                </div>
-              </div>
-            </div>
+            <input
+              type='text'
+              placeholder='Search bookings...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full h-12 pl-11 pr-4 rounded-xl border border-outline-variant/20 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20'
+            />
           </div>
-        ))}
+
+          {/* Actions */}
+          <div className='flex gap-3 w-full lg:w-auto'>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value)
+                setPage(1)
+              }}
+              className='h-12 px-4 rounded-xl border border-outline-variant/20 bg-white text-sm shadow-sm flex-1 lg:flex-none focus:outline-none'
+            >
+              <option value=''>All Status</option>
+              <option value='pending'>Reviewing</option>
+              <option value='accepted'>Confirmed</option>
+              <option value='payment_confirmed'>Paid</option>
+              <option value='completed'>Finished</option>
+              <option value='rejected'>Rejected</option>
+              <option value='cancelled'>Cancelled</option>
+            </select>
+
+            <Button
+              onClick={fetchBookings}
+              className='h-12 px-5 rounded-xl shadow-sm'
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking List */}
+      <section className='space-y-4'>
+        {bookings.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title='No Bookings Found'
+            message={
+              statusFilter
+                ? `No ${getStatusDisplay(
+                    statusFilter,
+                  ).label.toLowerCase()} bookings found.`
+                : 'There are no bookings yet.'
+            }
+          />
+        ) : (
+          bookings.map((booking) => {
+            const status = getStatusDisplay(booking.status)
+
+            return (
+              <div
+                key={booking._id}
+                className='group bg-white rounded-2xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden'
+              >
+                <div className='p-4 sm:p-5 lg:p-6 flex flex-col xl:flex-row gap-5'>
+                  {/* Image */}
+                  <div className='relative w-full xl:w-52 h-52 sm:h-60 xl:h-44 rounded-2xl overflow-hidden bg-surface-container shrink-0'>
+                    {booking.isPaid && (
+                      <div className='absolute top-3 left-3 z-10 bg-emerald-500 text-white px-3 py-1 rounded-full text-[11px] font-medium shadow-sm flex items-center gap-1'>
+                        <IndianRupee className='w-3 h-3' />
+                        Paid
+                      </div>
+                    )}
+
+                    <img
+                      src={
+                        booking.listing?.photos?.[0] ||
+                        `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400`
+                      }
+                      alt={booking.listing?.title || 'Property'}
+                      className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className='flex-1 flex flex-col justify-between'>
+                    {/* Top */}
+                    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'>
+                      {/* Property */}
+                      <div>
+                        <p className='text-xs uppercase tracking-wide text-on-surface-variant mb-2'>
+                          Booking ID
+                        </p>
+
+                        <h3 className='text-lg font-bold mb-3'>
+                          #{booking._id.substring(18).toUpperCase()}
+                        </h3>
+
+                        <div className='flex items-start gap-3'>
+                          <div className='w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center shrink-0'>
+                            <Home className='w-4 h-4 text-on-surface-variant' />
+                          </div>
+
+                          <div>
+                            <p className='font-semibold text-sm leading-snug'>
+                              {booking.listing?.title || 'Unknown Property'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* People */}
+                      <div>
+                        <p className='text-xs uppercase tracking-wide text-on-surface-variant mb-3'>
+                          People
+                        </p>
+
+                        <div className='space-y-4'>
+                          <div className='flex items-center gap-3'>
+                            <div className='w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center'>
+                              <User className='w-4 h-4 text-primary' />
+                            </div>
+
+                            <div>
+                              <p className='text-sm font-semibold'>
+                                {booking.student?.name || 'Guest'}
+                              </p>
+
+                              <p className='text-xs text-on-surface-variant'>
+                                Student
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className='flex items-center gap-3'>
+                            <div className='w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center'>
+                              <Building2 className='w-4 h-4 text-on-surface-variant' />
+                            </div>
+
+                            <div>
+                              <p className='text-sm font-semibold'>
+                                {booking.owner?.name || 'Partner'}
+                              </p>
+
+                              <p className='text-xs text-on-surface-variant'>
+                                Property Owner
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Stay */}
+                      <div>
+                        <p className='text-xs uppercase tracking-wide text-on-surface-variant mb-3'>
+                          Stay Details
+                        </p>
+
+                        <div className='space-y-3'>
+                          <div className='flex items-center gap-3'>
+                            <Calendar className='w-4 h-4 text-on-surface-variant' />
+
+                            <span className='text-sm font-medium'>
+                              {format(
+                                new Date(booking.moveInDate),
+                                'MMM dd, yyyy',
+                              )}
+                            </span>
+                          </div>
+
+                          <div className='flex items-center gap-3'>
+                            <Clock className='w-4 h-4 text-primary' />
+
+                            <span className='text-sm font-medium text-primary'>
+                              {booking.durationMonths} Months
+                            </span>
+                          </div>
+
+                          <div className='flex items-center gap-3'>
+                            <Calendar className='w-4 h-4 text-on-surface-variant' />
+
+                            <span className='text-sm text-on-surface-variant'>
+                              {calculateMoveOut(
+                                booking.moveInDate,
+                                booking.durationMonths,
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom */}
+                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-5 border-t border-outline-variant/10'>
+                      {/* Status */}
+                      <div>
+                        <span
+                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${status.color}`}
+                        >
+                          <span className='w-2 h-2 rounded-full bg-current mr-2 opacity-70' />
+                          {status.label}
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className='flex gap-2 w-full sm:w-auto'>
+                        <Button
+                          variant='outline'
+                          className='flex-1 sm:flex-none h-11 px-5 rounded-xl border-outline-variant/20'
+                        >
+                          <Eye className='w-4 h-4 mr-2' />
+                          View Details
+                        </Button>
+
+                        {/* <Button
+                          variant='outline'
+                          size='icon'
+                          className='h-11 w-11 rounded-2xl border-outline-variant/20'
+                        >
+                          <MoreVertical className='w-4 h-4' />
+                        </Button> */}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })
+        )}
       </section>
 
       {/* Pagination */}
-      <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-          Showing <span className="text-on-surface font-black">1-4</span> of <span className="text-on-surface font-black">1,842</span> bookings
-        </p>
-        <div className="flex gap-2 p-1 bg-surface-container-lowest rounded-2xl border border-outline-variant/10">
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all active:scale-90">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 text-on-primary font-black text-xs">
-            1
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all text-xs font-bold active:scale-90">
-            2
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all text-xs font-bold active:scale-90">
-            3
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container transition-all active:scale-90">
-            <ChevronRight className="w-5 h-5" />
-          </button>
+      {pagination && pagination.pages > 1 && (
+        <div className='mt-8 bg-white rounded-2xl border border-outline-variant/10 shadow-sm p-4 sm:p-5'>
+          <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+            <p className='text-sm text-on-surface-variant'>
+              Showing{' '}
+              <span className='font-semibold text-on-surface'>
+                {(page - 1) * 10 + 1}
+              </span>{' '}
+              to{' '}
+              <span className='font-semibold text-on-surface'>
+                {Math.min(page * 10, pagination.total)}
+              </span>{' '}
+              of{' '}
+              <span className='font-semibold text-on-surface'>
+                {pagination.total}
+              </span>{' '}
+              bookings
+            </p>
+
+            <div className='flex items-center gap-2 overflow-x-auto no-scrollbar'>
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className='min-w-[40px] h-10 rounded-xl border border-outline-variant/10 bg-white flex items-center justify-center hover:bg-surface-container transition-all disabled:opacity-40'
+              >
+                <ChevronLeft className='w-4 h-4' />
+              </button>
+
+              {[...Array(pagination.pages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPage(i + 1)}
+                  className={`min-w-[40px] h-10 rounded-xl text-sm font-medium transition-all ${
+                    page === i + 1
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'border border-outline-variant/10 bg-white hover:bg-surface-container'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                disabled={page === pagination.pages}
+                onClick={() =>
+                  setPage((p) => Math.min(pagination.pages, p + 1))
+                }
+                className='min-w-[40px] h-10 rounded-xl border border-outline-variant/10 bg-white flex items-center justify-center hover:bg-surface-container transition-all disabled:opacity-40'
+              >
+                <ChevronRight className='w-4 h-4' />
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  );
+  )
 }

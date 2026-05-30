@@ -118,6 +118,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authApi.getCurrentUser();
+      setUser(response.user);
+      return response.user;
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -128,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithGoogle,
     verifyEmail,
     verifyStudentEmail,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,6 +1,6 @@
 export default function AdminUsersSkeleton() {
   return (
-    <div className='px-4 md:px-12 py-6 pb-24'>
+    <div className='px-2 md:px-12 py-6 pb-24'>
       {/* KPI Cards Skeleton */}
       <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 animate-pulse'>
         {[1, 2, 3, 4].map((stat) => (

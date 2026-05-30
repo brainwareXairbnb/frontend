@@ -4,11 +4,15 @@ const nextConfig: NextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   trailingSlash: false,
   reactStrictMode: false,
-  // Ensure proper base path for Capacitor apps
-  assetPrefix: '',
 }
 
 export default nextConfig

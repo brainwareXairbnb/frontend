@@ -29,7 +29,7 @@ export default function CreateListingDrawer({
   editingListing,
   viewMode = false,
 }: CreateListingDrawerProps) {
-  const [loading, setLoading] = useState(false)
+  const [loadingAction, setLoadingAction] = useState<'draft' | 'submit' | null>(null)
   const [photos, setPhotos] = useState<string[]>([])
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 4
@@ -150,7 +150,7 @@ export default function CreateListingDrawer({
     }
 
     try {
-      setLoading(true)
+      setLoadingAction('draft')
 
       const listingData = {
         title: formData.title,
@@ -215,7 +215,7 @@ export default function CreateListingDrawer({
         description: error.message,
       })
     } finally {
-      setLoading(false)
+      setLoadingAction(null)
     }
   }
 
@@ -233,7 +233,7 @@ export default function CreateListingDrawer({
     }
 
     try {
-      setLoading(true)
+      setLoadingAction('submit')
 
       const listingData = {
         title: formData.title,
@@ -302,7 +302,7 @@ export default function CreateListingDrawer({
         description: error.message,
       })
     } finally {
-      setLoading(false)
+      setLoadingAction(null)
     }
   }
 
@@ -424,7 +424,7 @@ export default function CreateListingDrawer({
             <FormNavigation
               currentStep={currentStep}
               totalSteps={totalSteps}
-              loading={loading}
+              loadingAction={loadingAction}
               editingListing={editingListing}
               onPrevStep={handlePrevStep}
               onNextStep={handleNextStep}

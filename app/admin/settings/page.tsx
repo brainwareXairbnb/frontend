@@ -1,198 +1,298 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { 
-  RefreshCcw, 
-  Gavel, 
-  ShieldCheck, 
-  Info, 
-  History, 
-  Download, 
+import { useState, useEffect } from 'react'
+import {
+  RefreshCcw,
+  Gavel,
+  ShieldCheck,
+  Info,
+  History,
+  Download,
   AlertCircle,
   FileText,
   CheckCircle2,
-  Clock
-} from 'lucide-react';
+  Clock,
+  Loader2,
+} from 'lucide-react'
+import { adminApi } from '@/lib/api'
+import { useAuth } from '@/lib/auth-context'
+import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 
 export default function AdminSettingsPage() {
-  const [serviceRate, setServiceRate] = useState('12.50');
+  const { user } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [serviceRate, setServiceRate] = useState('0')
+  const [history, setHistory] = useState<any[]>([])
 
-  const rateChanges = [
-    { rate: '12.5%', changedBy: 'System Admin', date: 'Today, 10:24 AM', reason: 'Q2 adjustment for market scaling' },
-    { rate: '10.0%', changedBy: 'Sneha Verma', date: 'Apr 09, 2024', reason: 'Platform fee reduction campaign' },
-    { rate: '11.5%', changedBy: 'System Boot', date: 'Mar 01, 2024', reason: 'Initial platform rate definition' },
-  ];
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    reason: '',
+  })
+
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true)
+      const response = await adminApi.getServiceCharge()
+      setServiceRate((response.currentRate * 100).toString())
+      setHistory(response.history || [])
+    } catch (error: any) {
+      toast.error('Failed to load settings', { description: error.message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUpdateClick = () => {
+    const rateNum = parseFloat(serviceRate)
+    if (isNaN(rateNum) || rateNum < 0 || rateNum > 100) {
+      toast.error('Invalid Rate', {
+        description: 'Rate must be between 0 and 100',
+      })
+      return
+    }
+    setModalConfig({ isOpen: true, reason: '' })
+  }
+
+  const handleCommit = async (reason?: string) => {
+    try {
+      setSaving(true)
+      const rateNum = parseFloat(serviceRate) / 100
+      await adminApi.updateServiceCharge(rateNum, reason || '')
+      toast.success('Configuration Propagated', {
+        description: `Global service rate updated to ${serviceRate}%`,
+      })
+      await fetchSettings()
+      setModalConfig({ isOpen: false, reason: '' })
+    } catch (error: any) {
+      toast.error('Propagation Failed', { description: error.message })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
-    <div className="px-6 md:px-12 py-6 pb-20">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 pb-20 bg-gray-50 min-h-screen">
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={handleCommit}
+        title="Update Service Fee"
+        message={`Update the service fee to ${serviceRate}% for all future bookings?`}
+        type="warning"
+        confirmText="Update Rate"
+        requiresInput={true}
+        inputPlaceholder="Reason for change..."
+        inputLabel="Reason"
+      />
+
       {/* Header Section */}
       <header className="mb-8">
-        <h2 className="text-xl font-headline font-bold text-on-surface mb-1">Service Policies</h2>
-        <p className="text-on-surface-variant font-body text-sm leading-relaxed max-w-2xl">
-          Configure platform-wide commission rates, service charge logic, and automated financial settlements.
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          Platform Settings
+        </h1>
+        <p className="text-sm text-gray-600">
+          Manage your service fees and financial configurations here.
         </p>
       </header>
 
       {/* Main Settings Card */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {/* Service Rate Configuration */}
-        <div className="lg:col-span-12 xl:col-span-7 bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm relative overflow-hidden">
-           <div className="absolute top-0 right-0 p-8 opacity-5">
-              <ShieldCheck className="w-32 h-32" />
-           </div>
-          
-          <div className="mb-10 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
-               <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-               Live Configuration
+        <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm">
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 px-2 py-1 bg-primary/10 text-primary rounded-md text-xs font-semibold mb-3">
+              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+              Live Settings
             </div>
-            <h2 className="font-headline text-3xl font-black text-on-surface mb-4 tracking-tight">
-              Global Platform Tax
+            <h2 className="text-lg font-bold text-gray-900 mb-1">
+              Service Fee
             </h2>
-            <p className="text-sm text-on-surface-variant font-medium leading-relaxed">
-              Define the standard platform commission percentage deducted from property owners per successful transaction. This parameter dictates platform gross profitability.
+            <p className="text-xs text-gray-500">
+              Percentage deducted from bookings as a platform fee. Applied to all
+              new payments.
             </p>
           </div>
 
-          <div className="mb-10">
-            <label className="block text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4 opacity-70">
-              Active Service Rate (%)
+          <div className="mb-6">
+            <label className="block text-xs font-medium text-gray-500 uppercase mb-3">
+              Current Service Rate (%)
             </label>
             <div className="relative group max-w-md">
               <input
                 type="number"
                 value={serviceRate}
                 onChange={(e) => setServiceRate(e.target.value)}
-                className="w-full text-5xl font-headline font-black text-primary bg-surface-container-lowest rounded-3xl px-8 py-8 focus:outline-none focus:ring-4 focus:ring-primary/5 border-2 border-outline-variant/5 group-hover:border-primary/20 transition-all font-mono"
+                className="w-full text-4xl sm:text-5xl font-bold text-primary bg-gray-50 rounded-lg px-6 py-6 focus:outline-none focus:ring-2 focus:ring-primary/20 border border-gray-200 group-hover:border-primary/30 transition-all font-mono"
                 step="0.01"
                 min="0"
                 max="100"
               />
-              <span className="absolute right-8 top-1/2 -translate-y-1/2 text-4xl font-headline font-black text-on-surface-variant/20 group-focus-within:text-primary/20 transition-colors">
+              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-3xl sm:text-4xl font-bold text-gray-300 group-focus-within:text-primary/30 transition-colors">
                 %
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-4">
-               <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
-               </div>
-               <div>
-                  <p className="text-[10px] font-black text-emerald-700/60 uppercase tracking-widest">Status</p>
-                  <p className="text-sm font-bold text-emerald-700">Operational</p>
-               </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-emerald-700/60 uppercase">
+                  Status
+                </p>
+                <p className="text-sm font-bold text-emerald-700">Active</p>
+              </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-4">
-               <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-                  <History className="w-5 h-5 text-white" />
-               </div>
-               <div>
-                  <p className="text-[10px] font-black text-blue-700/60 uppercase tracking-widest">Convergence</p>
-                  <p className="text-sm font-bold text-blue-700">14 Apr 2024</p>
-               </div>
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
+                <History className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-blue-700/60 uppercase">
+                  Last Modified
+                </p>
+                <p className="text-sm font-bold text-blue-700">
+                  {history[0]
+                    ? format(new Date(history[0].createdAt), 'dd MMM yyyy')
+                    : 'No records'}
+                </p>
+              </div>
             </div>
           </div>
 
-          <button className="w-full max-w-md bg-primary text-on-primary h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3">
-            <RefreshCcw className="w-4 h-4" />
-            Commit & Propagate
+          <button
+            disabled={saving}
+            onClick={handleUpdateClick}
+            className="w-full sm:max-w-md h-11 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCcw className="w-4 h-4" />
+            )}
+            Update Rate
           </button>
         </div>
 
-        {/* Rate Change Log */}
-        <div className="lg:col-span-12 xl:col-span-5 bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm relative overflow-hidden">
-          <div className="mb-10 flex items-center justify-between">
+        {/* Change History */}
+        <div className="lg:col-span-1 bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
             <div>
-              <h3 className="font-headline text-lg font-bold text-on-surface mb-1">
-                Policy Ledger
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                Change History
               </h3>
-              <p className="text-xs text-on-surface-variant font-medium">Historical lifecycle of rate modifications</p>
+              <p className="text-xs text-gray-500">Historical fee adjustments</p>
             </div>
-            <button className="p-2.5 hover:bg-surface-container rounded-xl transition-all group">
-              <Download className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+            <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-all">
+              <Download className="w-4 h-4 text-gray-600" />
             </button>
           </div>
 
-          <div className="space-y-8">
-            {rateChanges.map((change, index) => (
-              <div
-                key={index}
-                className="relative pl-8 before:absolute before:left-0 before:top-1.5 before:bottom-0 before:w-0.5 before:bg-outline-variant/10 last:before:hidden group"
-              >
-                <div className="absolute left-[-4px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-outline-variant/30 group-hover:bg-primary group-hover:scale-125 transition-all"></div>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <p className="text-xl font-headline font-black text-primary mb-1 tracking-tighter">
-                      {change.rate}
-                    </p>
-                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1 opacity-60">
-                      Operator: <span className="text-on-surface opacity-100">{change.changedBy}</span>
-                    </p>
-                    <div className="flex items-center gap-1.5 opacity-40">
-                       <Clock className="w-3 h-3" />
-                       <p className="text-[10px] font-bold uppercase tracking-widest">{change.date}</p>
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+            {history.length === 0 ? (
+              <div className="text-center py-12">
+                <Info className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-xs text-gray-400">No history found</p>
+              </div>
+            ) : (
+              history.map((change, index) => (
+                <div
+                  key={change._id}
+                  className="relative pl-6 before:absolute before:left-0 before:top-1.5 before:bottom-0 before:w-0.5 before:bg-gray-200 last:before:hidden group"
+                >
+                  <div className="absolute left-[-4px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-gray-300 group-hover:bg-primary group-hover:scale-125 transition-all" />
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <p className="text-xl font-bold text-primary mb-1">
+                        {(change.rate * 100).toFixed(2)}%
+                      </p>
+                      <p className="text-xs font-medium text-gray-500 mb-1">
+                        By:{' '}
+                        <span className="text-gray-900">
+                          {change.updatedBy?.name || 'Admin'}
+                        </span>
+                      </p>
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Clock className="w-3 h-3" />
+                        <p className="text-xs">
+                          {format(new Date(change.createdAt), 'MMM dd, HH:mm')}
+                        </p>
+                      </div>
                     </div>
+                    {index === 0 && (
+                      <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded text-xs font-semibold">
+                        Current
+                      </span>
+                    )}
                   </div>
-                  {index === 0 && (
-                    <span className="px-2 py-1 bg-primary text-on-primary rounded text-[8px] font-black uppercase tracking-widest">
-                      ACTIVE
-                    </span>
+                  {change.reason && (
+                    <p className="text-xs text-gray-600 italic mt-2 leading-relaxed border-l-2 border-gray-200 pl-3 py-1 bg-gray-50 rounded-r-lg">
+                      "{change.reason}"
+                    </p>
                   )}
                 </div>
-                <p className="text-xs text-on-surface-variant italic font-medium mt-3 leading-relaxed border-l-2 border-on-surface/5 pl-3 py-1 bg-surface-container-lowest/50 rounded-r-lg">
-                  "{change.reason}"
-                </p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-
-          <button className="w-full mt-10 pt-6 border-t border-outline-variant/10 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] hover:text-primary transition-colors text-center">
-            Extended Audit Trail
-          </button>
         </div>
       </section>
 
       {/* Info Cards */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Audit Notice */}
-        <div className="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm group hover:border-red-100 transition-colors">
-          <div className="flex items-start gap-6">
-            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center shrink-0 border border-red-100 group-hover:bg-red-500 transition-all duration-500">
-              <Gavel className="text-red-600 w-7 h-7 group-hover:text-white transition-all duration-500" />
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div className="bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center shrink-0 border border-red-100 group-hover:bg-red-500 transition-all">
+              <Gavel className="text-red-600 w-6 h-6 group-hover:text-white transition-all" />
             </div>
             <div className="flex-1">
-              <h3 className="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-red-600 transition-colors">
-                Regulatory Compliance
+              <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-red-600 transition-colors">
+                Audit Trail
               </h3>
-              <p className="text-sm text-on-surface-variant font-medium leading-relaxed mb-4">
-                Platform financial adjustments are immutable once propagated. All modifications require high-level clearance and automated audit logging.
+              <p className="text-xs text-gray-600 leading-relaxed mb-3">
+                All changes to financial settings are tracked. Updates apply to all
+                new transactions immediately.
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container rounded-lg text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
-                 <ShieldCheck className="w-3 h-3" />
-                 Last Compliance Audit: 12.04.24
+              <div className="inline-flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg text-xs font-semibold text-gray-700">
+                <ShieldCheck className="w-3 h-3" />
+                Logging Active
               </div>
             </div>
           </div>
         </div>
 
-        {/* Validation Layer */}
-        <div className="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm group hover:border-emerald-100 transition-colors">
-          <div className="flex items-start gap-6">
-            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-emerald-500 transition-all duration-500">
-              <ShieldCheck className="text-emerald-600 w-7 h-7 group-hover:text-white transition-all duration-500" />
+        <div className="bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-emerald-500 transition-all">
+              <ShieldCheck className="text-emerald-600 w-6 h-6 group-hover:text-white transition-all" />
             </div>
             <div className="flex-1">
-              <h3 className="font-headline text-lg font-bold text-on-surface mb-2 group-hover:text-emerald-600 transition-colors">
-                Secured Validation
+              <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">
+                Secure Access
               </h3>
-              <p className="text-sm text-on-surface-variant font-medium leading-relaxed mb-4">
-                Multi-layer encryption and session validation ensure only verified system administrators can commit changes to the global policy.
+              <p className="text-xs text-gray-600 leading-relaxed mb-3">
+                Only verified administrators can modify these settings. Every session
+                is validated for security.
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
-                 <AlertCircle className="w-3 h-3" />
-                 L3 SECURITY ENABLED
+              <div className="inline-flex items-center gap-2 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold shadow-sm">
+                <AlertCircle className="w-3 h-3" />
+                Level: High
               </div>
             </div>
           </div>
@@ -200,20 +300,21 @@ export default function AdminSettingsPage() {
       </section>
 
       {/* Notice Banner */}
-      <div className="mt-8 bg-on-surface p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div className="flex items-start gap-6 relative z-10">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
-            <Info className="text-white w-6 h-6" />
+      <div className="bg-gray-900 p-4 sm:p-6 rounded border border-gray-800 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="flex items-start gap-4 relative z-10">
+          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
+            <Info className="text-white w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-white font-bold text-sm mb-2 uppercase tracking-widest">System Propagation Notice</h4>
-            <p className="text-sm text-white/70 leading-relaxed font-medium">
-              Updating the <span className="text-white font-black hover:underline cursor-help">Global Service Rate</span> will immediately alter the yield calculations for all incoming property listings. Active contracts and historical transaction logs remain unaffected but will show in legacy reports as "grandfathered."
+            <h4 className="text-white font-bold text-sm mb-1">Important</h4>
+            <p className="text-xs text-white/70 leading-relaxed">
+              Updating the service fee affects how much owners receive. Past
+              transactions are not changed.
             </p>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

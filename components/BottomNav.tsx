@@ -27,22 +27,21 @@ export default function BottomNav() {
   )
     return null
 
-  // Phase 1: Only Explore and Profile
   const navItems = [
     { label: 'Explore', icon: Search, path: '/' },
-    // { label: 'Wishlists', icon: Heart, path: '/student/saved' },
-    // {
-    //   label: 'Bookings',
-    //   icon: Map,
-    //   path: '/student/bookings',
-    //   authRequired: true,
-    // },
-    // {
-    //   label: 'Notifications',
-    //   icon: Bell,
-    //   path: '/student/notifications',
-    //   authRequired: true,
-    // },
+    { label: 'Wishlists', icon: Heart, path: '/student/saved' },
+    {
+      label: 'Bookings',
+      icon: Map,
+      path: '/student/bookings',
+      authRequired: true,
+    },
+    {
+      label: 'Notifications',
+      icon: Bell,
+      path: '/student/notifications',
+      authRequired: true,
+    },
     {
       label: user ? 'Profile' : 'Log in',
       icon: User,

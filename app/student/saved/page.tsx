@@ -4,18 +4,17 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { userApi } from '@/lib/api'
 import { RoomCard } from '@/components/RoomCard'
-import { AuthPrompt } from '@/components/AuthPrompt'
-import { Info } from 'lucide-react'
+import { SkeletonGrid, Skeleton } from '@/components/skeletons'
 
 export default function StudentSavedPage() {
   const router = useRouter()
   const { user, loading } = useAuth()
   const [savedRooms, setSavedRooms] = useState<any[]>([])
-  const [fetching, setFetching] = useState(false)
+  const [fetching, setFetching] = useState(true)
   const [error, setError] = useState<any>(null)
 
   useEffect(() => {
-    if (!user) return
+
     const fetchSaved = async () => {
       setFetching(true)
       setError(null)
@@ -42,8 +41,8 @@ export default function StudentSavedPage() {
             images: l.photos?.length
               ? l.photos
               : [
-                  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
-                ],
+                'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
+              ],
             amenities: l.amenities || [],
             owner: l.owner || { name: 'Verified Owner' },
           }))
@@ -70,31 +69,27 @@ export default function StudentSavedPage() {
     fetchSaved()
   }, [user])
 
-  if (loading || fetching) {
-    return (
-      <div className='min-h-screen bg-white flex items-center justify-center'>
-        <div className='w-8 h-8 border-4 border-[#FF385C]/20 border-t-[#FF385C] rounded-full animate-spin'></div>
-      </div>
-    )
-  }
+
 
   return (
-    <div className='bg-white min-h-full'>
-      <div className='px-8 md:px-10 pb-32 pt-2'>
-        {!user ? (
-          <AuthPrompt
-            title='Log in to view your wishlists'
-            description="You can create, view, or edit wishlists once you've logged in."
-          />
-        ) : error?.type === 'role_mismatch' ? (
-          <div className='max-w-md mx-auto text-center py-12'>
-            <Info className='w-16 h-16 mx-auto text-blue-500 mb-4' />
-            <h3 className='text-xl font-bold mb-2'>Student-Only Section</h3>
-            <p className='text-on-surface-variant mb-4'>{error.message}</p>
-            <p className='text-sm text-on-surface-variant/60'>
-              You're viewing as:{' '}
-              <strong className='capitalize'>{error.userRole}</strong>
-            </p>
+    <div className='bg-slate-50 min-h-screen'>
+      {/* Airbnb Style Header */}
+      <div className='sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/5'>
+        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6'>
+          <h1 className='text-3xl md:text-5xl font-semibold tracking-tight text-neutral-900'>
+            Wishlists
+          </h1>
+          <p className='mt-2 text-sm md:text-base text-neutral-500'>
+            Explore your favorite places to stay and properties
+          </p>
+        </div>
+      </div>
+
+      <div className='min-h-screen bg-[#f7f7f7]'>
+        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8'>
+        {loading || fetching ? (
+          <div className='pt-4'>
+            <SkeletonGrid count={8} className='grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6' />
           </div>
         ) : error?.type === 'generic' ? (
           <div className='max-w-md mx-auto text-center py-12'>
@@ -102,30 +97,31 @@ export default function StudentSavedPage() {
           </div>
         ) : savedRooms.length > 0 ? (
           <>
-            <h1 className='text-2xl font-bold mb-6'>Saved Homes</h1>
-            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6'>
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 pt-4'>
               {savedRooms.map((room) => (
                 <RoomCard key={room.id} room={room} priceSuffix='/ month' />
               ))}
             </div>
           </>
         ) : (
-          <div className='py-20 text-center'>
-            <h2 className='text-[20px] font-bold mb-3 text-on-surface'>
-              Create your first wishlist
-            </h2>
-            <p className='text-[15px] text-on-surface-variant leading-relaxed opacity-70'>
-              As you explore rooms, click the heart icon to save the ones you
-              love.
-            </p>
-            <button
-              onClick={() => router.push('/')}
-              className='mt-8 px-8 py-3 bg-[#222222] text-white rounded-lg font-bold'
-            >
-              Start exploring
-            </button>
+          <div className='flex flex-col pt-8 pb-24'>
+            <div className='max-w-md'>
+              <h2 className='text-[22px] font-semibold mb-3 text-gray-900'>
+                Create your first wishlist
+              </h2>
+              <p className='text-[15px] text-gray-500 leading-relaxed mb-8'>
+                As you search, tap the heart icon to save your favorite places to stay or things to do to a wishlist.
+              </p>
+              <button
+                onClick={() => router.push('/')}
+                className='px-6 py-3.5 bg-gray-900 hover:bg-black text-white rounded-lg font-semibold text-[15px] transition-colors'
+              >
+                Start exploring
+              </button>
+            </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

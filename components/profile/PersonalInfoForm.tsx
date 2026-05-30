@@ -17,7 +17,7 @@ export function PersonalInfoForm({
   userRole,
 }: PersonalInfoFormProps) {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, refreshUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [showOtpInput, setShowOtpInput] = useState(false)
   const [pendingEmail, setPendingEmail] = useState('')
@@ -65,6 +65,7 @@ export function PersonalInfoForm({
         toast.success('Verification OTP sent to your new email')
       } else {
         // Profile updated without email change
+        await refreshUser()
         toast.success('Profile updated successfully')
         router.push(backPath)
       }
@@ -86,10 +87,9 @@ export function PersonalInfoForm({
     try {
       setLoading(true)
       await userApi.verifyEmailChange(otp)
+      await refreshUser()
       toast.success('Email changed successfully')
       router.push(backPath)
-      // Reload to update auth context
-      window.location.reload()
     } catch (error: any) {
       toast.error(error.message || 'Invalid OTP')
     } finally {

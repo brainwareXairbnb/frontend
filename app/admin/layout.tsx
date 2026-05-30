@@ -15,12 +15,11 @@ import {
   CalendarCheck,
   Landmark,
   IndianRupee,
-  BarChart3,
   Flag,
   Settings,
-  Bell,
   ShieldCheck,
   ChevronRight,
+  ChevronLeft,
   LogOut,
   Menu,
   X,
@@ -29,15 +28,15 @@ import {
   Eye,
 } from 'lucide-react'
 import { AdminLayoutProps } from '@/lib/types'
+import Logo from '@/components/Logo'
 
 const NAV_ITEMS = [
-  // Phase 1: Only Listings, Users, Notifications, and Profile
-  // {
-  //   id: 'dashboard',
-  //   label: 'Dashboard',
-  //   icon: LayoutDashboard,
-  //   href: '/admin/dashboard',
-  // },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/admin/dashboard',
+  },
   {
     id: 'users',
     label: 'User Management',
@@ -50,42 +49,36 @@ const NAV_ITEMS = [
     icon: ClipboardCheck,
     href: '/admin/listings',
   },
-  // {
-  //   id: 'bookings',
-  //   label: 'All Bookings',
-  //   icon: CalendarCheck,
-  //   href: '/admin/bookings',
-  // },
-  // {
-  //   id: 'financial',
-  //   label: 'Financial Dashboard',
-  //   icon: Landmark,
-  //   href: '/admin/financial',
-  // },
-  // {
-  //   id: 'payouts',
-  //   label: 'Payout Management',
-  //   icon: IndianRupee,
-  //   href: '/admin/payouts',
-  // },
-  // {
-  //   id: 'analytics',
-  //   label: 'Revenue Analytics',
-  //   icon: BarChart3,
-  //   href: '/admin/analytics',
-  // },
-  // {
-  //   id: 'reviews',
-  //   label: 'Flagged Reviews',
-  //   icon: Flag,
-  //   href: '/admin/reviews',
-  // },
-  // {
-  //   id: 'settings',
-  //   label: 'Service Charge',
-  //   icon: Settings,
-  //   href: '/admin/settings',
-  // },
+  {
+    id: 'bookings',
+    label: 'All Bookings',
+    icon: CalendarCheck,
+    href: '/admin/bookings',
+  },
+  {
+    id: 'financial',
+    label: 'Financial Dashboard',
+    icon: Landmark,
+    href: '/admin/financial',
+  },
+  {
+    id: 'payouts',
+    label: 'Payout Management',
+    icon: IndianRupee,
+    href: '/admin/payouts',
+  },
+  {
+    id: 'reviews',
+    label: 'Reviews Management',
+    icon: Flag,
+    href: '/admin/reviews',
+  },
+  {
+    id: 'settings',
+    label: 'Service Charge',
+    icon: Settings,
+    href: '/admin/settings',
+  },
 ]
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -94,6 +87,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { logout, user } = useAuth()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -112,6 +106,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return () => clearInterval(interval)
   }, [user])
 
+  useEffect(() => {
+    const saved = localStorage.getItem('adminSidebarCollapsed')
+    if (saved !== null) {
+      setIsSidebarCollapsed(saved === 'true')
+    }
+  }, [])
+
+  const toggleSidebar = () => {
+    const newState = !isSidebarCollapsed
+    setIsSidebarCollapsed(newState)
+    localStorage.setItem('adminSidebarCollapsed', String(newState))
+  }
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -122,21 +129,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       // Force redirect anyway
       router.push('/login')
     }
-  }
-
-  const getPageTitle = () => {
-    if (pathname === '/admin' || pathname === '/admin/dashboard')
-      return 'System Overview'
-    if (pathname.startsWith('/admin/users')) return 'User Management'
-    if (pathname.startsWith('/admin/listings')) return 'Listing Approval'
-    if (pathname.startsWith('/admin/bookings')) return 'All Bookings'
-    if (pathname.startsWith('/admin/financial')) return 'Financial Dashboard'
-    if (pathname.startsWith('/admin/payouts')) return 'Payout Management'
-    if (pathname.startsWith('/admin/analytics')) return 'Revenue Analytics'
-    if (pathname.startsWith('/admin/reviews')) return 'Flagged Reviews'
-    if (pathname.startsWith('/admin/notifications')) return 'Notifications'
-    if (pathname.startsWith('/admin/settings')) return 'Service Charge Settings'
-    return 'Admin Portal'
   }
 
   const isActive = (href: string) => {
@@ -152,9 +144,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Common Header */}
         <div className='sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-16'>
           <div className='flex items-center justify-between h-full px-6 md:px-8'>
-            <h1 className='font-headline text-xl md:text-2xl font-bold text-on-surface'>
-              {getPageTitle()}
-            </h1>
+            <Logo noMargin compact heading='Admin Portal' />
             <div className='flex items-center gap-3'>
               <NotificationBell />
               <Link
@@ -174,23 +164,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Main Layout */}
         <div className='flex flex-1'>
           {/* Sidebar */}
-          <div className='hidden md:flex w-64 bg-white border-r border-outline-variant/10 flex-col shrink-0 fixed left-0 top-16 bottom-0'>
-            {/* Logo */}
-            <div className='px-6 py-6 border-b border-outline-variant/10 shrink-0'>
-              <div className='flex items-center gap-3'>
-                <div className='w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary'>
-                  <ShieldCheck className='w-6 h-6' />
-                </div>
-                <div>
-                  <h2 className='font-headline text-sm font-bold text-on-surface'>
-                    Admin Portal
-                  </h2>
-                  <p className='text-xs text-on-surface-variant'>
-                    System Management
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div
+            className={`hidden md:flex bg-white border-r border-outline-variant/10 flex-col shrink-0 fixed left-0 top-16 bottom-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}
+          >
+            {/* Toggle Button */}
+            <button
+              onClick={toggleSidebar}
+              className='absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors z-10 shadow-sm cursor-pointer'
+            >
+              {isSidebarCollapsed ? (
+                <ChevronRight className='w-4 h-4 text-gray-600' />
+              ) : (
+                <ChevronLeft className='w-4 h-4 text-gray-600' />
+              )}
+            </button>
 
             {/* Navigation */}
             <nav className='flex-1 py-4 px-3 overflow-y-auto'>
@@ -200,14 +187,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Link
                     key={item.id}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all text-sm ${
+                    title={isSidebarCollapsed ? item.label : ''}
+                    className={`flex items-center rounded-lg mb-1 transition-all text-sm ${
+                      isSidebarCollapsed
+                        ? 'justify-center px-3 py-3'
+                        : 'gap-3 px-3 py-2.5'
+                    } ${
                       isActive(item.href)
                         ? 'bg-primary/10 text-primary font-semibold'
                         : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
                     }`}
                   >
-                    <Icon className='w-5 h-5' />
-                    <span>{item.label}</span>
+                    <Icon className='w-5 h-5 shrink-0' />
+                    {!isSidebarCollapsed && <span>{item.label}</span>}
                   </Link>
                 )
               })}
@@ -218,49 +210,82 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               {/* View as Student */}
               <Link
                 href='/'
-                className='flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+                title={isSidebarCollapsed ? 'View as Student' : ''}
+                className={`flex items-center rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium ${
+                  isSidebarCollapsed
+                    ? 'justify-center px-3 py-3'
+                    : 'gap-3 px-3 py-2.5'
+                }`}
               >
-                <Eye className='w-5 h-5' />
-                <span>View as Student</span>
+                <Eye className='w-5 h-5 shrink-0' />
+                {!isSidebarCollapsed && <span>View as Student</span>}
               </Link>
             </nav>
 
             {/* Admin Profile - Fixed at bottom */}
             <div className='p-4 border-t border-outline-variant/10 shrink-0'>
-              <Link
-                href='/admin/profile'
-                className='flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-3 hover:bg-surface-container-high transition-colors'
-              >
-                <div className='w-10 h-10 rounded-full overflow-hidden bg-primary shrink-0'>
-                  <img
-                    alt='Admin User'
-                    className='w-full h-full object-cover'
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
-                  />
-                </div>
-                <div className='flex-1 min-w-0'>
-                  <p className='text-xs font-bold text-on-surface truncate'>
-                    {user?.name || 'Admin User'}
-                  </p>
-                  <p className='text-[10px] text-on-surface-variant'>
-                    System Admin
-                  </p>
-                </div>
-                <ChevronRight className='w-5 h-5 text-on-surface-variant' />
-              </Link>
+              {!isSidebarCollapsed ? (
+                <>
+                  <Link
+                    href='/admin/profile'
+                    className='flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-3 hover:bg-surface-container-high transition-colors'
+                  >
+                    <div className='w-10 h-10 rounded-full overflow-hidden bg-primary shrink-0'>
+                      <img
+                        alt='Admin User'
+                        className='w-full h-full object-cover'
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
+                      />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-xs font-bold text-on-surface truncate'>
+                        {user?.name || 'Admin User'}
+                      </p>
+                      <p className='text-[10px] text-on-surface-variant'>
+                        System Admin
+                      </p>
+                    </div>
+                    <ChevronRight className='w-5 h-5 text-on-surface-variant' />
+                  </Link>
 
-              <button
-                onClick={handleLogout}
-                className='w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-error hover:bg-error/10 transition-colors'
-              >
-                <LogOut className='w-5 h-5' />
-                <span className='text-sm font-bold'>Logout</span>
-              </button>
+                  <button
+                    onClick={handleLogout}
+                    className='w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-error hover:bg-error/10 transition-colors cursor-pointer'
+                  >
+                    <LogOut className='w-5 h-5' />
+                    <span className='text-sm font-bold'>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <div className='flex flex-col items-center gap-3'>
+                  <Link
+                    href='/admin/profile'
+                    title='Profile'
+                    className='w-10 h-10 rounded-full overflow-hidden bg-primary hover:ring-2 hover:ring-primary/20 transition-all'
+                  >
+                    <img
+                      alt='Admin User'
+                      className='w-full h-full object-cover'
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
+                    />
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    title='Logout'
+                    className='w-10 h-10 flex items-center justify-center rounded-lg text-error hover:bg-error/10 transition-colors cursor-pointer'
+                  >
+                    <LogOut className='w-5 h-5' />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Main Content */}
-          <div className='flex-1 overflow-y-auto bg-[#fafafa] md:ml-64'>
+          <div
+            className={`flex-1 overflow-y-auto bg-[#fafafa] transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}
+          >
             {children}
           </div>
         </div>
@@ -268,7 +293,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Mobile Bottom Navigation - Phase 1: Only Listings, Users, Notifications, Profile */}
         <div className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 safe-area-inset-bottom'>
           <div className='flex items-center justify-around px-2 py-2'>
-            {/* <Link
+            <Link
               href='/admin/dashboard'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/dashboard')
@@ -278,7 +303,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <LayoutDashboard className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Dashboard</span>
-            </Link> */}
+            </Link>
             <Link
               href='/admin/listings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
@@ -301,7 +326,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Users className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Users</span>
             </Link>
-            {/* <Link
+            <Link
               href='/admin/bookings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/admin/bookings')
@@ -311,24 +336,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <CalendarCheck className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Bookings</span>
-            </Link> */}
-            <Link
-              href='/admin/notifications'
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                isActive('/admin/notifications')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
-              }`}
-            >
-              <div className='relative'>
-                <Bell className='w-6 h-6' />
-                {unreadCount > 0 && (
-                  <span className='absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-[8px] font-bold rounded-full flex items-center justify-center'>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </div>
-              <span className='text-[10px] font-bold'>Notifications</span>
             </Link>
             <div
               onClick={() => setIsDrawerOpen(true)}
@@ -369,7 +376,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </div>
                   <button
                     onClick={() => setIsDrawerOpen(false)}
-                    className='w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface'
+                    className='w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface cursor-pointer'
                   >
                     <X className='w-5 h-5' />
                   </button>
@@ -423,7 +430,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       setIsDrawerOpen(false)
                       handleLogout()
                     }}
-                    className='w-full flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error/10 transition-colors'
+                    className='w-full flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error/10 transition-colors cursor-pointer'
                   >
                     <LogOut className='w-6 h-6' />
                     <span className='text-sm font-bold'>Logout</span>

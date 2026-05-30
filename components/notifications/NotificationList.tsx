@@ -1,19 +1,7 @@
 'use client'
 
 import { NotificationCard } from './NotificationCard'
-
-interface Notification {
-  _id: string
-  type: string
-  title: string
-  message: string
-  isRead: boolean
-  createdAt: string
-  reference?: {
-    model: string
-    id: string
-  }
-}
+import { Notification } from '@/lib/types'
 
 interface NotificationListProps {
   notifications: Notification[]

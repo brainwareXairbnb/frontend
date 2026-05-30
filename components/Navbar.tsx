@@ -1,19 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  PlusCircle,
-  User,
-  Settings,
-  Building2,
-  CircleUser,
-  Menu,
-} from 'lucide-react'
+import { PlusCircle, User, Building2 } from 'lucide-react'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
 export function Navbar() {
   const { user } = useAuth()
@@ -35,8 +26,6 @@ export function Navbar() {
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path))
 
   const isAlreadyOwnerOrAdmin = user?.role === 'admin' || user?.role === 'owner'
-
-  console.log(user)
 
   if (isAdminOrOwner || isAuthPath) return null
 
@@ -66,7 +55,7 @@ export function Navbar() {
           >
             Explore
           </Link>
-          {/* <Link
+          <Link
             href='/student/saved'
             className={`text-sm font-semibold transition-colors ${pathname === '/student/saved' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
@@ -77,7 +66,7 @@ export function Navbar() {
             className={`text-sm font-semibold transition-colors ${pathname === '/student/bookings' ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
             Bookings
-          </Link> */}
+          </Link>
         </nav>
 
         {/* Right Nav */}

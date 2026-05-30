@@ -5,6 +5,25 @@
  * "The Editorial Concierge" - Premium, curated room booking experience
  */
 
+/* Mobile drawer slide-up animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Safe area for bottom notch/home indicator */
+.pb-safe {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
 :root {
   /* === PRIMARY COLORS === */
   --primary: #FF385C;
@@ -395,4 +414,14 @@ input[type=number] {
     height: 90dvh !important;
     max-height: 90dvh !important;
   }
+}
+
+/* === HIDE SCROLLBAR === */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

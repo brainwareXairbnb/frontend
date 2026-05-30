@@ -5,8 +5,16 @@ const config: CapacitorConfig = {
   appName: 'BrainX',
   webDir: 'out',
   server: {
-    androidScheme: 'http',
-    cleartext: true,
+    androidScheme: 'https', // CRITICAL: HTTPS required for Razorpay payments
+    iosScheme: 'ionic',
+    // Allow navigation to external URLs (required for Razorpay payment flow)
+    allowNavigation: [
+      'checkout.razorpay.com',
+      'api.razorpay.com',
+      '*.razorpay.com',
+      'localhost',
+      '*.onrender.com',
+    ],
   },
   plugins: {
     GoogleAuth: {

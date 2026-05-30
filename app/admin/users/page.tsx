@@ -194,7 +194,11 @@ export default function AdminUsersPage() {
           description: 'User account has been suspended',
         })
       } else if (modalConfig.action === 'ban') {
-        await adminApi.updateUserStatus(modalConfig.userId, 'banned', inputValue)
+        await adminApi.updateUserStatus(
+          modalConfig.userId,
+          'banned',
+          inputValue,
+        )
         toast.error('User Banned', {
           description: 'User account has been permanently banned',
         })
@@ -299,7 +303,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className='px-4 md:px-12 py-6 pb-24 max-w-[1600px] mx-auto min-h-screen'>
+    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-20 bg-gray-50 min-h-screen'>
       <UserDetailModal
         userId={selectedUserId}
         isOpen={isUserDetailOpen}
@@ -323,9 +327,12 @@ export default function AdminUsersPage() {
       />
 
       {/* Header Section */}
-      <header className='mb-6 md:mb-10'>
-        <p className='text-on-surface-variant text-xs md:text-sm max-w-2xl'>
-          Overview of registered users and role upgrade requests.
+      <header className='mb-8'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+          User Management
+        </h1>
+        <p className='text-sm text-gray-600'>
+          Overview of registered users and role upgrade requests
         </p>
       </header>
 

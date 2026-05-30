@@ -1,210 +1,537 @@
-'use client';
+'use client'
 
-import { 
-  Filter, 
-  MapPin, 
-  Clock, 
-  ChevronRight, 
-  GraduationCap, 
-  Building2, 
-  Calendar, 
-  ShieldCheck,
-  Zap,
-  Star,
-  Activity,
-  UserCheck,
-  CheckCircle2
-} from 'lucide-react';
-import { EmptyState } from '@/components/EmptyState';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  Check,
+  X,
+  Search,
+  Filter,
+  ChevronRight,
+  GraduationCap,
+  User as UserIcon,
+  IndianRupee,
+  Mail,
+  Phone,
+} from 'lucide-react'
+import { bookingsApi } from '@/lib/api'
+import { toast } from 'sonner'
+import { useAuth } from '@/lib/auth-context'
+import { AuthPrompt } from '@/components/AuthPrompt'
+import { Booking } from '@/lib/types'
 
 export default function OwnerBookingsPage() {
-  const bookings = [
-    {
-      id: 1,
-      name: 'Rohit Saha',
-      status: 'pending',
-      program: 'B.Tech Computer Science',
-      university: 'Brainware University',
-      property: 'Heritage Suite, Room 2A',
-      appliedTime: '2h ago',
-      moveInDate: 'Sept 15, 2024',
-      duration: '12 Months',
-      avatar: 'https://ui-avatars.com/api/?name=Rohit+Saha&background=b6212f&color=fff&size=128'
-    },
-    {
-      id: 2,
-      name: 'Priya Nandi',
-      status: 'pending',
-      program: 'MBA Marketing',
-      university: 'St. Xavier\'s College',
-      property: 'Scholars Atrium',
-      appliedTime: '1d ago',
-      moveInDate: 'Aug 28, 2024',
-      duration: '24 Months',
-      avatar: 'https://ui-avatars.com/api/?name=Priya+Nandi&background=b6212f&color=fff&size=128'
-    },
-    {
-      id: 3,
-      name: 'Arif Islam',
-      status: 'pending',
-      program: 'M.Sc Data Science',
-      university: 'Jadavpur University',
-      property: 'Modern Loft, Room 1B',
-      appliedTime: '3d ago',
-      moveInDate: 'Oct 1, 2024',
-      duration: '18 Months',
-      avatar: 'https://ui-avatars.com/api/?name=Arif+Islam&background=b6212f&color=fff&size=128'
+  const { isAuthenticated, user } = useAuth()
+  const router = useRouter()
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [showReplyModal, setShowReplyModal] = useState<Booking | null>(null)
+  const [replyMessage, setReplyMessage] = useState('')
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'owner') {
+      fetchBookings()
     }
-  ];
+  }, [isAuthenticated, user])
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showFilterDropdown && !target.closest('.filter-dropdown-container')) {
+        setShowFilterDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showFilterDropdown])
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true)
+      const response = await bookingsApi.getOwnerBookings()
+      setBookings(response.bookings || [])
+    } catch (error: any) {
+      console.error('Failed to fetch bookings:', error)
+      toast.error('Failed to load bookings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAccept = async (bookingId: string) => {
+    try {
+      setProcessingId(bookingId)
+      await bookingsApi.acceptBooking(bookingId, replyMessage || undefined)
+      toast.success('Booking accepted!')
+      setShowReplyModal(null)
+      setReplyMessage('')
+      fetchBookings()
+    } catch (error: any) {
+      console.error('Failed to accept booking:', error)
+      toast.error(error?.response?.data?.error || 'Failed to accept booking')
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
+  const handleReject = async (bookingId: string, reason: string) => {
+    if (!reason.trim()) {
+      toast.error('Please provide a reason for rejection')
+      return
+    }
+
+    try {
+      setProcessingId(bookingId)
+      await bookingsApi.rejectBooking(bookingId, reason)
+      toast.success('Booking rejected')
+      setShowReplyModal(null)
+      setReplyMessage('')
+      fetchBookings()
+    } catch (error: any) {
+      console.error('Failed to reject booking:', error)
+      toast.error(error?.response?.data?.error || 'Failed to reject booking')
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesSearch =
+      booking.student?.name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      booking.listing?.title
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      false
+
+    const matchesStatus =
+      statusFilter === 'all' || booking.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
+  const stats = {
+    pending: bookings.filter((b) => b.status === 'pending').length,
+    accepted: bookings.filter((b) => b.status === 'accepted').length,
+    confirmed: bookings.filter((b) => b.status === 'payment_confirmed').length,
+  }
+
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      accepted: 'bg-blue-100 text-blue-700 border-blue-200',
+      rejected: 'bg-red-100 text-red-700 border-red-200',
+      cancelled: 'bg-gray-100 text-gray-700 border-gray-200',
+      payment_confirmed: 'bg-green-100 text-green-700 border-green-200',
+    }
+
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${styles[status as keyof typeof styles]}`}
+      >
+        {status === 'payment_confirmed'
+          ? 'Confirmed'
+          : status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    )
+  }
+
+  if (!isAuthenticated || user?.role !== 'owner') {
+    return (
+      <div className='container mx-auto px-4 py-12'>
+        <AuthPrompt
+          title='Owner Access Required'
+          description='Please login with an owner account to view bookings.'
+        />
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center py-20'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF385C]' />
+      </div>
+    )
+  }
 
   return (
-    <div className="px-6 md:px-12 pb-20">
-      {/* Header Section */}
-      <header className="py-10 flex flex-col md:flex-row md:items-end justify-between gap-10 border-b border-outline-variant/5 mb-10">
-        <div className="max-w-2xl">
-           <h2 className="text-xl font-headline font-black text-on-surface mb-2 uppercase tracking-wide">Tenant Intel</h2>
-          <p className="text-on-surface-variant font-body text-base leading-relaxed font-medium">
-            Manage your incoming student residency lifecycle. Audit academic profiles, verified university affiliations, and secure move-in trajectories.
-          </p>
-        </div>
-        <div className="flex gap-4">
-           <div className="h-14 px-6 bg-white border border-outline-variant/10 rounded-2xl flex items-center gap-3 shadow-md shadow-black/[0.02] hover:bg-surface-container-low transition-all cursor-pointer group">
-            <Filter className="text-primary w-4 h-4 group-hover:rotate-12 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Asset Topology</span>
-          </div>
-        </div>
-      </header>
-
-      {/* Inbox Grid/Bento Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Summary Stats (Intelligent Sidebar) */}
-        <div className="lg:col-span-12 xl:col-span-3 space-y-8">
-          <div className="bg-primary p-8 rounded-[2rem] shadow-xl shadow-primary/20 relative overflow-hidden group">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-primary/70 mb-4 relative z-10">
-              Audit Queue
-            </p>
-            <div className="text-6xl font-black font-headline text-on-primary tracking-tighter relative z-10">08</div>
-            <div className="mt-8 flex items-center justify-between relative z-10">
-               <p className="text-xs font-medium text-on-primary/80 max-w-[140px]">
-                  Unverified academic requests pending node commitment.
-               </p>
-               <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
-                  <Zap className="w-5 h-5 text-on-primary" />
-               </div>
+    <div className='min-h-screen bg-gray-50 pb-24 md:pb-6'>
+      {/* Stats Cards */}
+      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-6'>
+        <div className='grid grid-cols-3 gap-3 md:gap-6'>
+          <button
+            onClick={() => setStatusFilter('pending')}
+            className={`p-3 md:p-4 rounded border transition-all ${
+              statusFilter === 'pending'
+                ? 'bg-yellow-50 border-yellow-200'
+                : 'bg-white border-outline-variant/10 hover:bg-gray-50'
+            }`}
+          >
+            <div className='text-2xl md:text-3xl font-bold text-yellow-600'>
+              {stats.pending}
             </div>
-          </div>
+            <div className='text-xs md:text-sm text-on-surface-variant mt-1'>
+              Pending
+            </div>
+          </button>
 
-          <div className="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-               <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">Asset Saturation</p>
-               <Building2 className="w-4 h-4 text-primary" />
+          <button
+            onClick={() => setStatusFilter('accepted')}
+            className={`p-3 md:p-4 rounded border transition-all ${
+              statusFilter === 'accepted'
+                ? 'bg-blue-50 border-blue-200'
+                : 'bg-white border-outline-variant/10 hover:bg-gray-50'
+            }`}
+          >
+            <div className='text-2xl md:text-3xl font-bold text-blue-600'>
+              {stats.accepted}
             </div>
-            <div className="space-y-8">
-               <div className="group">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm font-bold text-on-surface">The Heritage Loft</span>
-                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded">2 UNITS LEFT</span>
-                  </div>
-                  <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden border border-outline-variant/5">
-                    <div className="bg-emerald-500 h-full rounded-full transition-all duration-1000 group-hover:bg-primary shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: '82%' }}></div>
-                  </div>
-               </div>
-               <div className="group">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm font-bold text-on-surface">Scholars Atrium</span>
-                    <span className="text-[10px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded">CRITICAL</span>
-                  </div>
-                  <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden border border-outline-variant/5">
-                    <div className="bg-orange-500 h-full rounded-full transition-all duration-1000 group-hover:bg-primary shadow-[0_0_10px_rgba(249,115,22,0.3)]" style={{ width: '94%' }}></div>
-                  </div>
-               </div>
+            <div className='text-xs md:text-sm text-on-surface-variant mt-1'>
+              Accepted
             </div>
-          </div>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('payment_confirmed')}
+            className={`p-3 md:p-4 rounded border transition-all ${
+              statusFilter === 'payment_confirmed'
+                ? 'bg-green-50 border-green-200'
+                : 'bg-white border-outline-variant/10 hover:bg-gray-50'
+            }`}
+          >
+            <div className='text-2xl md:text-3xl font-bold text-green-600'>
+              {stats.confirmed}
+            </div>
+            <div className='text-xs md:text-sm text-on-surface-variant mt-1'>
+              Confirmed
+            </div>
+          </button>
         </div>
+      </div>
 
-        {/* Booking List */}
-        <div className="lg:col-span-12 xl:col-span-9 space-y-6">
-          {bookings.length === 0 ? (
-            <EmptyState
-              icon={CheckCircle2}
-              title="Inbox Purified"
-              message="No pending residency requests identifiers detected in the current ecosystem cycle."
+      {/* Search and Filter */}
+      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-4'>
+        <div className='flex gap-3'>
+          <div className='flex-1 relative'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant' />
+            <input
+              type='text'
+              placeholder='Search bookings...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='w-full pl-10 pr-4 py-2.5 border border-outline-variant/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF385C] focus:border-transparent'
             />
-          ) : (
-            bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="group bg-white p-8 rounded-[2.5rem] flex flex-col lg:flex-row lg:items-center gap-8 shadow-sm border border-outline-variant/10 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden"
-              >
-                 <div className="absolute top-0 right-0 w-2 h-full bg-primary/10 group-hover:bg-primary transition-colors"></div>
-                <div className="flex items-center gap-6 flex-1">
-                  <div className="relative shrink-0">
-                     <div className="w-20 h-20 rounded-[2rem] overflow-hidden border-4 border-surface-container-low shadow-xl group-hover:scale-110 transition-transform duration-700">
-                        <img
-                          alt={booking.name}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-opacity"
-                          src={booking.avatar}
-                        />
-                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-white rounded-2xl shadow-lg flex items-center justify-center">
-                       <ShieldCheck className="w-3.5 h-3.5 text-white" />
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-2xl font-black font-headline text-on-surface tracking-tighter hover:text-primary transition-colors cursor-default">{booking.name}</h3>
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/5 text-primary rounded-xl text-[9px] font-black uppercase tracking-widest border border-primary/10">
-                         <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                         {booking.status}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-on-surface-variant font-bold text-xs opacity-70 mb-4">
-                       <GraduationCap className="w-4 h-4 text-primary" />
-                       {booking.program} <span className="text-outline-variant mx-1">•</span> {booking.university}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-6 text-[10px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">
-                      <div className="flex items-center gap-2 group/icon">
-                        <MapPin className="w-3.5 h-3.5 group-hover/icon:text-primary transition-colors" />
-                        {booking.property}
-                      </div>
-                      <div className="flex items-center gap-2 group/icon">
-                        <Clock className="w-3.5 h-3.5 group-hover/icon:text-primary transition-colors" />
-                        Applied {booking.appliedTime}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-row xl:flex-col 2xl:flex-row items-center xl:items-end 2xl:items-center gap-8 lg:border-l lg:border-outline-variant/10 lg:pl-10 pt-8 lg:pt-0">
-                  <div className="text-left xl:text-right 2xl:text-left min-w-[120px]">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-2 opacity-50">
-                      Residency Orbit
-                    </p>
-                    <div className="flex flex-col">
-                      <span className="text-lg font-black font-headline text-on-surface tracking-tight">{booking.moveInDate}</span>
-                      <div className="flex items-center gap-1.5 mt-1">
-                         <Calendar className="w-3 h-3 text-primary" />
-                         <span className="text-[10px] font-black text-primary uppercase tracking-wider">{booking.duration} Cycle</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="h-14 px-8 bg-on-surface text-surface rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-                    <UserCheck className="w-4 h-4" />
-                    Audit Identity
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+          </div>
+          <div className='relative filter-dropdown-container'>
+            <button
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              className='px-4 py-2.5 border border-outline-variant/30 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors flex items-center gap-2'
+            >
+              <Filter className='w-4 h-4' />
+              <span className='hidden md:inline'>
+                {statusFilter === 'all'
+                  ? 'All'
+                  : statusFilter === 'payment_confirmed'
+                    ? 'Confirmed'
+                    : statusFilter.charAt(0).toUpperCase() +
+                      statusFilter.slice(1)}
+              </span>
+            </button>
 
-          {/* Pagination/Load More */}
-          <div className="pt-10 flex justify-center">
-             <button className="h-14 px-10 border-2 border-outline-variant/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:bg-white hover:border-primary/20 hover:text-primary transition-all">
-                Load Extended Ecosystem Data
-             </button>
+            {showFilterDropdown && (
+              <div className='absolute right-0 top-full mt-2 w-48 bg-white rounded shadow-xl border border-outline-variant/20 py-2 z-50'>
+                <button
+                  onClick={() => {
+                    setStatusFilter('all')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'all' ? 'font-bold text-[#FF385C]' : ''
+                  }`}
+                >
+                  All Bookings
+                </button>
+                <button
+                  onClick={() => {
+                    setStatusFilter('pending')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'pending' ? 'font-bold text-[#FF385C]' : ''
+                  }`}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => {
+                    setStatusFilter('accepted')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'accepted'
+                      ? 'font-bold text-[#FF385C]'
+                      : ''
+                  }`}
+                >
+                  Accepted
+                </button>
+                <button
+                  onClick={() => {
+                    setStatusFilter('payment_confirmed')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'payment_confirmed'
+                      ? 'font-bold text-[#FF385C]'
+                      : ''
+                  }`}
+                >
+                  Confirmed
+                </button>
+                <button
+                  onClick={() => {
+                    setStatusFilter('rejected')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'rejected'
+                      ? 'font-bold text-[#FF385C]'
+                      : ''
+                  }`}
+                >
+                  Rejected
+                </button>
+                <button
+                  onClick={() => {
+                    setStatusFilter('cancelled')
+                    setShowFilterDropdown(false)
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                    statusFilter === 'cancelled'
+                      ? 'font-bold text-[#FF385C]'
+                      : ''
+                  }`}
+                >
+                  Cancelled
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Bookings List */}
+      <div className='px-4 md:px-8 py-6 space-y-4'>
+        {filteredBookings.length === 0 ? (
+          <div className='text-center py-12 bg-white rounded-xl border border-outline-variant/10'>
+            <Calendar className='w-12 h-12 mx-auto text-gray-300 mb-3' />
+            <p className='text-gray-500'>No bookings found</p>
+          </div>
+        ) : (
+          filteredBookings.map((booking) => (
+            <div
+              key={booking._id}
+              className='bg-white rounded border border-outline-variant/10 overflow-hidden hover:shadow-lg transition-shadow'
+            >
+              {/* Header */}
+              <div className='flex items-start gap-3 p-4 border-b border-outline-variant/10'>
+                <div className='w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shrink-0'>
+                  <UserIcon className='w-6 h-6' />
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <div className='flex items-center gap-2 mb-1 flex-wrap'>
+                    <h3 className='font-bold text-sm md:text-base truncate'>
+                      {booking.student?.name || 'Unknown Student'}
+                    </h3>
+                    {getStatusBadge(booking.status)}
+                  </div>
+                  <p className='text-xs text-on-surface-variant'>
+                    Applied{' '}
+                    {new Date(booking.createdAt).toLocaleDateString('en-IN')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Property Info */}
+              <div className='p-4 bg-gray-50 border-b border-outline-variant/10'>
+                <div className='flex gap-3'>
+                  <div className='w-16 h-16 rounded-lg overflow-hidden shrink-0'>
+                    <img
+                      src={
+                        booking.listing?.photos?.[0] ||
+                        'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=100&w=200'
+                      }
+                      alt={booking.listing?.title || 'Property'}
+                      className='w-full h-full object-cover'
+                    />
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <p className='font-bold text-sm line-clamp-1'>
+                      {booking.listing?.title || 'Unknown Property'}
+                    </p>
+                    <div className='flex items-center gap-1 text-xs text-on-surface-variant mt-1'>
+                      <MapPin className='w-3 h-3' />
+                      <span className='truncate'>
+                        {booking.listing?.address?.street || 'N/A'}
+                      </span>
+                    </div>
+                    <p className='text-sm font-bold text-[#FF385C] mt-1'>
+                      ₹{booking.listing?.rent?.toLocaleString('en-IN') || 0}
+                      /month
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Details */}
+              <div className='p-4 space-y-3'>
+                <div className='grid grid-cols-2 gap-3 text-sm'>
+                  <div className='flex items-center gap-2'>
+                    <Calendar className='w-4 h-4 text-on-surface-variant' />
+                    <div>
+                      <p className='text-xs text-on-surface-variant'>
+                        Move-in Date
+                      </p>
+                      <p className='font-semibold'>
+                        {new Date(booking.moveInDate).toLocaleDateString(
+                          'en-IN',
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Clock className='w-4 h-4 text-on-surface-variant' />
+                    <div>
+                      <p className='text-xs text-on-surface-variant'>
+                        Duration
+                      </p>
+                      <p className='font-semibold'>
+                        {booking.durationMonths} months
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {booking.message && (
+                  <div className='p-3 bg-blue-50 rounded-lg border border-blue-100'>
+                    <p className='text-xs font-semibold text-blue-900 mb-1'>
+                      Message from student:
+                    </p>
+                    <p className='text-xs text-blue-800'>{booking.message}</p>
+                  </div>
+                )}
+
+                {/* Contact Info */}
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-xs'>
+                  <div className='flex items-center gap-2 p-2 bg-gray-50 rounded'>
+                    <Mail className='w-3 h-3 text-on-surface-variant' />
+                    <span className='truncate'>
+                      {booking.student?.email || 'N/A'}
+                    </span>
+                  </div>
+                  <div className='flex items-center gap-2 p-2 bg-gray-50 rounded'>
+                    <Phone className='w-3 h-3 text-on-surface-variant' />
+                    <span>{booking.student?.phone || 'N/A'}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                {booking.status === 'pending' && (
+                  <div className='flex gap-2 pt-2'>
+                    <button
+                      onClick={() => setShowReplyModal(booking)}
+                      disabled={processingId === booking._id}
+                      className='flex-1 px-4 py-2.5 bg-[#FF385C] text-white rounded-lg text-sm font-bold hover:brightness-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2'
+                    >
+                      <Check className='w-4 h-4' />
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowReplyModal(booking)
+                        setReplyMessage('')
+                      }}
+                      disabled={processingId === booking._id}
+                      className='flex-1 px-4 py-2.5 border border-outline-variant/30 rounded-lg text-sm font-bold text-error hover:bg-error/5 transition-all disabled:opacity-50 flex items-center justify-center gap-2'
+                    >
+                      <X className='w-4 h-4' />
+                      Reject
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Reply Modal */}
+      {showReplyModal && (
+        <div
+          className='fixed inset-0 z-[200] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-4'
+          onClick={() => setShowReplyModal(null)}
+        >
+          <div
+            className='bg-white rounded-t-3xl md:rounded-2xl w-full max-w-lg'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='md:hidden pt-2 pb-1 flex justify-center'>
+              <div className='w-10 h-1 bg-outline-variant/30 rounded-full' />
+            </div>
+            <div className='p-6'>
+              <h3 className='text-lg font-bold mb-4'>
+                {replyMessage ? 'Reject Booking' : 'Accept Booking'}
+              </h3>
+              <div className='mb-4'>
+                <label className='block text-sm font-semibold mb-2'>
+                  Message to Student (optional)
+                </label>
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder='Add a message...'
+                  rows={4}
+                  className='w-full px-4 py-3 border border-outline-variant/30 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#FF385C] focus:border-transparent resize-none'
+                />
+              </div>
+              <div className='flex gap-3'>
+                <button
+                  onClick={() => setShowReplyModal(null)}
+                  className='flex-1 px-4 py-2.5 border border-outline-variant/30 rounded-lg font-bold hover:bg-gray-50 transition-colors'
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() =>
+                    replyMessage && replyMessage.trim()
+                      ? handleReject(showReplyModal._id, replyMessage)
+                      : handleAccept(showReplyModal._id)
+                  }
+                  disabled={processingId === showReplyModal._id}
+                  className='flex-1 px-4 py-2.5 bg-[#FF385C] text-white rounded-lg font-bold hover:brightness-95 transition-all disabled:opacity-50'
+                >
+                  {processingId === showReplyModal._id
+                    ? 'Processing...'
+                    : replyMessage && replyMessage.trim()
+                      ? 'Reject'
+                      : 'Accept'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Bell, X, Check, CheckCheck, Trash2, Loader2 } from 'lucide-react'
 import { notificationsApi } from '@/lib/api'
 import { toast } from 'sonner'
@@ -8,19 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { Button } from './ui/button'
 import { useRouter, usePathname } from 'next/navigation'
 import useIsMobile from '@/lib/useIsMobile'
-
-interface Notification {
-  _id: string
-  type: string
-  title: string
-  message: string
-  isRead: boolean
-  createdAt: string
-  reference?: {
-    model: string
-    id: string
-  }
-}
+import { Notification } from '@/lib/types'
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
@@ -28,30 +17,32 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const isMobile = useIsMobile()
 
-  // Close dropdown when clicking outside
+  // Ensure portal is only rendered on client side
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+    setMounted(true)
+  }, [])
+
+  // Close drawer with ESC key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen && !isMobile) {
         setIsOpen(false)
       }
     }
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+    if (isOpen && !isMobile) {
+      document.addEventListener('keydown', handleEscape)
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
     }
-  }, [isOpen])
+  }, [isOpen, isMobile])
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
@@ -216,11 +207,11 @@ export function NotificationBell() {
   }
 
   return (
-    <div className='relative' ref={dropdownRef}>
+    <>
       {/* Bell Button */}
       <button
         onClick={handleBellClick}
-        className='relative p-2 rounded-full hover:bg-surface-container transition-colors'
+        className='relative p-2 rounded-full hover:bg-surface-container transition-colors cursor-pointer'
         aria-label='Notifications'
       >
         <Bell className='w-5 h-5 text-on-surface' />
@@ -231,17 +222,26 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <div className='absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-outline-variant/10 z-50'>
+      {/* Portal for Backdrop and Drawer - renders at document.body level */}
+      {mounted && isOpen && !isMobile && createPortal(
+        <>
+          {/* Backdrop for desktop drawer */}
+          <div
+            className='fixed inset-0 bg-black/50'
+            style={{ zIndex: 9998 }}
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Drawer */}
+          <div className='fixed right-0 top-0 bottom-0 w-[28rem] max-w-[90vw] bg-white shadow-2xl flex flex-col' style={{ zIndex: 9999 }}>
           {/* Header */}
-          <div className='flex items-center justify-between p-4 border-b border-outline-variant/10'>
+          <div className='flex items-center justify-between p-6 border-b border-outline-variant/10 shrink-0'>
             <div>
-              <h3 className='font-bold text-base text-on-surface'>
+              <h3 className='font-bold text-xl text-on-surface'>
                 Notifications
               </h3>
               {unreadCount > 0 && (
-                <p className='text-[10px] text-on-surface-variant'>
+                <p className='text-xs text-on-surface-variant mt-1'>
                   {unreadCount} unread
                 </p>
               )}
@@ -253,7 +253,7 @@ export function NotificationBell() {
                   size='sm'
                   onClick={handleMarkAllAsRead}
                   disabled={actionLoading === 'all'}
-                  className='text-xs h-7 px-2'
+                  className='text-xs h-8 px-3 cursor-pointer'
                 >
                   {actionLoading === 'all' ? (
                     <Loader2 className='w-3 h-3 animate-spin' />
@@ -267,29 +267,29 @@ export function NotificationBell() {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className='p-1 rounded-lg hover:bg-surface-container transition-colors'
+                className='p-2 rounded-lg hover:bg-surface-container transition-colors cursor-pointer'
               >
-                <X className='w-4 h-4 text-on-surface-variant' />
+                <X className='w-5 h-5 text-on-surface-variant' />
               </button>
             </div>
           </div>
 
           {/* Notifications List */}
-          <div className='max-h-[500px] overflow-y-auto'>
+          <div className='flex-1 overflow-y-auto'>
             {loading ? (
-              <div className='flex flex-col items-center justify-center py-12'>
-                <Loader2 className='w-8 h-8 animate-spin text-primary mb-2' />
+              <div className='flex flex-col items-center justify-center py-20'>
+                <Loader2 className='w-10 h-10 animate-spin text-primary mb-3' />
                 <p className='text-sm text-on-surface-variant'>
                   Loading notifications...
                 </p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className='flex flex-col items-center justify-center py-12 px-4'>
-                <Bell className='w-12 h-12 text-on-surface-variant/30 mb-3' />
-                <p className='font-bold text-on-surface-variant text-sm'>
+              <div className='flex flex-col items-center justify-center py-20 px-6'>
+                <Bell className='w-16 h-16 text-on-surface-variant/30 mb-4' />
+                <p className='font-bold text-on-surface-variant text-base'>
                   No notifications yet
                 </p>
-                <p className='text-xs text-on-surface-variant/70 mt-1'>
+                <p className='text-sm text-on-surface-variant/70 mt-2 text-center'>
                   We'll notify you when something happens
                 </p>
               </div>
@@ -298,21 +298,21 @@ export function NotificationBell() {
                 {notifications.map((notification) => (
                   <div
                     key={notification._id}
-                    className={`p-4 hover:bg-surface-container-lowest/50 transition-colors ${getNotificationColor(notification.type)} ${
+                    className={`p-5 hover:bg-surface-container-lowest/50 transition-colors ${getNotificationColor(notification.type)} ${
                       !notification.isRead ? 'bg-primary/5' : ''
                     }`}
                   >
-                    <div className='flex items-start gap-3'>
+                    <div className='flex items-start gap-4'>
                       {/* Icon */}
-                      <div className='text-2xl shrink-0 mt-0.5'>
+                      <div className='text-3xl shrink-0 mt-0.5'>
                         {getNotificationIcon(notification.type)}
                       </div>
 
                       {/* Content */}
                       <div className='flex-1 min-w-0'>
-                        <div className='flex items-start justify-between gap-2 mb-1'>
+                        <div className='flex items-start justify-between gap-2 mb-2'>
                           <h4
-                            className={`text-sm font-bold ${
+                            className={`text-base font-bold ${
                               !notification.isRead
                                 ? 'text-on-surface'
                                 : 'text-on-surface-variant'
@@ -321,14 +321,14 @@ export function NotificationBell() {
                             {notification.title}
                           </h4>
                           {!notification.isRead && (
-                            <div className='w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5'></div>
+                            <div className='w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5'></div>
                           )}
                         </div>
-                        <p className='text-xs text-on-surface-variant mb-2 line-clamp-2'>
+                        <p className='text-sm text-on-surface-variant mb-3 line-clamp-2'>
                           {notification.message}
                         </p>
                         <div className='flex items-center justify-between'>
-                          <span className='text-[10px] text-on-surface-variant/70'>
+                          <span className='text-xs text-on-surface-variant/70'>
                             {formatDistanceToNow(
                               new Date(notification.createdAt),
                               {
@@ -336,20 +336,20 @@ export function NotificationBell() {
                               },
                             )}
                           </span>
-                          <div className='flex items-center gap-1'>
+                          <div className='flex items-center gap-2'>
                             {!notification.isRead && (
                               <button
                                 onClick={() =>
                                   handleMarkAsRead(notification._id)
                                 }
                                 disabled={actionLoading === notification._id}
-                                className='p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-50'
+                                className='p-1.5 rounded hover:bg-surface-container transition-colors disabled:opacity-50 cursor-pointer'
                                 title='Mark as read'
                               >
                                 {actionLoading === notification._id ? (
-                                  <Loader2 className='w-3 h-3 animate-spin text-on-surface-variant' />
+                                  <Loader2 className='w-4 h-4 animate-spin text-on-surface-variant' />
                                 ) : (
-                                  <Check className='w-3 h-3 text-on-surface-variant' />
+                                  <Check className='w-4 h-4 text-on-surface-variant' />
                                 )}
                               </button>
                             )}
@@ -358,13 +358,13 @@ export function NotificationBell() {
                                 handleDeleteNotification(notification._id)
                               }
                               disabled={actionLoading === notification._id}
-                              className='p-1 rounded hover:bg-red-50 transition-colors disabled:opacity-50'
+                              className='p-1.5 rounded hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer'
                               title='Delete'
                             >
                               {actionLoading === notification._id ? (
-                                <Loader2 className='w-3 h-3 animate-spin text-red-600' />
+                                <Loader2 className='w-4 h-4 animate-spin text-red-600' />
                               ) : (
-                                <Trash2 className='w-3 h-3 text-red-600' />
+                                <Trash2 className='w-4 h-4 text-red-600' />
                               )}
                             </button>
                           </div>
@@ -377,7 +377,9 @@ export function NotificationBell() {
             )}
           </div>
         </div>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   )
 }

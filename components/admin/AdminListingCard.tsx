@@ -198,58 +198,62 @@ export function AdminListingCard({
               </Button>
             </div>
           ) : (
-            <Button
-              size='sm'
-              variant='outline'
-              className='w-full'
-              onClick={() => router.push(`/admin/listings/details?id=${listing._id}`)}
-            >
-              <Eye className='w-4 h-4 mr-1' />
-              View Details
-            </Button>
+            <>
+              {/* Additional Admin Actions */}
+              <div className='flex gap-2'>
+                {listing.isAvailable === false && handleRelistClick && (
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    className='flex-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
+                    onClick={() => handleRelistClick(listing._id, listing.title)}
+                    disabled={actionLoading === listing._id}
+                  >
+                    <RefreshCw className='w-3.5 h-3.5 mr-1' />
+                    Re-list
+                  </Button>
+                )}
+
+                {listing.isAvailable !== false && handleUnlistClick && (
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    className='flex-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                    onClick={() => handleUnlistClick(listing._id, listing.title)}
+                    disabled={actionLoading === listing._id}
+                  >
+                    <EyeOff className='w-3.5 h-3.5 mr-1' />
+                    Unlist
+                  </Button>
+                )}
+
+                {handleDeleteClick && (
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    className='flex-1 text-red-600 hover:text-red-700 hover:bg-red-50'
+                    onClick={() => handleDeleteClick(listing._id, listing.title)}
+                    disabled={actionLoading === listing._id}
+                  >
+                    <Trash2 className='w-3.5 h-3.5 mr-1' />
+                    Delete
+                  </Button>
+                )}
+              </div>
+              <Button
+                size='sm'
+                variant='outline'
+                className='w-full'
+                onClick={() => router.push(`/admin/listings/details?id=${listing._id}`)}
+              >
+                <Eye className='w-4 h-4 mr-1' />
+                View Details
+              </Button>
+
+            </>
           )}
 
-          {/* Additional Admin Actions */}
-          <div className='flex gap-2'>
-            {listing.isAvailable === false && handleRelistClick && (
-              <Button
-                size='sm'
-                variant='outline'
-                className='flex-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
-                onClick={() => handleRelistClick(listing._id, listing.title)}
-                disabled={actionLoading === listing._id}
-              >
-                <RefreshCw className='w-3.5 h-3.5 mr-1' />
-                Re-list
-              </Button>
-            )}
 
-            {listing.isAvailable !== false && handleUnlistClick && (
-              <Button
-                size='sm'
-                variant='outline'
-                className='flex-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50'
-                onClick={() => handleUnlistClick(listing._id, listing.title)}
-                disabled={actionLoading === listing._id}
-              >
-                <EyeOff className='w-3.5 h-3.5 mr-1' />
-                Unlist
-              </Button>
-            )}
-
-            {handleDeleteClick && (
-              <Button
-                size='sm'
-                variant='outline'
-                className='flex-1 text-red-600 hover:text-red-700 hover:bg-red-50'
-                onClick={() => handleDeleteClick(listing._id, listing.title)}
-                disabled={actionLoading === listing._id}
-              >
-                <Trash2 className='w-3.5 h-3.5 mr-1' />
-                Delete
-              </Button>
-            )}
-          </div>
         </div>
       </CardContent>
     </Card>

@@ -17,6 +17,8 @@ import {
   Mail,
   Calendar,
   ShieldCheck,
+  CreditCard,
+  Wallet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StudentProfileSkeleton } from '@/components/ui/skeleton/profile-skeleton'
@@ -51,20 +53,27 @@ export default function StudentProfilePage() {
       icon: Lock,
       path: '/student/profile/security',
     },
+    {
+      id: 'payments',
+      title: 'Payments & payouts',
+      description: 'Review payments, payment methods, and payout settings',
+      icon: Wallet,
+      path: '/student/payments',
+    },
   ]
 
   // Only show "Become a Owner" if user is not already an admin or owner
   const hostingSection =
     user && user.role !== 'admin' && user.role !== 'owner'
       ? [
-          {
-            id: 'become-owner',
-            title: 'List your space',
-            description: 'Become an owner and start earning from your property',
-            icon: Building2,
-            path: '/host/homes',
-          },
-        ]
+        {
+          id: 'become-owner',
+          title: 'List your space',
+          description: 'Become an owner and start earning from your property',
+          icon: Building2,
+          path: '/host/homes',
+        },
+      ]
       : []
 
   if (loading) {
@@ -72,30 +81,14 @@ export default function StudentProfilePage() {
   }
 
   if (!user) {
-    return (
-      <div className='bg-white min-h-screen'>
-        <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12'>
-          <div className='bg-white p-2'>
-            <p className='text-base text-gray-600 mb-6'>
-              Log in and start planning your next stay.
-            </p>
-            <Button
-              className='w-full sm:w-auto px-8'
-              onClick={() => router.push('/login')}
-            >
-              Log in or sign up
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
+    return null;
   }
 
   return (
     <div className='min-h-screen bg-white'>
       <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12'>
         {/* Student Verification Banner - Only show if NOT verified */}
-        {!user.isStudentVerified && (
+        {!user.isStudentVerified && user.role === 'student' && (
           <div className='mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded p-4 sm:p-6 shadow-sm'>
             <div className='flex items-start gap-3 sm:gap-4'>
               <div className='w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0'>

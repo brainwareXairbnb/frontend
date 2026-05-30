@@ -34,8 +34,8 @@ function LoginForm() {
         router.push(redirectTo)
       } else {
         if (user.role === 'student') router.push('/')
-        else if (user.role === 'owner') router.push('/owner/listings')
-        else if (user.role === 'admin') router.push('/admin/users')
+        else if (user.role === 'owner') router.push('/owner')
+        else if (user.role === 'admin') router.push('/admin/dashboard')
       }
     }
   }, [user, redirectTo, router])
@@ -118,7 +118,7 @@ function LoginForm() {
       <div className='flex-1 flex flex-col items-center md:justify-center p-6 md:p-12 lg:p-16 bg-white overflow-y-auto'>
         <header className='w-full max-w-md mb-6 md:mb-10 animate-in fade-in slide-in-from-top-4 duration-700'>
           <Link href='/' className='inline-block mb-4'>
-            <Logo />
+            <Logo asLink={false} />
           </Link>
 
           <div className='flex items-center gap-2 mb-3'>

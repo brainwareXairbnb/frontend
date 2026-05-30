@@ -389,12 +389,13 @@ export const bookingsApi = {
   createBooking: async (
     listingId: string,
     moveInDate: string,
+    durationMonths: number,
     message?: string,
     token?: string,
   ) => {
     return apiFetch('/student/bookings', {
       method: 'POST',
-      body: JSON.stringify({ listingId, moveInDate, message }),
+      body: JSON.stringify({ listingId, moveInDate, durationMonths, message }),
       token,
     })
   },
@@ -407,18 +408,36 @@ export const bookingsApi = {
   },
 
   /**
+   * Get booking by ID
+   */
+  getBookingById: async (bookingId: string, token?: string) => {
+    return apiFetch(`/student/bookings/${bookingId}`, { token })
+  },
+
+  /**
+   * Cancel booking (student)
+   */
+  cancelBooking: async (bookingId: string, token?: string) => {
+    return apiFetch(`/student/bookings/${bookingId}/cancel`, {
+      method: 'PATCH',
+      token,
+    })
+  },
+
+  /**
    * Get owner bookings
    */
   getOwnerBookings: async (token?: string) => {
-    return apiFetch('/owner/bookings', { token })
+    return apiFetch<{ bookings: any[]; pagination: any }>('/owner/bookings', { token })
   },
 
   /**
    * Accept booking (owner)
    */
-  acceptBooking: async (bookingId: string, token?: string) => {
-    return apiFetch(`/owner/bookings/${bookingId}/accept`, {
-      method: 'POST',
+  acceptBooking: async (bookingId: string, ownerReply?: string, token?: string) => {
+    return apiFetch<{ booking: any; listing: any }>(`/owner/bookings/${bookingId}/accept`, {
+      method: 'PATCH',
+      body: ownerReply ? JSON.stringify({ ownerReply }) : undefined,
       token,
     })
   },
@@ -426,9 +445,9 @@ export const bookingsApi = {
   /**
    * Reject booking (owner)
    */
-  rejectBooking: async (bookingId: string, reason?: string, token?: string) => {
-    return apiFetch(`/owner/bookings/${bookingId}/reject`, {
-      method: 'POST',
+  rejectBooking: async (bookingId: string, reason: string, token?: string) => {
+    return apiFetch<{ booking: any }>(`/owner/bookings/${bookingId}/reject`, {
+      method: 'PATCH',
       body: JSON.stringify({ reason }),
       token,
     })
@@ -465,6 +484,60 @@ export const ownerApi = {
       bankDetails: any
     }>('/owner/bank-details', { token })
   },
+
+  /**
+   * Get payout history
+   */
+  getPayouts: async (params?: { page?: number; limit?: number; status?: string }, token?: string) => {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return apiFetch<{
+      transactions: any[]
+      summary: { totalGross: number; totalServiceCharge: number; totalNet: number }
+      pagination: any
+    }>(`/owner/payouts?${queryParams.toString()}`, { token })
+  },
+
+  /**
+   * Get analytics dashboard data
+   */
+  getAnalytics: async (token?: string) => {
+    return apiFetch<{
+      views: number
+      avgRating: number
+      totalListings: number
+      totalBookingRequests: number
+      acceptedBookings: number
+      acceptanceRate: number
+      completedBookings: number
+      monthlyRevenue: Array<{
+        _id: { month: number; year: number }
+        gross: number
+        serviceCharge: number
+        net: number
+      }>
+      topPerformers: {
+        byViews: {
+          id: string
+          title: string
+          viewCount: number
+          avgRating: number
+        } | null
+        byRevenue: {
+          id: string
+          title: string
+          totalRevenue: number
+          avgRating: number
+        } | null
+      }
+    }>('/owner/analytics', { token })
+  },
 }
 
 /**
@@ -486,14 +559,14 @@ export const paymentApi = {
    * Verify payment
    */
   verifyPayment: async (
-    orderId: string,
-    paymentId: string,
-    signature: string,
+    razorpayOrderId: string,
+    razorpayPaymentId: string,
+    razorpaySignature: string,
     token?: string,
   ) => {
-    return apiFetch('/payment/verify', {
+    return apiFetch('/payment/verify-payment', {
       method: 'POST',
-      body: JSON.stringify({ orderId, paymentId, signature }),
+      body: JSON.stringify({ razorpayOrderId, razorpayPaymentId, razorpaySignature }),
       token,
     })
   },
@@ -501,8 +574,94 @@ export const paymentApi = {
   /**
    * Get payment history
    */
-  getPaymentHistory: async (token?: string) => {
-    return apiFetch('/payment/history', { token })
+  getPaymentHistory: async (params?: { bookingId?: string; page?: number; limit?: number }, token?: string) => {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return apiFetch<{ transactions: any[]; pagination: any }>(`/payment/my-payments?${queryParams.toString()}`, { token })
+  },
+
+  /**
+   * Cancel booking with refund
+   */
+  cancelBooking: async (bookingId: string, token?: string) => {
+    return apiFetch('/payment/cancel-booking', {
+      method: 'POST',
+      body: JSON.stringify({ bookingId }),
+      token,
+    })
+  },
+
+  /**
+   * Get refund policy
+   */
+  getRefundPolicy: async (bookingId: string, token?: string) => {
+    return apiFetch(`/payment/refund-policy?bookingId=${bookingId}`, { token })
+  },
+
+  /**
+   * Get payment schedules
+   */
+  getPaymentSchedules: async (token?: string) => {
+    return apiFetch('/payment/schedules', { token })
+  },
+
+  /**
+   * Get payment schedule by booking ID
+   */
+  getPaymentScheduleByBooking: async (bookingId: string, token?: string) => {
+    return apiFetch(`/payment/schedule/${bookingId}`, { token })
+  },
+
+  /**
+   * Toggle auto-pay for payment schedule
+   */
+  toggleAutoPay: async (scheduleId: string, autoPayEnabled: boolean, token?: string) => {
+    return apiFetch(`/payment/schedule/${scheduleId}/toggle-autopay`, {
+      method: 'POST',
+      body: JSON.stringify({ autoPayEnabled }),
+      token,
+    })
+  },
+
+  /**
+   * Create order for monthly payment
+   */
+  createMonthlyPaymentOrder: async (scheduleId: string, month: number, token?: string) => {
+    return apiFetch('/payment/schedule/' + scheduleId + '/pay-month', {
+      method: 'POST',
+      body: JSON.stringify({ month }),
+      token,
+    })
+  },
+
+  /**
+   * Verify scheduled payment
+   */
+  verifyScheduledPayment: async (
+    razorpayOrderId: string,
+    razorpayPaymentId: string,
+    razorpaySignature: string,
+    scheduleId: string,
+    month: number,
+    token?: string,
+  ) => {
+    return apiFetch('/payment/schedule/verify-payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpaySignature,
+        scheduleId,
+        month,
+      }),
+      token,
+    })
   },
 }
 
@@ -613,10 +772,47 @@ export const reviewsApi = {
   },
 
   /**
-   * Get listing reviews
+   * Get listing reviews (includes student's own review if authenticated)
    */
-  getListingReviews: async (listingId: string, page = 1, limit = 10) => {
-    return apiFetch(`/reviews/listing/${listingId}?page=${page}&limit=${limit}`)
+  getListingReviews: async (listingId: string, page = 1, limit = 10, token?: string) => {
+    return apiFetch<{
+      reviews: any[]
+      myReview: any | null
+      pagination: {
+        page: number
+        limit: number
+        total: number
+        pages: number
+      }
+    }>(`/reviews/listing/${listingId}?page=${page}&limit=${limit}`, { token })
+  },
+
+  /**
+   * Get student's own reviews
+   */
+  getMyReviews: async (token?: string) => {
+    return apiFetch<{ reviews: any[] }>('/reviews/my', { token })
+  },
+
+  /**
+   * Update student's own review (only if not approved)
+   */
+  updateReview: async (reviewId: string, data: { rating?: number; comment?: string }, token?: string) => {
+    return apiFetch(`/reviews/${reviewId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      token,
+    })
+  },
+
+  /**
+   * Delete student's own review (only if not approved)
+   */
+  deleteReview: async (reviewId: string, token?: string) => {
+    return apiFetch(`/reviews/${reviewId}`, {
+      method: 'DELETE',
+      token,
+    })
   },
 }
 
@@ -627,8 +823,8 @@ export const adminApi = {
   /**
    * Get dashboard stats
    */
-  getDashboardStats: async (token?: string) => {
-    return apiFetch<{ stats: DashboardStats }>('/admin/dashboard-stats', {
+  getDashboardStats: async (period: string = '30days', token?: string) => {
+    return apiFetch<{ stats: DashboardStats }>(`/admin/dashboard/stats?period=${period}`, {
       token,
     })
   },
@@ -784,6 +980,173 @@ export const adminApi = {
     return apiFetch(`/admin/users/${userId}/reject-upgrade`, {
       method: 'PATCH',
       body: JSON.stringify({ reason }),
+    })
+  },
+
+  /**
+   * Get service charge configuration
+   */
+  getServiceCharge: async (token?: string) => {
+    return apiFetch<{ currentRate: number; history: any[] }>('/admin/service-charge', {
+      token,
+    })
+  },
+
+  /**
+   * Update service charge rate
+   */
+  updateServiceCharge: async (rate: number, reason?: string, token?: string) => {
+    return apiFetch('/admin/service-charge', {
+      method: 'PATCH',
+      body: JSON.stringify({ rate, reason }),
+      token,
+    })
+  },
+
+  /**
+   * Get all owner payouts
+   */
+  getPayouts: async (params?: { status?: string; search?: string; page?: number; limit?: number }, token?: string) => {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return apiFetch<{
+      transactions: any[]
+      stats: { totalPendingAmount: number; pendingCount: number; failedPayouts: number }
+      pagination: any
+    }>(`/admin/payouts?${queryParams.toString()}`, { token })
+  },
+
+  /**
+   * Update payout status
+   */
+  updatePayoutStatus: async (transactionId: string, status: string, notes?: string, token?: string) => {
+    return apiFetch(`/admin/payouts/${transactionId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, notes }),
+      token,
+    })
+  },
+
+  /**
+   * Get financial statistics for the dashboard
+   */
+  getFinancialStats: async (token?: string) => {
+    return apiFetch<{
+      kpis: {
+        totalGross: number
+        totalNetRevenue: number
+        totalPayoutsSettled: number
+        pendingPayoutsCount: number
+      }
+      trends: any[]
+      topListings: any[]
+      recentTransactions: any[]
+    }>('/admin/financial/stats', { token })
+  },
+
+  /**
+   * Get all platform bookings
+   */
+  getBookings: async (params?: { status?: string; page?: number; limit?: number }, token?: string) => {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return apiFetch<{
+      bookings: any[]
+      pagination: {
+        page: number
+        limit: number
+        total: number
+        pages: number
+      }
+    }>(`/admin/bookings?${queryParams.toString()}`, { token })
+  },
+
+  /**
+   * Get platform analytics and statistics
+   */
+  getAnalytics: async (token?: string) => {
+    return apiFetch<{
+      users: {
+        total: number
+        students: number
+        owners: number
+        newLast30Days: number
+        newLast7Days: number
+      }
+      listings: {
+        total: number
+        approved: number
+        pending: number
+      }
+      bookings: {
+        total: number
+        paymentConfirmed: number
+        completed: number
+        last30Days: number
+      }
+      revenue: any
+      payouts: any
+      recentTransactions: any[]
+    }>('/admin/analytics', { token })
+  },
+
+  /**
+   * Get all reviews with pagination and filters
+   */
+  getReviews: async (params?: { isApproved?: boolean; page?: number; limit?: number }, token?: string) => {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return apiFetch<{
+      reviews: any[]
+      stats: {
+        totalPending: number
+        totalReviews: number
+        avgApprovalTime: string
+      }
+      pagination: {
+        page: number
+        limit: number
+        total: number
+        pages: number
+      }
+    }>(`/admin/reviews?${queryParams.toString()}`, { token })
+  },
+
+  /**
+   * Approve a review
+   */
+  approveReview: async (reviewId: string, token?: string) => {
+    return apiFetch(`/admin/reviews/${reviewId}/approve`, {
+      method: 'PATCH',
+      token,
+    })
+  },
+
+  /**
+   * Delete a review permanently
+   */
+  deleteReview: async (reviewId: string, token?: string) => {
+    return apiFetch(`/admin/reviews/${reviewId}`, {
+      method: 'DELETE',
+      token,
     })
   },
 }

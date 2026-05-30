@@ -284,7 +284,7 @@ export default function AdminListingsPage() {
   }
 
   return (
-    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 max-w-[1600px] mx-auto'>
+    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 bg-gray-50 min-h-screen'>
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
         onClose={() => setModalConfig((prev) => ({ ...prev, isOpen: false }))}
@@ -298,8 +298,18 @@ export default function AdminListingsPage() {
         inputLabel='Rejection Reason'
       />
 
+      {/* Header Section */}
+      <header className='mb-8'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+          Listing Approval
+        </h1>
+        <p className='text-sm text-gray-600'>
+          Review and manage property listings submitted by owners
+        </p>
+      </header>
+
       {/* Stats Cards */}
-      <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6'>
+      <section className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
         {[
           {
             label: 'Total',
@@ -336,17 +346,19 @@ export default function AdminListingsPage() {
         ].map((stat, index) => (
           <div
             key={index}
-            className='bg-white p-4 md:p-6 rounded-2xl border border-outline-variant/10 shadow-sm'
+            className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'
           >
-            <div className='flex items-center justify-between mb-2'>
-              <span className={`p-2 rounded-lg ${stat} ${stat.color}`}>
-                <stat.icon className='w-4 h-4 md:w-5 md:h-5' />
-              </span>
-              <p className='text-[10px] font-black uppercase tracking-widest text-on-surface-variant'>
-                {stat.label}
-              </p>
+            <div className='flex items-center justify-between mb-4'>
+              <div
+                className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
+              >
+                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              </div>
             </div>
-            <h3 className='text-xl md:text-2xl font-bold text-on-surface'>
+            <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+              {stat.label}
+            </p>
+            <h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
               {stat.value}
             </h3>
           </div>
@@ -354,29 +366,29 @@ export default function AdminListingsPage() {
       </section>
 
       {/* Search and Filters */}
-      <div className='mb-6 space-y-4'>
+      <div className='mb-6 flex flex-col gap-3'>
         {/* Search Bar */}
-        <div className='bg-white border-2 border-outline-variant/10 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-sm focus-within:border-primary focus-within:shadow-md transition-all'>
-          <Search className='text-on-surface-variant w-5 h-5 shrink-0' />
+        <div className='relative'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
           <input
             type='text'
             placeholder='Search by title, owner, or city...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className='flex-1 bg-transparent border-none focus:outline-none text-sm placeholder:text-on-surface-variant/50'
+            className='w-full h-11 bg-white border border-gray-300 rounded-lg pl-10 pr-4 text-sm text-gray-900 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-all placeholder:text-gray-400'
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className='p-1 hover:bg-surface-container rounded-full transition-colors'
+              className='absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors'
             >
-              <X className='w-4 h-4 text-on-surface-variant' />
+              <X className='w-4 h-4 text-gray-400' />
             </button>
           )}
         </div>
 
         {/* Filter Tabs */}
-        <div className='flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide'>
+        <div className='flex gap-2 overflow-x-auto pb-2 scrollbar-hide'>
           {[
             { key: 'all', label: 'All', count: stats.total },
             { key: 'pending', label: 'Pending', count: stats.pending },
@@ -386,18 +398,18 @@ export default function AdminListingsPage() {
             <button
               key={filter.key}
               onClick={() => setActiveFilter(filter.key)}
-              className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+              className={`h-9 px-4 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
                 activeFilter === filter.key
-                  ? 'bg-primary text-on-primary shadow-lg shadow-primary/25'
-                  : 'bg-white border-2 border-outline-variant/10 text-on-surface-variant hover:bg-surface-container-lowest hover:border-primary/20'
+                  ? 'bg-gray-900 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >
               <span>{filter.label}</span>
               <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-black min-w-[24px] text-center ${
+                className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                   activeFilter === filter.key
-                    ? 'bg-on-primary/20 text-on-primary'
-                    : 'bg-surface-container text-on-surface-variant'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 {filter.count}

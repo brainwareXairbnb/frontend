@@ -7,7 +7,7 @@ import { Listing } from '@/lib/types'
 interface FormNavigationProps {
   currentStep: number
   totalSteps: number
-  loading: boolean
+  loadingAction: 'draft' | 'submit' | null
   editingListing?: Listing | null
   onPrevStep: () => void
   onNextStep: () => void
@@ -18,13 +18,17 @@ interface FormNavigationProps {
 export function FormNavigation({
   currentStep,
   totalSteps,
-  loading,
+  loadingAction,
   editingListing,
   onPrevStep,
   onNextStep,
   onSaveDraft,
   onSubmit,
 }: FormNavigationProps) {
+  const isDraftLoading = loadingAction === 'draft'
+  const isSubmitLoading = loadingAction === 'submit'
+  const isAnyLoading = loadingAction !== null
+
   if (currentStep < totalSteps) {
     // Navigation Buttons (Steps 1-3)
     return (
@@ -36,7 +40,7 @@ export function FormNavigation({
             size='sm'
             rounded='md'
             onClick={onPrevStep}
-            disabled={loading}
+            disabled={isAnyLoading}
             className='h-11 px-8 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
           >
             Previous
@@ -49,7 +53,7 @@ export function FormNavigation({
           size='sm'
           rounded='md'
           onClick={onNextStep}
-          disabled={loading}
+          disabled={isAnyLoading}
           className='h-11 px-12 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
         >
           Next
@@ -68,7 +72,7 @@ export function FormNavigation({
         size='sm'
         rounded='md'
         onClick={onPrevStep}
-        disabled={loading}
+        disabled={isAnyLoading}
         className='w-full h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider md:hidden'
       >
         Previous
@@ -83,7 +87,7 @@ export function FormNavigation({
           size='sm'
           rounded='md'
           onClick={onPrevStep}
-          disabled={loading}
+          disabled={isAnyLoading}
           className='hidden md:flex h-10 px-6 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
         >
           Previous
@@ -98,10 +102,10 @@ export function FormNavigation({
               size='sm'
               rounded='md'
               onClick={onSaveDraft}
-              disabled={loading}
+              disabled={isAnyLoading}
               className='flex-1 h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
             >
-              {loading ? (
+              {isDraftLoading ? (
                 <>
                   <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
                   Updating...
@@ -119,10 +123,10 @@ export function FormNavigation({
                 size='sm'
                 rounded='md'
                 onClick={onSubmit}
-                disabled={loading}
+                disabled={isAnyLoading}
                 className='flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
               >
-                {loading ? (
+                {isSubmitLoading ? (
                   <>
                     <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
                     Submitting...
@@ -145,10 +149,10 @@ export function FormNavigation({
               size='sm'
               rounded='md'
               onClick={onSaveDraft}
-              disabled={loading}
+              disabled={isAnyLoading}
               className='flex-1 h-10 border border-gray-300 bg-white hover:bg-gray-50 text-xs font-bold text-gray-700 uppercase tracking-wider'
             >
-              {loading ? (
+              {isDraftLoading ? (
                 <>
                   <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
                   Saving...
@@ -165,10 +169,10 @@ export function FormNavigation({
               size='sm'
               rounded='md'
               onClick={onSubmit}
-              disabled={loading}
+              disabled={isAnyLoading}
               className='flex-1 h-10 bg-primary text-white hover:bg-primary/90 text-xs font-bold shadow-md shadow-primary/20 uppercase tracking-wider'
             >
-              {loading ? (
+              {isSubmitLoading ? (
                 <>
                   <Loader2 className='w-3.5 h-3.5 animate-spin mr-1.5' />
                   Submitting...

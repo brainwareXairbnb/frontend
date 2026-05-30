@@ -10,16 +10,20 @@ export function ViewingAsIndicator() {
   const router = useRouter()
 
   if (!user || user.role === 'student') return null
-  
-  const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/register'
-  const isManagementPage = pathname.startsWith('/admin') || pathname.startsWith('/owner')
-  
+
+  const isAuthPage =
+    pathname.startsWith('/auth') ||
+    pathname === '/login' ||
+    pathname === '/register'
+  const isManagementPage =
+    pathname.startsWith('/admin') || pathname.startsWith('/owner')
+
   if (isAuthPage || isManagementPage) return null
 
   const isAdmin = user.role === 'admin'
 
   const handleBack = () => {
-    router.push(isAdmin ? '/admin/users' : '/owner/listings')
+    router.push(isAdmin ? '/admin/dashboard' : '/owner')
   }
 
   return (

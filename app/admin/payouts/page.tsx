@@ -1,328 +1,836 @@
-'use client';
+'use client'
 
-import { 
-  Wallet, 
-  Coins, 
-  AlertCircle, 
-  Search, 
-  Filter, 
-  CheckCircle2, 
-  Clock, 
-  PauseCircle, 
-  Ban, 
-  MoreVertical, 
-  ChevronLeft, 
+import { useState, useEffect } from 'react'
+import {
+  Wallet,
+  AlertCircle,
+  Search,
+  CheckCircle2,
+  Clock,
+  PauseCircle,
+  Ban,
+  MoreVertical,
+  ChevronLeft,
   ChevronRight,
-  ArrowUpRight,
-  Zap,
-  Banknote,
   ShieldCheck,
-  Calendar
-} from 'lucide-react';
+  Loader2,
+  RefreshCcw,
+  Info,
+  Copy,
+  User,
+} from 'lucide-react'
+import { adminApi } from '@/lib/api'
+import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 
 export default function AdminPayoutsPage() {
-  const stats = {
-    totalPending: '₹1,42,850',
-    pendingCount: 14,
-    failedPayouts: 3,
-  };
+  const [loading, setLoading] = useState(true)
+  const [payouts, setPayouts] = useState<any[]>([])
+  const [stats, setStats] = useState({
+    totalPendingAmount: 0,
+    pendingCount: 0,
+    failedPayouts: 0,
+  })
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 1,
+  })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  const payouts = [
-    {
-      owner: 'Ankit Verma',
-      email: 'ankit@example.com',
-      bankStatus: 'Verified',
-      amount: '₹2,840.00',
-      dueDate: 'Apr 15, 2024',
-      status: 'Ready',
-      avatar: 'https://ui-avatars.com/api/?name=Ankit+Verma&background=b6212f&color=fff&size=128',
-    },
-    {
-      owner: 'Priya Chatterjee',
-      email: 'priya@example.com',
-      bankStatus: 'On Hold',
-      amount: '₹8,920.50',
-      dueDate: 'Apr 14, 2024',
-      status: 'Hold',
-      avatar: 'https://ui-avatars.com/api/?name=Priya+Chatterjee&background=b6212f&color=fff&size=128',
-    },
-    {
-      owner: 'Arnesh Maheshwari',
-      email: 'arnesh@example.com',
-      bankStatus: 'Verified',
-      amount: '₹15,120.75',
-      dueDate: 'Apr 13, 2024',
-      status: 'Processing',
-      avatar: 'https://ui-avatars.com/api/?name=Arnesh+Maheshwari&background=b6212f&color=fff&size=128',
-    },
-    {
-      owner: 'Rohit Kumar',
-      email: 'rohit@example.com',
-      bankStatus: 'Verified',
-      amount: '₹5,640.00',
-      dueDate: 'Apr 12, 2024',
-      status: 'Ready',
-      avatar: 'https://ui-avatars.com/api/?name=Rohit+Kumar&background=b6212f&color=fff&size=128',
-    },
-  ];
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean
+    transactionId: string | null
+    status: string
+    title: string
+    message: string
+  }>({
+    isOpen: false,
+    transactionId: null,
+    status: '',
+    title: '',
+    message: '',
+  })
+
+  useEffect(() => {
+    fetchPayouts()
+  }, [pagination.page, statusFilter])
+
+  const fetchPayouts = async () => {
+    try {
+      setLoading(true)
+      const response = await adminApi.getPayouts({
+        page: pagination.page,
+        limit: pagination.limit,
+        status: statusFilter,
+        search: searchQuery,
+      })
+      setPayouts(response.transactions)
+      setStats(response.stats)
+      setPagination(response.pagination)
+    } catch (error: any) {
+      toast.error('Failed to load payouts', { description: error.message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setPagination({ ...pagination, page: 1 })
+    fetchPayouts()
+  }
+
+  const handleStatusUpdate = async (
+    transactionId: string,
+    status: string,
+    title: string,
+    message: string,
+  ) => {
+    setModalConfig({
+      isOpen: true,
+      transactionId,
+      status,
+      title,
+      message,
+    })
+  }
+
+  const confirmStatusUpdate = async (reason?: string) => {
+    if (!modalConfig.transactionId) return
+
+    try {
+      setActionLoading(modalConfig.transactionId)
+      await adminApi.updatePayoutStatus(
+        modalConfig.transactionId,
+        modalConfig.status,
+        reason,
+      )
+      toast.success('Payout Status Updated')
+      fetchPayouts()
+      setModalConfig({ ...modalConfig, isOpen: false })
+    } catch (error: any) {
+      toast.error('Update Failed', { description: error.message })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleVerifyBank = async (userId: string) => {
+    try {
+      setActionLoading(userId)
+      await adminApi.verifyUserBank(userId)
+      toast.success('Bank Account Verified')
+      fetchPayouts()
+    } catch (error: any) {
+      toast.error('Verification Failed', { description: error.message })
+    } finally {
+      setActionLoading(null)
+    }
+  }
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'Ready':
-        return { color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', icon: CheckCircle2 };
-      case 'Processing':
-        return { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100', icon: Clock };
-      case 'Hold':
-        return { color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100', icon: PauseCircle };
-      case 'Failed':
-        return { color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-100', icon: Ban };
+      case 'settled':
+        return {
+          label: 'Paid',
+          color: 'text-green-700',
+          bg: 'bg-green-50',
+          border: 'border-green-200',
+          icon: CheckCircle2,
+        }
+      case 'processing':
+        return {
+          label: 'Processing',
+          color: 'text-blue-700',
+          bg: 'bg-blue-50',
+          border: 'border-blue-200',
+          icon: Clock,
+        }
+      case 'on_hold':
+        return {
+          label: 'On Hold',
+          color: 'text-orange-700',
+          bg: 'bg-orange-50',
+          border: 'border-orange-200',
+          icon: PauseCircle,
+        }
+      case 'failed':
+        return {
+          label: 'Failed',
+          color: 'text-red-700',
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          icon: Ban,
+        }
+      case 'pending':
       default:
-        return { color: 'text-gray-400', bg: 'bg-gray-50', border: 'border-gray-100', icon: Clock };
+        return {
+          label: 'Pending',
+          color: 'text-gray-700',
+          bg: 'bg-gray-50',
+          border: 'border-gray-200',
+          icon: Clock,
+        }
     }
-  };
+  }
+
+  if (loading && pagination.page === 1) {
+    return (
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <Loader2 className='w-8 h-8 animate-spin text-primary' />
+      </div>
+    )
+  }
 
   return (
-    <div className="px-6 md:px-12 py-10 pb-24 bg-[#fafafa]">
+    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-20 bg-gray-50 min-h-screen'>
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={confirmStatusUpdate}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.status === 'settled' ? 'success' : 'warning'}
+        confirmText='Confirm'
+        requiresInput={
+          modalConfig.status === 'on_hold' || modalConfig.status === 'failed'
+        }
+        inputPlaceholder='Reason for status change...'
+      />
+
       {/* Header Section */}
-      <header className="mb-10">
-        <div className="flex items-center gap-3 mb-4">
-           <div className="w-8 h-8 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
-              <Banknote className="w-4 h-4" />
-           </div>
-           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Fiscal Operations</h2>
+      <header className='mb-8'>
+        <div className='flex items-center justify-between mb-4'>
+          <div className='flex-1'>
+            <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+              Owner Settlements
+            </h1>
+            <p className='text-sm text-gray-600'>
+              Manage payouts to property partners and verify bank credentials
+            </p>
+          </div>
+          <button
+            onClick={fetchPayouts}
+            disabled={loading}
+            className='h-10 px-4 sm:px-6 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
+          >
+            {loading ? (
+              <Loader2 className='w-4 h-4 animate-spin' />
+            ) : (
+              <RefreshCcw className='w-4 h-4' />
+            )}
+            <span className='hidden sm:inline'>Refresh</span>
+          </button>
         </div>
-        <h1 className="text-4xl md:text-5xl font-headline font-black text-on-surface tracking-tighter uppercase mb-4">
-           Revenue <span className="text-primary">Disbursement</span>
-        </h1>
-        <p className="text-on-surface-variant font-medium text-sm leading-relaxed max-w-2xl opacity-60 uppercase tracking-widest">
-          Coordinate partner payouts and schedule automated fiscal cycles. Resolve failed transactions and verify bank identity modules.
-        </p>
       </header>
 
       {/* Stats Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-xl shadow-black/[0.02] group">
-          <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40 mb-3">
-            Total Liability
-          </p>
-          <div className="flex items-end justify-between">
-             <h3 className="text-3xl font-headline font-black text-on-surface tracking-tighter uppercase">
-               {stats.totalPending}
-             </h3>
-             <Wallet className="w-8 h-8 opacity-[0.05] group-hover:opacity-20 transition-opacity" />
+      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6'>
+        <div className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0'>
+              <Wallet className='w-6 h-6 text-orange-600' />
+            </div>
+            <div className='w-2 h-2 rounded-full bg-orange-500 animate-pulse' />
           </div>
-          <p className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant opacity-40 mt-3">{stats.pendingCount} Pending Batches</p>
+          <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+            Awaiting Settlement
+          </p>
+          <h3 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1'>
+            ₹{stats.totalPendingAmount.toLocaleString('en-IN')}
+          </h3>
+          <p className='text-xs text-gray-500'>
+            {stats.pendingCount} owners in queue
+          </p>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-xl shadow-black/[0.02] group">
-          <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40 mb-3">
-            Clearance Buffer
-          </p>
-          <div className="flex items-end justify-between">
-             <h3 className="text-3xl font-headline font-black text-emerald-500 tracking-tighter uppercase">
-               {stats.pendingCount}
-             </h3>
-             <Coins className="w-8 h-8 text-emerald-500 opacity-[0.05] group-hover:opacity-20 transition-opacity" />
+        <div className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center shrink-0'>
+              <ShieldCheck className='w-6 h-6 text-green-600' />
+            </div>
+            <div className='flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md'>
+              <CheckCircle2 className='w-3 h-3' />
+              <span>Ready</span>
+            </div>
           </div>
-          <p className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant opacity-40 mt-3">Verified Entity Wallets</p>
+          <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+            Verified Accounts
+          </p>
+          <h3 className='text-2xl sm:text-3xl font-bold text-green-600 mb-1'>
+            {payouts.filter((p) => p.owner?.bankDetails?.isVerified).length}
+          </h3>
+          <p className='text-xs text-gray-500'>Ready for transfer</p>
         </div>
 
-        <div className="bg-on-surface p-8 rounded-[2.5rem] shadow-2xl group">
-          <p className="text-[10px] font-black uppercase tracking-widest text-surface opacity-40 mb-3">
-            High Priority (Failed)
-          </p>
-          <div className="flex items-end justify-between">
-             <h3 className="text-3xl font-headline font-black text-primary tracking-tighter uppercase">
-               {stats.failedPayouts}
-             </h3>
-             <AlertCircle className="w-8 h-8 text-primary shadow-xl shadow-primary/20 rotate-12 transition-transform" />
+        <div className='bg-gray-900 p-4 sm:p-6 rounded shadow-sm sm:col-span-2 lg:col-span-1'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='w-12 h-12 rounded-lg bg-red-500 flex items-center justify-center shrink-0'>
+              <AlertCircle className='w-6 h-6 text-white' />
+            </div>
           </div>
-          <p className="text-[9px] font-black uppercase tracking-widest text-surface opacity-40 mt-3 flex items-center gap-2">
-            Requires Manual Override
+          <p className='text-xs font-medium text-gray-400 uppercase mb-1'>
+            Manual Review Required
           </p>
+          <h3 className='text-2xl sm:text-3xl font-bold text-white mb-1'>
+            {stats.failedPayouts}
+          </h3>
+          <p className='text-xs text-gray-400'>Failed transactions</p>
         </div>
       </section>
 
       {/* Search and Filters */}
-      <div className="mb-10 flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant/20 group-focus-within:text-primary transition-all" />
+      <div className='mb-6 flex flex-col gap-3'>
+        <form onSubmit={handleSearch} className='flex-1 relative'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
           <input
-            type="text"
-            placeholder="SEARCH ENTITY NAME OR FISCAL ID..."
-            className="w-full h-16 bg-white border border-outline-variant/10 rounded-2xl pl-16 pr-6 text-[10px] font-black uppercase tracking-widest text-on-surface focus:border-primary outline-none shadow-sm transition-all"
+            type='text'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder='Search owners by name or email...'
+            className='w-full h-11 bg-white border border-gray-300 rounded-lg pl-10 pr-4 text-sm text-gray-900 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-all placeholder:text-gray-400'
           />
-        </div>
-        <div className="flex gap-4">
-          <button className="h-16 px-8 bg-white border border-outline-variant/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:border-primary/20 transition-all flex items-center gap-3">
-            <Filter className="w-4 h-4 opacity-40" />
-            Classifiers
-          </button>
+        </form>
+        <div className='flex gap-2 overflow-x-auto pb-2 scrollbar-hide'>
+          {['', 'pending', 'processing', 'settled', 'failed', 'on_hold'].map(
+            (status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`h-9 px-4 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  statusFilter === status
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {status === '' ? 'All' : getStatusConfig(status).label}
+              </button>
+            ),
+          )}
         </div>
       </div>
 
-      {/* Payouts Table */}
-      <section className="bg-white rounded-[3rem] border border-outline-variant/10 shadow-xl shadow-black/[0.02] overflow-hidden group/table">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+      {/* Payouts List - Mobile Cards */}
+      <section className='space-y-4 lg:hidden'>
+        {payouts.length === 0 ? (
+          <div className='bg-white rounded border border-gray-200 p-12 text-center'>
+            <Info className='w-12 h-12 text-gray-300 mx-auto mb-3' />
+            <p className='text-sm text-gray-500'>No payouts found</p>
+          </div>
+        ) : (
+          payouts.map((payout) => {
+            const status = getStatusConfig(payout.payoutStatus)
+            const StatusIcon = status.icon
+            return (
+              <div
+                key={payout._id}
+                className='bg-white rounded border border-gray-200 shadow-sm overflow-hidden'
+              >
+                <div className='p-4'>
+                  {/* Owner Info */}
+                  <div className='flex items-center gap-3 mb-4 pb-4 border-b border-gray-100'>
+                    <div className='w-12 h-12 rounded-lg overflow-hidden bg-gray-200 shrink-0'>
+                      {payout.owner?.avatar ? (
+                        <img
+                          alt={payout.owner?.name}
+                          className='w-full h-full object-cover'
+                          src={payout.owner.avatar}
+                        />
+                      ) : (
+                        <div className='w-full h-full flex items-center justify-center'>
+                          <User className='w-6 h-6 text-gray-400' />
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-semibold text-gray-900 truncate'>
+                        {payout.owner?.name || 'Unknown'}
+                      </p>
+                      <p className='text-xs text-gray-500 truncate'>
+                        {payout.owner?.email || 'N/A'}
+                      </p>
+                    </div>
+                    <div
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${status.bg} ${status.color} border ${status.border}`}
+                    >
+                      <StatusIcon className='w-3 h-3' />
+                      <span>{status.label}</span>
+                    </div>
+                  </div>
+
+                  {/* Amount & Date */}
+                  <div className='grid grid-cols-2 gap-4 mb-4'>
+                    <div>
+                      <p className='text-xs text-gray-500 mb-1'>Net Amount</p>
+                      <p className='text-lg font-bold text-gray-900'>
+                        ₹{payout.ownerNetPayout.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                    <div>
+                      <p className='text-xs text-gray-500 mb-1'>Date</p>
+                      <p className='text-sm font-semibold text-gray-900'>
+                        {format(new Date(payout.createdAt), 'MMM dd, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Bank Details */}
+                  {!payout.owner?.bankDetails?.accountNumber ? (
+                    <div className='flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-red-50 text-red-700 border border-red-200 mb-4'>
+                      <AlertCircle className='w-4 h-4' />
+                      <span>Bank details missing</span>
+                    </div>
+                  ) : (
+                    <div className='bg-gray-50 rounded-lg p-3 mb-4'>
+                      <div className='flex items-center justify-between mb-2'>
+                        <span className='text-xs font-medium text-gray-500'>
+                          Bank Account
+                        </span>
+                        <div
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${
+                            payout.owner?.bankDetails?.isVerified
+                              ? 'bg-green-50 text-green-700 border border-green-200'
+                              : 'bg-orange-50 text-orange-700 border border-orange-200'
+                          }`}
+                        >
+                          {payout.owner?.bankDetails?.isVerified ? (
+                            <>
+                              <ShieldCheck className='w-3 h-3' />
+                              <span>Verified</span>
+                            </>
+                          ) : (
+                            <>
+                              <Clock className='w-3 h-3' />
+                              <span>Pending</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <p className='text-sm font-semibold text-gray-900 mb-1'>
+                        {payout.owner.bankDetails.bankName || 'Standard Bank'}
+                      </p>
+                      <p className='text-xs text-gray-600 mb-2'>
+                        {payout.owner.bankDetails.accountHolderName ||
+                          payout.owner.name}
+                      </p>
+                      <div className='flex items-center justify-between text-xs'>
+                        <div>
+                          <p className='text-gray-500 mb-0.5'>Account No.</p>
+                          <p className='font-semibold text-gray-900'>
+                            {payout.owner.bankDetails.accountNumber}
+                          </p>
+                        </div>
+                        <div className='text-right'>
+                          <p className='text-gray-500 mb-0.5'>IFSC</p>
+                          <p className='font-semibold text-gray-900'>
+                            {payout.owner.bankDetails.ifsc ||
+                              payout.owner.bankDetails.ifscCode ||
+                              'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className='flex gap-2'>
+                    {payout.payoutStatus === 'pending' && (
+                      <button
+                        onClick={() =>
+                          handleStatusUpdate(
+                            payout._id,
+                            'processing',
+                            'Mark as Processing',
+                            'Update payout status to processing?',
+                          )
+                        }
+                        disabled={actionLoading === payout._id}
+                        className='flex-1 h-10 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50'
+                      >
+                        {actionLoading === payout._id ? (
+                          <Loader2 className='w-4 h-4 animate-spin mx-auto' />
+                        ) : (
+                          'Process'
+                        )}
+                      </button>
+                    )}
+                    {payout.payoutStatus === 'processing' && (
+                      <button
+                        onClick={() =>
+                          handleStatusUpdate(
+                            payout._id,
+                            'settled',
+                            'Mark as Paid',
+                            'Confirm that the payout has been successfully transferred.',
+                          )
+                        }
+                        disabled={actionLoading === payout._id}
+                        className='flex-1 h-10 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 active:scale-95 transition-all disabled:opacity-50'
+                      >
+                        {actionLoading === payout._id ? (
+                          <Loader2 className='w-4 h-4 animate-spin mx-auto' />
+                        ) : (
+                          'Complete'
+                        )}
+                      </button>
+                    )}
+                    {!payout.owner?.bankDetails?.isVerified &&
+                      payout.owner?.bankDetails?.accountNumber && (
+                        <button
+                          onClick={() => handleVerifyBank(payout.owner?._id)}
+                          disabled={actionLoading === payout.owner?._id}
+                          className='h-10 px-4 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2'
+                        >
+                          {actionLoading === payout.owner?._id ? (
+                            <Loader2 className='w-4 h-4 animate-spin' />
+                          ) : (
+                            <>
+                              <ShieldCheck className='w-4 h-4' />
+                              <span>Verify</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </section>
+
+      {/* Payouts Table - Desktop */}
+      <section className='hidden lg:block bg-white rounded border border-gray-200 shadow-sm overflow-hidden'>
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="border-b border-outline-variant/5 bg-[#FAFAFA]">
-                <th className="text-left px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Global Entity
+              <tr className='bg-gray-50 border-b border-gray-200'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Owner
                 </th>
-                <th className="text-left px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Bank Registry
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Bank Account
                 </th>
-                <th className="text-left px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Cycle Yield
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Amount
                 </th>
-                <th className="text-left px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Maturity Date
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Date
                 </th>
-                <th className="text-left px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Protocol Status
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Status
                 </th>
-                <th className="text-right px-8 py-6 text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-                  Override
+                <th className='text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                  Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline-variant/5">
-              {payouts.map((payout, index) => {
-                const status = getStatusConfig(payout.status);
-                const StatusIcon = status.icon;
-                return (
-                  <tr
-                    key={index}
-                    className="hover:bg-[#FAFAFA] transition-colors group/row"
-                  >
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white shadow-sm shrink-0 border border-outline-variant/5">
-                          <img
-                            alt={payout.owner}
-                            className="w-full h-full object-cover grayscale group-hover/row:grayscale-0 transition-all duration-500"
-                            src={payout.avatar}
-                          />
+            <tbody className='divide-y divide-gray-100'>
+              {payouts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className='px-6 py-12 text-center'>
+                    <Info className='w-12 h-12 text-gray-300 mx-auto mb-3' />
+                    <p className='text-sm text-gray-500'>No payouts found</p>
+                  </td>
+                </tr>
+              ) : (
+                payouts.map((payout) => {
+                  const status = getStatusConfig(payout.payoutStatus)
+                  const StatusIcon = status.icon
+                  return (
+                    <tr
+                      key={payout._id}
+                      className='hover:bg-gray-50 transition-colors'
+                    >
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center gap-3'>
+                          <div className='w-10 h-10 rounded-lg overflow-hidden bg-gray-200 shrink-0'>
+                            {payout.owner?.avatar ? (
+                              <img
+                                alt={payout.owner?.name}
+                                className='w-full h-full object-cover'
+                                src={payout.owner.avatar}
+                              />
+                            ) : (
+                              <div className='w-full h-full flex items-center justify-center'>
+                                <User className='w-5 h-5 text-gray-400' />
+                              </div>
+                            )}
+                          </div>
+                          <div className='min-w-0'>
+                            <p className='text-sm font-semibold text-gray-900 truncate'>
+                              {payout.owner?.name || 'Unknown'}
+                            </p>
+                            <p className='text-xs text-gray-500 truncate'>
+                              {payout.owner?.email || 'N/A'}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-on-surface">{payout.owner}</p>
-                          <p className="text-[9px] font-bold text-on-surface-variant opacity-40 uppercase tracking-widest">{payout.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest ${payout.bankStatus === 'Verified' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
-                        {payout.bankStatus === 'Verified' ? <ShieldCheck className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                        {payout.bankStatus}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="text-base font-headline font-black text-on-surface tracking-tighter">
-                        {payout.amount}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-on-surface opacity-40">{payout.dueDate}</span>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest border ${status.bg} ${status.color} ${status.border}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {payout.status}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        {payout.status === 'Ready' && (
-                          <button className="h-10 px-6 bg-primary text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
-                            Initialize
-                          </button>
+                      </td>
+                      <td className='px-6 py-4'>
+                        {!payout.owner?.bankDetails?.accountNumber ? (
+                          <div className='flex items-center gap-2 text-xs font-semibold text-red-600'>
+                            <AlertCircle className='w-4 h-4' />
+                            <span>Missing</span>
+                          </div>
+                        ) : (
+                          <div className='space-y-2'>
+                            <div
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${
+                                payout.owner?.bankDetails?.isVerified
+                                  ? 'bg-green-50 text-green-700 border border-green-200'
+                                  : 'bg-orange-50 text-orange-700 border border-orange-200'
+                              }`}
+                            >
+                              {payout.owner?.bankDetails?.isVerified ? (
+                                <>
+                                  <ShieldCheck className='w-3 h-3' />
+                                  <span>Verified</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Clock className='w-3 h-3' />
+                                  <span>Pending</span>
+                                </>
+                              )}
+                            </div>
+                            <div className='text-xs text-gray-600'>
+                              <p className='font-semibold text-gray-900'>
+                                {payout.owner.bankDetails.accountNumber}
+                              </p>
+                              <p>
+                                {payout.owner.bankDetails.ifsc ||
+                                  payout.owner.bankDetails.ifscCode ||
+                                  'N/A'}
+                              </p>
+                            </div>
+                          </div>
                         )}
-                        <button className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-xl hover:border border-outline-variant/5 transition-all opacity-20 hover:opacity-100">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className='px-6 py-4'>
+                        <p className='text-lg font-bold text-gray-900'>
+                          ₹{payout.ownerNetPayout.toLocaleString('en-IN')}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          ID: {payout._id.substring(18).toUpperCase()}
+                        </p>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <p className='text-sm font-semibold text-gray-900'>
+                          {format(new Date(payout.createdAt), 'MMM dd, yyyy')}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {format(new Date(payout.createdAt), 'hh:mm a')}
+                        </p>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <div
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-semibold ${status.bg} ${status.color} border ${status.border}`}
+                        >
+                          <StatusIcon className='w-4 h-4' />
+                          {status.label}
+                        </div>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center justify-end gap-2 flex-wrap'>
+                          {payout.payoutStatus === 'pending' && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    payout._id,
+                                    'processing',
+                                    'Mark as Processing',
+                                    'Update payout status to processing?',
+                                  )
+                                }
+                                disabled={actionLoading === payout._id}
+                                className='h-9 px-3 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 whitespace-nowrap'
+                              >
+                                Process
+                              </button>
+                              {!payout.owner?.bankDetails?.isVerified &&
+                                payout.owner?.bankDetails?.accountNumber && (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyBank(payout.owner?._id)
+                                    }
+                                    disabled={
+                                      actionLoading === payout.owner?._id
+                                    }
+                                    className='h-9 px-3 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-gray-800 transition-all disabled:opacity-50 whitespace-nowrap'
+                                  >
+                                    Verify
+                                  </button>
+                                )}
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    payout._id,
+                                    'on_hold',
+                                    'Put on Hold',
+                                    'Put this payout on hold? Provide a reason.',
+                                  )
+                                }
+                                disabled={actionLoading === payout._id}
+                                className='h-9 px-3 bg-orange-600 text-white rounded-lg text-xs font-semibold hover:bg-orange-700 transition-all disabled:opacity-50 whitespace-nowrap'
+                              >
+                                Hold
+                              </button>
+                            </>
+                          )}
+                          {payout.payoutStatus === 'processing' && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    payout._id,
+                                    'settled',
+                                    'Mark as Paid',
+                                    'Confirm that the payout has been transferred.',
+                                  )
+                                }
+                                disabled={actionLoading === payout._id}
+                                className='h-9 px-3 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 transition-all disabled:opacity-50 whitespace-nowrap'
+                              >
+                                Complete
+                              </button>
+                              {!payout.owner?.bankDetails?.isVerified &&
+                                payout.owner?.bankDetails?.accountNumber && (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyBank(payout.owner?._id)
+                                    }
+                                    disabled={
+                                      actionLoading === payout.owner?._id
+                                    }
+                                    className='h-9 px-3 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-gray-800 transition-all disabled:opacity-50 whitespace-nowrap'
+                                  >
+                                    Verify
+                                  </button>
+                                )}
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    payout._id,
+                                    'failed',
+                                    'Mark as Failed',
+                                    'Mark as failed? Provide a reason.',
+                                  )
+                                }
+                                disabled={actionLoading === payout._id}
+                                className='h-9 px-3 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition-all disabled:opacity-50 whitespace-nowrap'
+                              >
+                                Fail
+                              </button>
+                            </>
+                          )}
+                          {(payout.payoutStatus === 'settled' ||
+                            payout.payoutStatus === 'on_hold' ||
+                            payout.payoutStatus === 'failed') && (
+                            <span className='text-xs text-gray-500'>
+                              No actions available
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <div className="px-10 py-8 border-t border-outline-variant/5 flex flex-col md:flex-row items-center justify-between gap-6 bg-[#FAFAFA]">
-          <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">
-            Current Buffer <span className="text-on-surface opacity-100">1-4</span> / <span className="text-on-surface opacity-100">14</span> Units
+        {pagination.total > 0 && (
+          <div className='px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4'>
+            <p className='text-sm text-gray-600'>
+              Showing{' '}
+              <span className='font-semibold text-gray-900'>
+                {(pagination.page - 1) * pagination.limit + 1}-
+                {Math.min(pagination.page * pagination.limit, pagination.total)}
+              </span>{' '}
+              of{' '}
+              <span className='font-semibold text-gray-900'>
+                {pagination.total}
+              </span>
+            </p>
+            <div className='flex gap-1'>
+              <button
+                disabled={pagination.page === 1}
+                onClick={() =>
+                  setPagination({ ...pagination, page: pagination.page - 1 })
+                }
+                className='w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <ChevronLeft className='w-4 h-4' />
+              </button>
+              {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                const pageNum = i + 1
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() =>
+                      setPagination({ ...pagination, page: pageNum })
+                    }
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                      pagination.page === pageNum
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              })}
+              <button
+                disabled={pagination.page === pagination.pages}
+                onClick={() =>
+                  setPagination({ ...pagination, page: pagination.page + 1 })
+                }
+                className='w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <ChevronRight className='w-4 h-4' />
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Mobile Pagination */}
+      {pagination.total > 0 && (
+        <div className='lg:hidden mt-6 flex flex-col sm:flex-row items-center justify-between gap-4'>
+          <p className='text-sm text-gray-600'>
+            Page {pagination.page} of {pagination.pages}
           </p>
-          <div className="flex gap-2">
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/10 hover:bg-white transition-all opacity-40 hover:opacity-100">
-              <ChevronLeft className="w-4 h-4" />
+          <div className='flex gap-1'>
+            <button
+              disabled={pagination.page === 1}
+              onClick={() =>
+                setPagination({ ...pagination, page: pagination.page - 1 })
+              }
+              className='w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              <ChevronLeft className='w-4 h-4' />
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-on-surface text-surface font-black text-[10px] shadow-xl">
-              1
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-outline-variant/10 text-on-surface-variant font-black text-[10px] hover:border-primary/20 transition-all">
-              2
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/10 hover:bg-white transition-all opacity-40 hover:opacity-100">
-              <ChevronRight className="w-4 h-4" />
+            <button
+              disabled={pagination.page === pagination.pages}
+              onClick={() =>
+                setPagination({ ...pagination, page: pagination.page + 1 })
+              }
+              className='w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              <ChevronRight className='w-4 h-4' />
             </button>
           </div>
         </div>
-      </section>
-
-      {/* Info Cards */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
-        <div className="bg-white p-8 md:p-10 rounded-[3rem] border border-outline-variant/10 shadow-xl shadow-black/[0.02] relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <h3 className="font-headline text-xl font-black text-on-surface tracking-tighter uppercase mb-2">
-            Protocol Automation
-          </h3>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40 mb-8">
-            Global Hub Cycles (Weekly)
-          </p>
-          <p className="text-[11px] font-medium text-on-surface-variant/60 leading-relaxed uppercase tracking-widest mb-10">
-            Synchronize bank-level packet deployment schedules. All validated units will automatically initialize at high-velocity thresholds.
-          </p>
-          <button className="h-14 bg-primary text-white px-10 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:opacity-90 transition-all group-hover:scale-105">
-            Calibrate Schedule
-          </button>
-        </div>
-
-        <div className="bg-white p-8 md:p-10 rounded-[3rem] border border-outline-variant/10 shadow-xl shadow-black/[0.02] relative overflow-hidden">
-          <h3 className="font-headline text-xl font-black text-on-surface tracking-tighter uppercase mb-2">
-            Disbursement Pulse
-          </h3>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-40 mb-8">
-            Next Cycle: T-Minus 48 Hours
-          </p>
-          
-          <div className="space-y-6">
-             <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                <span className="text-on-surface-variant opacity-40">Validation Cluster Status</span>
-                <span className="text-primary">75% DEPLETION</span>
-             </div>
-             <div className="h-4 bg-[#FAFAFA] rounded-full overflow-hidden border border-outline-variant/5">
-                <div className="h-full bg-primary w-3/4 shadow-[0_0_20px_rgba(182,33,47,0.4)] animate-pulse"></div>
-             </div>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-3">
-                   <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white">
-                      <Zap className="w-4 h-4" />
-                   </div>
-                   <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">NODE ACTIVE</span>
-                </div>
-                <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-3">
-                   <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white">
-                      <Calendar className="w-4 h-4" />
-                   </div>
-                   <span className="text-[9px] font-black uppercase tracking-widest text-blue-700">APR 14 TARGET</span>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
+      )}
     </div>
-  );
+  )
 }

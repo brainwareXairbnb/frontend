@@ -90,18 +90,7 @@ export default function VerifyStudentEmailPage() {
     }
   }
 
-  if (!user || user.role !== 'student') {
-    return (
-      <div className='min-h-screen bg-white flex items-center justify-center'>
-        <div className='text-center'>
-          <p className='text-gray-600 mb-4'>
-            This page is only accessible to students
-          </p>
-          <Button onClick={() => router.push('/')}>Go Home</Button>
-        </div>
-      </div>
-    )
-  }
+  if (!user) return null;
 
   if (user.isStudentVerified) {
     return (

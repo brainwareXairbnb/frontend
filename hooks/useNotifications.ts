@@ -3,19 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { notificationsApi } from '@/lib/api'
 import { toast } from 'sonner'
-
-interface Notification {
-  _id: string
-  type: string
-  title: string
-  message: string
-  isRead: boolean
-  createdAt: string
-  reference?: {
-    model: string
-    id: string
-  }
-}
+import { Notification } from '@/lib/types'
 
 const NOTIFICATIONS_PER_PAGE = 20
 
