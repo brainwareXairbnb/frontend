@@ -20,7 +20,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
 
   if (!user || user.role !== 'student') {
     return (
-      <div className=" bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-[calc(100dvh-5rem)] bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <AuthPrompt
             title=" Log in and start planning your next stay."

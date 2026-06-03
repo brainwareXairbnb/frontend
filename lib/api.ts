@@ -710,6 +710,48 @@ export const userApi = {
   },
 
   /**
+   * Upload profile picture
+   */
+  uploadProfilePicture: async (file: File, token?: string) => {
+    const authToken =
+      token ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('br_access_token')
+        : null)
+
+    const formData = new FormData()
+    formData.append('profilePicture', file)
+
+    const response = await fetch(`${API_BASE_URL}/auth/upload-profile-picture`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: formData,
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        error: 'Failed to upload profile picture',
+      }))
+      throw new Error(error.error || 'Failed to upload profile picture')
+    }
+
+    return response.json()
+  },
+
+  /**
+   * Delete profile picture
+   */
+  deleteProfilePicture: async (token?: string) => {
+    return apiFetch<{ message: string }>('/auth/delete-profile-picture', {
+      method: 'DELETE',
+      token,
+    })
+  },
+
+  /**
    * Get saved rooms (student)
    */
   getSavedRooms: async (token?: string) => {

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
@@ -107,13 +108,21 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
               <NotificationBell />
               <Link
                 href='/owner/profile'
-                className='w-10 h-10 rounded-full overflow-hidden bg-primary'
+                className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center'
               >
-                <img
-                  alt='Owner'
-                  className='w-full h-full object-cover'
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
-                />
+                {user?.profilePicUrl ? (
+                  <Image
+                    src={user.profilePicUrl}
+                    alt={user?.name || 'Owner'}
+                    width={40}
+                    height={40}
+                    className='w-full h-full object-cover'
+                  />
+                ) : (
+                  <span className='text-sm font-semibold text-white'>
+                    {user?.name?.charAt(0).toUpperCase() || 'O'}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
@@ -188,12 +197,20 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                     href='/owner/profile'
                     className='flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-3 hover:bg-surface-container-high transition-colors'
                   >
-                    <div className='w-10 h-10 rounded-full overflow-hidden bg-primary shrink-0'>
-                      <img
-                        alt='Owner'
-                        className='w-full h-full object-cover'
-                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
-                      />
+                    <div className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center shrink-0'>
+                      {user?.profilePicUrl ? (
+                        <Image
+                          src={user.profilePicUrl}
+                          alt={user?.name || 'Owner'}
+                          width={40}
+                          height={40}
+                          className='w-full h-full object-cover'
+                        />
+                      ) : (
+                        <span className='text-sm font-semibold text-white'>
+                          {user?.name?.charAt(0).toUpperCase() || 'O'}
+                        </span>
+                      )}
                     </div>
                     <div className='flex-1 min-w-0'>
                       <p className='text-xs font-bold text-on-surface truncate'>
@@ -219,13 +236,21 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                   <Link
                     href='/owner/profile'
                     title='Profile'
-                    className='w-10 h-10 rounded-full overflow-hidden bg-primary hover:ring-2 hover:ring-primary/20 transition-all'
+                    className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center hover:ring-2 hover:ring-primary/20 transition-all'
                   >
-                    <img
-                      alt='Owner'
-                      className='w-full h-full object-cover'
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=b6212f&color=fff&size=128`}
-                    />
+                    {user?.profilePicUrl ? (
+                      <Image
+                        src={user.profilePicUrl}
+                        alt={user?.name || 'Owner'}
+                        width={40}
+                        height={40}
+                        className='w-full h-full object-cover'
+                      />
+                    ) : (
+                      <span className='text-sm font-semibold text-white'>
+                        {user?.name?.charAt(0).toUpperCase() || 'O'}
+                      </span>
+                    )}
                   </Link>
 
                   <button

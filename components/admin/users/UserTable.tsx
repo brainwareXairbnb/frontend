@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { User } from '@/lib/types'
+import { UserAvatar } from './UserAvatar'
 
 interface UserTableProps {
   users: User[]
@@ -65,9 +66,7 @@ export function UserTable({
             >
               <td className='px-6 py-4'>
                 <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant font-black'>
-                    {user.name.charAt(0)}
-                  </div>
+                  <UserAvatar src={user.profilePicUrl} name={user.name} size="sm" />
                   <div className='min-w-0'>
                     <p className='text-sm font-bold text-on-surface truncate'>
                       {user.name}

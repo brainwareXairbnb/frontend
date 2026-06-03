@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import { User, Mail, Phone, Loader2, KeyRound } from 'lucide-react'
 import { userApi } from '@/lib/api'
+import ProfilePictureUpload from './ProfilePictureUpload'
 
 interface PersonalInfoFormProps {
   backPath: string
@@ -194,6 +195,21 @@ export function PersonalInfoForm({
           ) : (
             /* Profile Update Form */
             <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-5'>
+              {/* Profile Picture */}
+              <div className='py-6 border-b border-outline-variant/10'>
+                <ProfilePictureUpload
+                  currentPictureUrl={user?.profilePicUrl}
+                  onUploadSuccess={(url) => {
+                    toast.success('Profile picture updated successfully')
+                    refreshUser()
+                  }}
+                  onDeleteSuccess={() => {
+                    toast.success('Profile picture removed successfully')
+                    refreshUser()
+                  }}
+                />
+              </div>
+
               {/* Name */}
               <div>
                 <label className='block text-sm font-semibold text-on-surface mb-2'>

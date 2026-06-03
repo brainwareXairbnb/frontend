@@ -13,10 +13,10 @@ export default function StudentPaymentsPage() {
 
   if (!isAuthenticated || user?.role !== 'student') {
     return (
-      <div className='container mx-auto px-4 py-12'>
+      <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center p-4">
         <AuthPrompt
-          title='Student Access Required'
-          description='Please login with a student account to view your payment schedules.'
+          title="Student Access Required"
+          description="Please login with a student account to view your payment schedules."
         />
       </div>
     )

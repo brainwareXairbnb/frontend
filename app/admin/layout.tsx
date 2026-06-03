@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { notificationsApi } from '@/lib/api'
@@ -149,13 +150,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <NotificationBell />
               <Link
                 href='/admin/profile'
-                className='w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden bg-primary'
+                className='w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center'
               >
-                <img
-                  alt='Admin User'
-                  className='w-full h-full object-cover'
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
-                />
+                {user?.profilePicUrl ? (
+                  <Image
+                    src={user.profilePicUrl}
+                    alt={user?.name || 'Admin'}
+                    width={40}
+                    height={40}
+                    className='w-full h-full object-cover'
+                  />
+                ) : (
+                  <span className='text-sm font-semibold text-white'>
+                    {user?.name?.charAt(0).toUpperCase() || 'A'}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
@@ -230,12 +239,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     href='/admin/profile'
                     className='flex items-center gap-3 p-3 bg-surface-container rounded-xl mb-3 hover:bg-surface-container-high transition-colors'
                   >
-                    <div className='w-10 h-10 rounded-full overflow-hidden bg-primary shrink-0'>
-                      <img
-                        alt='Admin User'
-                        className='w-full h-full object-cover'
-                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
-                      />
+                    <div className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0'>
+                      {user?.profilePicUrl ? (
+                        <Image
+                          src={user.profilePicUrl}
+                          alt={user?.name || 'Admin'}
+                          width={40}
+                          height={40}
+                          className='w-full h-full object-cover'
+                        />
+                      ) : (
+                        <span className='text-sm font-semibold text-white'>
+                          {user?.name?.charAt(0).toUpperCase() || 'A'}
+                        </span>
+                      )}
                     </div>
                     <div className='flex-1 min-w-0'>
                       <p className='text-xs font-bold text-on-surface truncate'>
@@ -261,13 +278,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Link
                     href='/admin/profile'
                     title='Profile'
-                    className='w-10 h-10 rounded-full overflow-hidden bg-primary hover:ring-2 hover:ring-primary/20 transition-all'
+                    className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center hover:ring-2 hover:ring-primary/20 transition-all'
                   >
-                    <img
-                      alt='Admin User'
-                      className='w-full h-full object-cover'
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}&background=b6212f&color=fff&size=128`}
-                    />
+                    {user?.profilePicUrl ? (
+                      <Image
+                        src={user.profilePicUrl}
+                        alt={user?.name || 'Admin'}
+                        width={40}
+                        height={40}
+                        className='w-full h-full object-cover'
+                      />
+                    ) : (
+                      <span className='text-sm font-semibold text-white'>
+                        {user?.name?.charAt(0).toUpperCase() || 'A'}
+                      </span>
+                    )}
                   </Link>
 
                   <button

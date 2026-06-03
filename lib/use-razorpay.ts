@@ -30,6 +30,7 @@ interface RazorpayOptions {
   modal?: {
     ondismiss?: () => void;
   };
+  webview_intent?: boolean;
 }
 
 export function useRazorpay() {
@@ -208,6 +209,10 @@ export function useRazorpay() {
           },
         },
       };
+
+      if (isNative) {
+        options.webview_intent = true;
+      }
 
       const razorpayInstance = new window.Razorpay(options);
 

@@ -12,6 +12,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { User } from '@/lib/types'
+import { UserAvatar } from './UserAvatar'
 
 interface UserCardsProps {
   users: User[]
@@ -42,9 +43,7 @@ export function UserCards({
           {/* User Info Header */}
           <div className='p-4 bg-gradient-to-br from-surface-container-lowest to-white'>
             <div className='flex items-start gap-3'>
-              <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg shrink-0'>
-                {user.name.charAt(0)}
-              </div>
+              <UserAvatar src={user.profilePicUrl} name={user.name} size="md" />
               <div className='flex-1 min-w-0'>
                 <p className='text-base font-bold text-on-surface mb-1'>
                   {user.name}

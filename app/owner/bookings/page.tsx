@@ -148,10 +148,10 @@ export default function OwnerBookingsPage() {
 
   if (!isAuthenticated || user?.role !== 'owner') {
     return (
-      <div className='container mx-auto px-4 py-12'>
+      <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center p-4">
         <AuthPrompt
-          title='Owner Access Required'
-          description='Please login with an owner account to view bookings.'
+          title="Owner Access Required"
+          description="Please login with an owner account to view bookings."
         />
       </div>
     )

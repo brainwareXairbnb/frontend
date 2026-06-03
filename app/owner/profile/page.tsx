@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
+import Image from 'next/image'
 import {
   User,
   ShieldCheck,
@@ -67,10 +68,21 @@ export default function OwnerProfilePage() {
             <div className='flex items-start gap-3 sm:gap-5 flex-1 min-w-0'>
               {/* Avatar */}
               <div className='relative shrink-0'>
-                <div className='w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center shadow-md'>
-                  <span className='text-xl sm:text-2xl font-semibold text-white'>
-                    {profile?.name?.[0]?.toUpperCase()}
-                  </span>
+                <div className='w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center shadow-md overflow-hidden'>
+                  {profile?.profilePicUrl ? (
+                    <Image
+                      src={profile.profilePicUrl}
+                      alt={profile?.name || 'Profile'}
+                      width={64}
+                      height={64}
+                      className='w-full h-full object-cover'
+                      priority
+                    />
+                  ) : (
+                    <span className='text-xl sm:text-2xl font-semibold text-white'>
+                      {profile?.name?.[0]?.toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 {profile?.isApproved && (
                   <div className='absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow'>
