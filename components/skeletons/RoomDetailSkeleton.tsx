@@ -9,15 +9,6 @@ import { Skeleton } from './Skeleton'
 export function RoomDetailSkeleton() {
   return (
     <div className='bg-white min-h-screen pb-24 md:pb-0'>
-      {/* Mobile Header Skeleton */}
-      <div className='md:hidden fixed top-0 w-full z-[100] bg-transparent px-4 pt-2 pb-2 flex justify-between items-center'>
-        <Skeleton className='w-8 h-8 rounded-full' />
-        <div className='flex gap-3'>
-          <Skeleton className='w-8 h-8 rounded-full' />
-          <Skeleton className='w-8 h-8 rounded-full' />
-        </div>
-      </div>
-
       {/* Mobile Image Carousel Skeleton */}
       <div className='md:hidden relative w-full h-[60vh]'>
         <Skeleton className='w-full h-full' />

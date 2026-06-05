@@ -215,7 +215,7 @@ export default function HomePage() {
             <div className='p-6 overflow-y-auto pb-4'>
               <FilterOptions state={filterState} />
             </div>
-            <DrawerFooter className='border-t border-outline-variant/20 pt-4 bg-white sticky bottom-0 flex-row justify-between'>
+            <DrawerFooter className='border-t border-outline-variant/20 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] px-6 bg-white sticky bottom-0 flex-row justify-between'>
               <button
                 className='font-semibold underline text-on-surface-variant'
                 onClick={() => {
