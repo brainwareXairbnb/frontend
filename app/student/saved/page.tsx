@@ -74,8 +74,8 @@ export default function StudentSavedPage() {
   return (
     <div className='bg-slate-50 min-h-screen'>
       {/* Airbnb Style Header */}
-      <div className='sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/5'>
-        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6'>
+      <div className='sticky top-[env(safe-area-inset-top)] z-30 bg-white/80 backdrop-blur-xl border-b border-black/5'>
+        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6'>
           <h1 className='text-3xl md:text-5xl font-semibold tracking-tight text-neutral-900'>
             Wishlists
           </h1>

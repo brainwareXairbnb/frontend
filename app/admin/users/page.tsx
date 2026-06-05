@@ -303,7 +303,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-20 bg-gray-50 min-h-screen'>
+    <div className='px-4 sm:px-6 lg:px-8 pt-4 pb-24 bg-gray-50 min-h-screen'>
       <UserDetailModal
         userId={selectedUserId}
         isOpen={isUserDetailOpen}
@@ -327,11 +327,11 @@ export default function AdminUsersPage() {
       />
 
       {/* Header Section */}
-      <header className='mb-8'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+      <header className='mb-3 md:mb-6'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 md:mb-2'>
           User Management
         </h1>
-        <p className='text-sm text-gray-600'>
+        <p className='text-sm text-gray-600 hidden sm:block'>
           Overview of registered users and role upgrade requests
         </p>
       </header>

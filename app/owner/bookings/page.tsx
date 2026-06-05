@@ -20,7 +20,6 @@ import {
 import { bookingsApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/auth-context'
-import { AuthPrompt } from '@/components/AuthPrompt'
 import { Booking } from '@/lib/types'
 
 export default function OwnerBookingsPage() {
@@ -38,8 +37,11 @@ export default function OwnerBookingsPage() {
   useEffect(() => {
     if (isAuthenticated && user?.role === 'owner') {
       fetchBookings()
+    } else if (!isAuthenticated || (user && user.role !== 'owner')) {
+      // Redirect to login if not authenticated or wrong role
+      router.push('/login')
     }
-  }, [isAuthenticated, user])
+  }, [isAuthenticated, user, router])
 
   // Close filter dropdown when clicking outside
   useEffect(() => {
@@ -146,13 +148,11 @@ export default function OwnerBookingsPage() {
     )
   }
 
+  // Show loading while redirecting (useEffect handles redirect)
   if (!isAuthenticated || user?.role !== 'owner') {
     return (
-      <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center p-4">
-        <AuthPrompt
-          title="Owner Access Required"
-          description="Please login with an owner account to view bookings."
-        />
+      <div className='flex items-center justify-center py-20'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF385C]' />
       </div>
     )
   }
@@ -168,7 +168,7 @@ export default function OwnerBookingsPage() {
   return (
     <div className='min-h-screen bg-gray-50 pb-24 md:pb-6'>
       {/* Stats Cards */}
-      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-6'>
+      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-2 md:py-4'>
         <div className='grid grid-cols-3 gap-3 md:gap-6'>
           <button
             onClick={() => setStatusFilter('pending')}
@@ -221,7 +221,7 @@ export default function OwnerBookingsPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-4'>
+      <div className='bg-white border-b border-outline-variant/10 px-4 md:px-8 py-1.5 md:py-3'>
         <div className='flex gap-3'>
           <div className='flex-1 relative'>
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant' />
@@ -332,7 +332,7 @@ export default function OwnerBookingsPage() {
       </div>
 
       {/* Bookings List */}
-      <div className='px-4 md:px-8 py-6 space-y-4'>
+      <div className='px-4 md:px-8 py-2 md:py-4 space-y-3'>
         {filteredBookings.length === 0 ? (
           <div className='text-center py-12 bg-white rounded-xl border border-outline-variant/10'>
             <Calendar className='w-12 h-12 mx-auto text-gray-300 mb-3' />

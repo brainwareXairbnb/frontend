@@ -188,7 +188,7 @@ export default function AdminPayoutsPage() {
   }
 
   return (
-    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-20 bg-gray-50 min-h-screen'>
+    <div className='px-4 sm:px-6 lg:px-8 pt-4 pb-24 bg-gray-50 min-h-screen'>
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
@@ -204,13 +204,13 @@ export default function AdminPayoutsPage() {
       />
 
       {/* Header Section */}
-      <header className='mb-8'>
-        <div className='flex items-center justify-between mb-4'>
+      <header className='mb-3 md:mb-6'>
+        <div className='flex items-center justify-between mb-2 md:mb-4'>
           <div className='flex-1'>
-            <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+            <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 md:mb-2'>
               Owner Settlements
             </h1>
-            <p className='text-sm text-gray-600'>
+            <p className='text-sm text-gray-600 hidden sm:block'>
               Manage payouts to property partners and verify bank credentials
             </p>
           </div>
@@ -230,11 +230,11 @@ export default function AdminPayoutsPage() {
       </header>
 
       {/* Stats Cards */}
-      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6'>
-        <div className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0'>
-              <Wallet className='w-6 h-6 text-orange-600' />
+      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 md:mb-6'>
+        <div className='bg-white p-3 sm:p-5 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between mb-2 md:mb-4'>
+            <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0'>
+              <Wallet className='w-5 h-5 md:w-6 md:h-6 text-orange-600' />
             </div>
             <div className='w-2 h-2 rounded-full bg-orange-500 animate-pulse' />
           </div>
@@ -249,10 +249,10 @@ export default function AdminPayoutsPage() {
           </p>
         </div>
 
-        <div className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center shrink-0'>
-              <ShieldCheck className='w-6 h-6 text-green-600' />
+        <div className='bg-white p-3 sm:p-5 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between mb-2 md:mb-4'>
+            <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg bg-green-50 flex items-center justify-center shrink-0'>
+              <ShieldCheck className='w-5 h-5 md:w-6 md:h-6 text-green-600' />
             </div>
             <div className='flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md'>
               <CheckCircle2 className='w-3 h-3' />
@@ -268,10 +268,10 @@ export default function AdminPayoutsPage() {
           <p className='text-xs text-gray-500'>Ready for transfer</p>
         </div>
 
-        <div className='bg-gray-900 p-4 sm:p-6 rounded shadow-sm sm:col-span-2 lg:col-span-1'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='w-12 h-12 rounded-lg bg-red-500 flex items-center justify-center shrink-0'>
-              <AlertCircle className='w-6 h-6 text-white' />
+        <div className='bg-gray-900 p-3 sm:p-5 rounded shadow-sm sm:col-span-2 lg:col-span-1'>
+          <div className='flex items-center justify-between mb-2 md:mb-4'>
+            <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg bg-red-500 flex items-center justify-center shrink-0'>
+              <AlertCircle className='w-5 h-5 md:w-6 md:h-6 text-white' />
             </div>
           </div>
           <p className='text-xs font-medium text-gray-400 uppercase mb-1'>

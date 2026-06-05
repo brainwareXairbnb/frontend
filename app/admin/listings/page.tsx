@@ -284,7 +284,7 @@ export default function AdminListingsPage() {
   }
 
   return (
-    <div className='px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 bg-gray-50 min-h-screen'>
+    <div className='px-4 sm:px-6 lg:px-8 pt-4 pb-24 md:pb-8 bg-gray-50 min-h-screen'>
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
         onClose={() => setModalConfig((prev) => ({ ...prev, isOpen: false }))}
@@ -299,17 +299,17 @@ export default function AdminListingsPage() {
       />
 
       {/* Header Section */}
-      <header className='mb-8'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
+      <header className='mb-3 md:mb-6'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 md:mb-2'>
           Listing Approval
         </h1>
-        <p className='text-sm text-gray-600'>
+        <p className='text-sm text-gray-600 hidden sm:block'>
           Review and manage property listings submitted by owners
         </p>
       </header>
 
       {/* Stats Cards */}
-      <section className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+      <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6'>
         {[
           {
             label: 'Total',
@@ -346,19 +346,19 @@ export default function AdminListingsPage() {
         ].map((stat, index) => (
           <div
             key={index}
-            className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'
+            className='bg-white p-3 sm:p-5 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'
           >
-            <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center justify-between mb-2 md:mb-4'>
               <div
-                className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
+                className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
               >
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                <stat.icon className={`w-5 h-5 md:w-6 md:h-6 ${stat.color}`} />
               </div>
             </div>
-            <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+            <p className='text-[10px] md:text-xs font-medium text-gray-500 uppercase mb-1'>
               {stat.label}
             </p>
-            <h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
+            <h3 className='text-xl sm:text-3xl font-bold text-gray-900'>
               {stat.value}
             </h3>
           </div>
@@ -366,7 +366,7 @@ export default function AdminListingsPage() {
       </section>
 
       {/* Search and Filters */}
-      <div className='mb-6 flex flex-col gap-3'>
+      <div className='mb-4 md:mb-6 flex flex-col gap-2 md:gap-3'>
         {/* Search Bar */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />

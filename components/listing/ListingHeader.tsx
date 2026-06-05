@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Share, Heart, CheckCircle2, X, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
+import { Share as CapShare } from '@capacitor/share'
+import { Capacitor } from '@capacitor/core'
+import { toast } from 'sonner'
 
 interface ListingHeaderProps {
   mode: 'student' | 'admin'
@@ -11,6 +14,7 @@ interface ListingHeaderProps {
   onToggleSave: (e: React.MouseEvent) => void
   listingStatus?: string
   listingTitle?: string
+  listingId?: string
 }
 
 export function ListingHeader({
@@ -20,12 +24,46 @@ export function ListingHeader({
   onToggleSave,
   listingStatus,
   listingTitle,
+  listingId,
 }: ListingHeaderProps) {
   const router = useRouter()
   const { user } = useAuth()
   
   const hasViewingIndicator = user && user.role !== 'student' && mode !== 'admin'
   const topClass = mode === 'admin' ? 'top-16' : hasViewingIndicator ? 'top-[53px]' : 'top-0'
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const shareUrl = listingId 
+      ? `https://brainxx.vercel.app/rooms/details?id=${listingId}`
+      : window.location.href
+
+    const shareData = {
+      title: listingTitle || 'BrainX Room Listing',
+      text: `Check out this room listing: ${listingTitle}`,
+      url: shareUrl,
+    }
+
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await CapShare.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url,
+          dialogTitle: 'Share this listing',
+        })
+      } else if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(shareData.url)
+        toast.success('Listing link copied to clipboard!')
+      }
+    } catch (error: any) {
+      if (error.message !== 'Share canceled') {
+        toast.error('Could not share listing', { description: error.message })
+      }
+    }
+  }
 
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -52,7 +90,7 @@ export function ListingHeader({
 
   return (
     <div
-      className={`md:hidden fixed ${topClass} w-full z-[100] transition-all duration-300 px-4 pt-2 pb-2 flex justify-between items-center ${isScrolled ? 'bg-white border-b border-outline-variant/10 shadow-sm pt-4' : 'bg-transparent'}`}
+      className={`md:hidden fixed ${topClass} w-full z-[100] transition-all duration-300 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-2 flex justify-between items-center ${isScrolled ? 'bg-white border-b border-outline-variant/10 shadow-sm' : 'bg-transparent'}`}
     >
       <button
         onClick={() => router.back()}
@@ -65,7 +103,8 @@ export function ListingHeader({
       </button>
       <div className='flex gap-3'>
         <button
-          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isScrolled ? 'bg-transparent' : 'bg-white/90 shadow-sm'}`}
+          onClick={handleShare}
+          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${isScrolled ? 'bg-transparent' : 'bg-white/90 shadow-sm'}`}
         >
           <Share
             className={`w-4 h-4 ${isScrolled ? 'text-on-surface' : 'text-black'}`}

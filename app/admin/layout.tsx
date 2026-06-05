@@ -30,6 +30,11 @@ import {
 } from 'lucide-react'
 import { AdminLayoutProps } from '@/lib/types'
 import Logo from '@/components/Logo'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerClose,
+} from '@/components/ui/drawer'
 
 const NAV_ITEMS = [
   {
@@ -143,7 +148,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <RoleGuard allowedRoles={['admin']}>
       <div className='flex min-h-screen bg-[#fafafa] flex-col'>
         {/* Common Header */}
-        <div className='sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-16'>
+        <div className='sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]'>
           <div className='flex items-center justify-between h-full px-6 md:px-8'>
             <Logo noMargin compact heading='Admin Portal' />
             <div className='flex items-center gap-3'>
@@ -316,7 +321,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* Mobile Bottom Navigation - Phase 1: Only Listings, Users, Notifications, Profile */}
-        <div className='md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 safe-area-inset-bottom'>
+        <div className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 pb-safe transition-all duration-300 ${isDrawerOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
           <div className='flex items-center justify-around px-2 py-2'>
             <Link
               href='/admin/dashboard'
@@ -377,38 +382,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* Mobile Navigation Drawer */}
-        {isDrawerOpen && (
-          <>
-            <div
-              className='fixed inset-0 bg-black/50 z-50 md:hidden'
-              onClick={() => setIsDrawerOpen(false)}
-            />
-            <div className='fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden max-h-[80vh] overflow-y-auto'>
-              <div className='sticky top-0 bg-white border-b border-outline-variant/10 px-6 py-4 rounded-t-3xl'>
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-3'>
-                    <div className='w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary'>
-                      <ShieldCheck className='w-6 h-6' />
-                    </div>
-                    <div>
-                      <h2 className='font-headline text-sm font-bold text-on-surface'>
-                        Admin Portal
-                      </h2>
-                      <p className='text-xs text-on-surface-variant'>
-                        {user?.name}
-                      </p>
-                    </div>
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerContent className='md:hidden max-h-[85vh] outline-none'>
+            <div className='sticky top-0 bg-white border-b border-outline-variant/10 px-6 py-4 rounded-t-3xl'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary'>
+                    <ShieldCheck className='w-6 h-6' />
                   </div>
-                  <button
-                    onClick={() => setIsDrawerOpen(false)}
-                    className='w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface cursor-pointer'
-                  >
+                  <div>
+                    <h2 className='font-headline text-sm font-bold text-on-surface'>
+                      Admin Portal
+                    </h2>
+                    <p className='text-xs text-on-surface-variant'>
+                      {user?.name}
+                    </p>
+                  </div>
+                </div>
+                <DrawerClose asChild>
+                  <button className='w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface cursor-pointer'>
                     <X className='w-5 h-5' />
                   </button>
-                </div>
+                </DrawerClose>
               </div>
+            </div>
 
-              <nav className='px-3 py-4'>
+            <div className='overflow-y-auto flex-1 px-3 py-4'>
+              <nav className='space-y-1'>
                 {NAV_ITEMS.map((item) => {
                   const Icon = item.icon
                   return (
@@ -416,7 +416,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       key={item.id}
                       href={item.href}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                         isActive(item.href)
                           ? 'bg-primary/10 text-primary font-semibold'
                           : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
@@ -432,14 +432,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <Link
                   href='/'
                   onClick={() => setIsDrawerOpen(false)}
-                  className='flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
+                  className='flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium'
                 >
                   <Eye className='w-6 h-6' />
                   <span className='text-sm'>View as Student</span>
                 </Link>
               </nav>
 
-              <div className='px-3 pb-6 pt-2 border-t border-outline-variant/10'>
+              <div className='mt-4 pt-4 border-t border-outline-variant/10 pb-safe'>
                 <div className='space-y-2'>
                   <Link
                     href='/admin/profile'
@@ -463,8 +463,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
               </div>
             </div>
-          </>
-        )}
+          </DrawerContent>
+        </Drawer>
       </div>
     </RoleGuard>
   )

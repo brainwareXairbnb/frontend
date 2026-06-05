@@ -87,7 +87,7 @@ export default function StudentProfilePage() {
 
   return (
     <div className='min-h-screen bg-white'>
-      <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12'>
+      <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 pt-4 pb-8 sm:py-12'>
         {/* Student Verification Banner - Only show if NOT verified */}
         {!user.isStudentVerified && user.role === 'student' && (
           <div className='mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded p-4 sm:p-6 shadow-sm'>

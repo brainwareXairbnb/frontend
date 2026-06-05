@@ -132,20 +132,20 @@ export default function OwnerListingsPage() {
 
   return (
     <>
-      <div className='px-4 md:px-6 lg:px-12 pb-20'>
+      <div className='px-4 md:px-6 lg:px-12 pt-4 pb-24'>
         {/* Header Section */}
-        <header className='py-6 md:py-10'>
-          <div className='max-w-3xl mb-6 md:mb-10'>
-            <h2 className='text-lg md:text-xl font-headline font-black text-on-surface mb-2 uppercase tracking-wide'>
+        <header className='pt-1 pb-2 md:py-6'>
+          <div className='max-w-3xl mb-2 md:mb-6'>
+            <h2 className='text-lg md:text-xl font-headline font-black text-on-surface mb-1 md:mb-2 uppercase tracking-wide'>
               Property Ecosystem
             </h2>
-            <p className='text-on-surface-variant font-body text-sm md:text-base leading-relaxed font-medium'>
+            <p className='text-on-surface-variant font-body text-sm md:text-base leading-relaxed font-medium hidden md:block'>
               Review and curate your collection of managed properties.
               Orchestrate status cycles, deployment availability, and
               high-fidelity editorial details.
             </p>
           </div>
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-2.5 md:gap-4'>
             {/* Search Bar - Full Width on Mobile */}
             <div className='w-full bg-white border border-outline-variant/10 rounded-2xl px-4 sm:px-5 py-3 sm:py-4 flex items-center gap-3 shadow-sm focus-within:border-primary transition-all'>
               <Search className='text-on-surface-variant/40 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0' />
@@ -295,7 +295,7 @@ export default function OwnerListingsPage() {
         ) : (
           <>
             {/* Stats Grid */}
-            <section className='grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-6 mb-6 md:mb-10'>
+            <section className='grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-6 mb-3 md:mb-10'>
               <div className='bg-white p-3 md:p-4 lg:p-6 rounded border border-outline-variant/10 shadow-sm'>
                 <div className='flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2'>
                   <Building2 className='w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-on-surface-variant/40' />
@@ -344,7 +344,7 @@ export default function OwnerListingsPage() {
 
             {/* Listings Grid */}
             {filteredListings.length === 0 ? (
-              <div className='text-center py-12 md:py-20 bg-surface-container/20 rounded-xl  border-2 border-dashed border-outline-variant/10'>
+              <div className='text-center py-8 md:py-16 bg-surface-container/20 rounded-xl  border-2 border-dashed border-outline-variant/10'>
                 <Activity className='w-10 h-10 md:w-12 md:h-12 text-on-surface-variant/20 mx-auto mb-3 md:mb-4' />
                 <p className='font-bold text-sm md:text-base text-on-surface-variant px-4'>
                   No listings found

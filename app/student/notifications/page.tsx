@@ -15,7 +15,6 @@ import {
   Home,
   Star
 } from "lucide-react";
-import { AuthPrompt } from "@/components/AuthPrompt";
 import NotificationSkeleton from "@/components/skeletons/NotificationSkeleton";
 import { toast } from "sonner";
 import { Notification, NotificationType, NotificationConfig } from "@/lib/types";
@@ -146,7 +145,7 @@ export default function StudentNotificationsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="px-5 md:px-10 pb-32 pt-2 max-w-2xl mx-auto">
+      <div className="px-5 md:px-10 pb-32 pt-4 max-w-2xl mx-auto">
             {/* Header with Mark All as Read */}
             {notifications.length > 0 && unreadCount > 0 && (
               <div className="flex justify-between items-center mb-4 pb-3 border-b border-outline-variant/10">

@@ -233,17 +233,17 @@ export default function OwnerDashboardPage() {
 
   return (
     <>
-      <div className='px-4 md:px-6 lg:px-12 pb-20 space-y-8 md:space-y-10'>
+      <div className='px-4 md:px-6 lg:px-12 pt-4 pb-24 space-y-3.5 md:space-y-8'>
         {/* Bank Account Setup Banner */}
         {!bankDetails && (
-          <div className='bg-primary/5 mt-6 md:mt-12 rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 lg:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-8 border border-primary/10 relative overflow-hidden group'>
+          <div className='bg-primary/5 mt-1 md:mt-6 rounded-2xl md:rounded-[2.5rem] p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-8 border border-primary/10 relative overflow-hidden group'>
             <div className='absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2'></div>
             <div className='flex items-start gap-4 md:gap-6 relative z-10'>
               <div className='w-12 h-12 md:w-16 md:h-16 bg-primary rounded-2xl md:rounded-3xl flex items-center justify-center text-on-primary shadow-xl shadow-primary/30 group-hover:rotate-12 transition-transform duration-500 shrink-0'>
                 <Landmark className='w-6 h-6 md:w-8 md:h-8' />
               </div>
               <div>
-                <div className='inline-flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-2 md:mb-3'>
+                <div className='inline-flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-1.5 md:mb-3'>
                   <ShieldCheck className='w-3 h-3 md:w-3.5 md:h-3.5' />
                   Action Required
                 </div>
@@ -266,7 +266,7 @@ export default function OwnerDashboardPage() {
         )}
 
         {/* Stats Cards */}
-        <section className='grid grid-cols-3 gap-2 md:gap-6 lg:gap-8 mt-6 md:mt-12'>
+        <section className='grid grid-cols-3 gap-2 md:gap-6 lg:gap-8 mt-1.5 md:mt-6'>
           {/* Total Revenue */}
           <div className='bg-white p-3 md:p-6 lg:p-8 rounded border border-outline-variant/10 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-500'>
             <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-2 md:mb-4 lg:mb-6'>
@@ -359,10 +359,10 @@ export default function OwnerDashboardPage() {
         </section>
 
         {/* Revenue Chart & Recent Requests */}
-        <section className='grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8'>
+        <section className='grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8'>
           {/* Revenue Chart */}
-          <div className='lg:col-span-8 bg-white p-6 md:p-8 lg:p-10 rounded border border-outline-variant/10 shadow-sm'>
-            <div className='flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-12 gap-4'>
+          <div className='lg:col-span-8 bg-white p-3 md:p-6 lg:p-8 rounded border border-outline-variant/10 shadow-sm'>
+            <div className='flex flex-col md:flex-row md:items-center justify-between mb-3 md:mb-6 gap-3'>
               <div>
                 <h3 className='font-headline font-black text-xl md:text-2xl tracking-tighter'>
                   Revenue Overview
@@ -449,8 +449,8 @@ export default function OwnerDashboardPage() {
 
           {/* Recent Booking Requests */}
           <div className='lg:col-span-4'>
-            <div className='bg-white p-6 md:p-8 rounded border border-outline-variant/10 shadow-sm h-full flex flex-col'>
-              <div className='flex items-center justify-between mb-8 md:mb-10'>
+            <div className='bg-white p-4 md:p-8 rounded border border-outline-variant/10 shadow-sm h-full flex flex-col'>
+              <div className='flex items-center justify-between mb-4 md:mb-10'>
                 <h3 className='font-headline font-black text-lg md:text-xl tracking-tight'>
                   Recent Requests
                 </h3>
@@ -465,7 +465,7 @@ export default function OwnerDashboardPage() {
 
               {pendingBookings.length > 0 ? (
                 <>
-                  <div className='space-y-8 flex-1'>
+                  <div className='space-y-4 flex-1'>
                     {pendingBookings.map((booking, i) => {
                       const timeDiff =
                         Date.now() - new Date(booking.createdAt).getTime()
@@ -518,7 +518,7 @@ export default function OwnerDashboardPage() {
                   </div>
                   <button
                     onClick={() => router.push('/owner/bookings')}
-                    className='w-full text-center mt-10 pt-8 border-t border-outline-variant/10 text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:tracking-[0.25em] transition-all'
+                    className='w-full text-center mt-6 pt-4 border-t border-outline-variant/10 text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:tracking-[0.25em] transition-all'
                   >
                     View All Requests
                   </button>

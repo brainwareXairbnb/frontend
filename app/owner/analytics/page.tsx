@@ -40,19 +40,19 @@ export default function OwnerAnalyticsPage() {
   ];
 
   return (
-    <div className="px-6 md:px-12 pb-20">
+    <div className="px-4 md:px-12 pt-4 pb-24">
       {/* Header Section */}
-      <header className="py-10 border-b border-outline-variant/5 mb-12">
+      <header className="pt-2 pb-4 md:py-10 border-b border-outline-variant/5 mb-6 md:mb-12">
          <h2 className="text-xl font-headline font-black text-on-surface mb-2 uppercase tracking-wide">Market Intelligence</h2>
-        <p className="text-on-surface-variant font-body text-base leading-relaxed font-medium max-w-2xl">
+        <p className="text-on-surface-variant font-body text-base leading-relaxed font-medium max-w-2xl hidden md:block">
           Deep telemetry into managed asset performance, yield trajectories, and student demographic clusters.
         </p>
       </header>
 
       {/* Key Metrics Overview */}
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-12">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center justify-between mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8 mb-6 md:mb-12">
+        <div className="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                <Eye className="w-6 h-6" />
             </div>
@@ -65,8 +65,8 @@ export default function OwnerAnalyticsPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">Total Impressions</p>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center justify-between mb-8">
+        <div className="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
                <UserPlus className="w-6 h-6" />
             </div>
@@ -79,8 +79,8 @@ export default function OwnerAnalyticsPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">Verified Inquiries</p>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center justify-between mb-8">
+        <div className="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
                <CalendarCheck className="w-6 h-6" />
             </div>
@@ -92,8 +92,8 @@ export default function OwnerAnalyticsPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant opacity-40">Node Commitments</p>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center justify-between mb-8">
+        <div className="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-outline-variant/10 shadow-sm group hover:shadow-2xl transition-all duration-500">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
                <Activity className="w-6 h-6" />
             </div>

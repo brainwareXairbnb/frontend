@@ -185,13 +185,13 @@ export default function OwnerPayoutsPage() {
   }
 
   return (
-    <div className='px-4 md:px-12 pb-20'>
-      <header className='py-6 md:py-10 border-b border-outline-variant/5 mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6'>
+    <div className='px-4 md:px-12 pt-4 pb-24'>
+      <header className='pt-1 pb-2 md:py-6 border-b border-outline-variant/5 mb-3 md:mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6'>
         <div>
           <h2 className='text-lg md:text-xl font-headline font-black text-on-surface mb-2 tracking-wide'>
             Payouts Dashboard
           </h2>
-          <p className='text-on-surface-variant font-body text-sm md:text-base leading-relaxed font-medium max-w-2xl'>
+          <p className='text-on-surface-variant font-body text-sm md:text-base leading-relaxed font-medium max-w-2xl hidden md:block'>
             View your earnings, platform fees, and payout history for all your
             properties in one place.
           </p>
@@ -208,9 +208,9 @@ export default function OwnerPayoutsPage() {
       </header>
 
       {/* Bento Grid Earnings Summary */}
-      <div className='grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mb-8 md:mb-12'>
+      <div className='grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6'>
         {/* Lifetime Earnings */}
-        <div className='xl:col-span-2 bg-on-surface p-6 md:p-10 rounded flex flex-col justify-between shadow-2xl shadow-on-surface/20 relative overflow-hidden group min-h-[280px] md:min-h-0'>
+        <div className='xl:col-span-2 bg-on-surface p-4 md:p-8 rounded flex flex-col justify-between shadow-2xl shadow-on-surface/20 relative overflow-hidden group min-h-[280px] md:min-h-0'>
           <div className='absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2'></div>
           <div className='relative z-10'>
             <p className='text-[9px] md:text-[10px] font-black tracking-[0.2em] text-white/40 mb-3 md:mb-4'>
@@ -236,7 +236,7 @@ export default function OwnerPayoutsPage() {
         </div>
 
         {/* Current Month */}
-        <div className='bg-white p-6 md:p-10 rounded flex flex-col shadow-sm border border-outline-variant/10 group hover:border-primary/20 transition-all duration-500'>
+        <div className='bg-white p-4 md:p-8 rounded flex flex-col shadow-sm border border-outline-variant/10 group hover:border-primary/20 transition-all duration-500'>
           <div className='flex items-center justify-between mb-6 md:mb-8'>
             <p className='text-[9px] md:text-[10px] font-black tracking-widest text-on-surface-variant opacity-60'>
               Recent Payouts
@@ -284,7 +284,7 @@ export default function OwnerPayoutsPage() {
 
       {/* Bank Account Banner if missing */}
       {!bankDetails && (
-        <div className='mb-8 md:mb-12 p-6 md:p-8 bg-primary/5 rounded border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-6'>
+        <div className='mb-4 md:mb-12 p-6 md:p-8 bg-primary/5 rounded border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-6'>
           <div className='flex items-center gap-6'>
             <div className='w-16 h-16 bg-primary/10 rounded flex items-center justify-center text-primary'>
               <CreditCard className='w-8 h-8' />
@@ -308,7 +308,7 @@ export default function OwnerPayoutsPage() {
       )}
 
       {/* Payout Process Info Banner */}
-      <div className='mb-8 md:mb-12 p-6 md:p-8 bg-blue-50 rounded border border-blue-100 flex items-start gap-4'>
+      <div className='mb-4 md:mb-12 p-6 md:p-8 bg-blue-50 rounded border border-blue-100 flex items-start gap-4'>
         <div className='w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0'>
           <Info className='w-5 h-5 md:w-6 md:h-6' />
         </div>
@@ -323,7 +323,7 @@ export default function OwnerPayoutsPage() {
       </div>
 
       {/* Transaction Controls */}
-      <div className='flex flex-col xl:flex-row justify-between items-center mb-8 md:mb-10 gap-4 md:gap-6'>
+      <div className='flex flex-col xl:flex-row justify-between items-center mb-4 md:mb-10 gap-4 md:gap-6'>
         <div className='relative w-full xl:w-96 group'>
           <Search className='absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant/30 group-focus-within:text-primary transition-colors w-5 h-5' />
           <input

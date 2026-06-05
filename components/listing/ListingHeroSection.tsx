@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { Grip, Share, Heart, CheckCircle2, X, AlertCircle } from 'lucide-react'
 import ImageModal from '@/components/ImageModal'
+import { Share as CapShare } from '@capacitor/share'
+import { Capacitor } from '@capacitor/core'
+import { toast } from 'sonner'
 
 interface ListingHeroSectionProps {
   images: string[]
@@ -11,6 +14,7 @@ interface ListingHeroSectionProps {
   onToggleSave: (e: React.MouseEvent) => void
   listingStatus?: string
   listingTitle: string
+  listingId?: string
 }
 
 export function ListingHeroSection({
@@ -20,10 +24,44 @@ export function ListingHeroSection({
   onToggleSave,
   listingStatus,
   listingTitle,
+  listingId,
 }: ListingHeroSectionProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [imageModalIndex, setImageModalIndex] = useState(0)
   const [imageModalShowGrid, setImageModalShowGrid] = useState(false)
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const shareUrl = listingId 
+      ? `https://brainxx.vercel.app/rooms/details?id=${listingId}`
+      : window.location.href
+
+    const shareData = {
+      title: listingTitle || 'BrainX Room Listing',
+      text: `Check out this room listing: ${listingTitle}`,
+      url: shareUrl,
+    }
+
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await CapShare.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url,
+          dialogTitle: 'Share this listing',
+        })
+      } else if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(shareData.url)
+        toast.success('Listing link copied to clipboard!')
+      }
+    } catch (error: any) {
+      if (error.message !== 'Share canceled') {
+        toast.error('Could not share listing', { description: error.message })
+      }
+    }
+  }
 
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -101,7 +139,10 @@ export function ListingHeroSection({
                 {getStatusInfo(listingStatus).label}
               </div>
             )}
-            <button className='flex items-center gap-2 text-sm font-medium'>
+            <button
+              onClick={handleShare}
+              className='flex items-center gap-2 text-sm font-medium hover:underline cursor-pointer'
+            >
               <Share className='w-[18px] h-[18px]' /> Share
             </button>
             {mode === 'student' && (

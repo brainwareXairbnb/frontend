@@ -207,14 +207,14 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className='px-6 md:px-12 py-6 pb-20'>
+    <div className='px-4 md:px-12 pt-4 pb-24'>
       {/* Header Section */}
-      <header className='mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4'>
+      <header className='mb-3 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
           <h2 className='text-xl font-headline font-bold text-on-surface mb-1'>
             System Overview
           </h2>
-          <p className='text-on-surface-variant font-body text-sm leading-relaxed'>
+          <p className='text-on-surface-variant font-body text-sm leading-relaxed hidden md:block'>
             Monitor live platform trends, user activity and booking performance.
           </p>
         </div>
@@ -254,18 +254,18 @@ export default function AdminDashboardPage() {
       </header>
 
       {/* KPI Cards */}
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8'>
+      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-3 md:mb-6'>
         {kpis.map((kpi, index) => {
           const Icon = kpi.icon
           return (
             <div
               key={index}
-              className='bg-white p-6 rounded-2xl border border-outline-variant/10 shadow-sm relative overflow-hidden group'
+              className='bg-white p-3 md:p-5 rounded-2xl border border-outline-variant/10 shadow-sm relative overflow-hidden group'
             >
               <div className='absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform'>
                 <Icon className='w-12 h-12' />
               </div>
-              <p className='text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-4'>
+              <p className='text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2 md:mb-4'>
                 {kpi.label}
               </p>
               <h3 className='text-3xl font-headline font-bold text-on-surface mb-2 tracking-tight'>
@@ -281,10 +281,10 @@ export default function AdminDashboardPage() {
       </section>
 
       {/* Growth Analytics & Live Stream */}
-      <section className='grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8'>
+      <section className='grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5 mb-3 md:mb-6'>
         {/* Growth Analytics Chart */}
-        <div className='lg:col-span-8 bg-white p-8 rounded-3xl border border-outline-variant/10 shadow-sm'>
-          <div className='flex flex-col md:flex-row md:items-center justify-between mb-8'>
+        <div className='lg:col-span-8 bg-white p-3 md:p-6 rounded-3xl border border-outline-variant/10 shadow-sm'>
+          <div className='flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8'>
             <div>
               <h3 className='font-headline text-lg font-bold text-on-surface mb-1'>
                 Growth Analytics
@@ -359,8 +359,8 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Live Stream */}
-        <div className='lg:col-span-4 bg-white p-8 rounded-3xl border border-outline-variant/10 shadow-sm relative overflow-hidden'>
-          <div className='flex items-center justify-between mb-8'>
+        <div className='lg:col-span-4 bg-white p-4 md:p-8 rounded-3xl border border-outline-variant/10 shadow-sm relative overflow-hidden'>
+          <div className='flex items-center justify-between mb-4 md:mb-8'>
             <div>
               <h3 className='font-headline text-lg font-bold text-on-surface mb-1'>
                 Live Stream
@@ -416,8 +416,8 @@ export default function AdminDashboardPage() {
       </section>
 
       {/* Top Performing Rooms */}
-      <section className='bg-white rounded-3xl border border-outline-variant/10 shadow-sm p-8'>
-        <div className='flex items-center justify-between mb-8'>
+      <section className='bg-white rounded-3xl border border-outline-variant/10 shadow-sm p-4 md:p-8'>
+        <div className='flex items-center justify-between mb-4 md:mb-8'>
           <div>
             <h3 className='font-headline text-lg font-bold text-on-surface mb-1'>
               Top Performing Rooms

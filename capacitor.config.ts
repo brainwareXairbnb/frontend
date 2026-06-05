@@ -26,6 +26,10 @@ const config: CapacitorConfig = {
       serverClientId: '296069206416-nl84jgdfq3va0thplfhhoebo49gc1miv.apps.googleusercontent.com',
       forceCodeForRefreshToken: true,
     },
+    StatusBar: {
+      style: 'LIGHT',
+      backgroundColor: '#ffffff',
+    },
   },
 };
 

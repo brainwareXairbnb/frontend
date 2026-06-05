@@ -311,6 +311,7 @@ export default function ListingDetailCommon({ mode, id }: Props) {
         onToggleSave={handleToggleSave}
         listingStatus={listing.status}
         listingTitle={listing.title}
+        listingId={listing._id || listing.id || listingId}
       />
 
       <main className='md:pt-28 max-w-7xl mx-auto px-0 md:px-10'>
@@ -321,6 +322,7 @@ export default function ListingDetailCommon({ mode, id }: Props) {
           onToggleSave={handleToggleSave}
           listingStatus={listing.status}
           listingTitle={listing.title}
+          listingId={listing._id || listing.id || listingId}
         />
 
         <div className='bg-white rounded-t-3xl -mt-6 md:mt-0 relative z-20 px-6 pt-6 md:px-0 md:pt-0 flex flex-col md:flex-row gap-0 md:gap-20'>

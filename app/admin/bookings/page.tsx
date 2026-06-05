@@ -132,10 +132,10 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <div className='min-h-screen bg-[#fafafa] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24'>
+    <div className='min-h-screen bg-[#fafafa] px-4 sm:px-6 lg:px-8 pt-4 pb-24'>
       {/* Header */}
-      <header className='mb-6 sm:mb-8'>
-        <div className='flex items-center gap-2 mb-3'>
+      <header className='mb-3 md:mb-6'>
+        <div className='flex items-center gap-2 mb-2'>
           <div className='w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center'>
             <Calendar className='w-4 h-4 text-primary' />
           </div>
@@ -151,7 +151,7 @@ export default function AdminBookingsPage() {
               Booking Management
             </h1>
 
-            <p className='mt-2 text-sm text-on-surface-variant max-w-2xl leading-relaxed'>
+            <p className='mt-2 text-sm text-on-surface-variant max-w-2xl leading-relaxed hidden md:block'>
               Manage reservations, payment statuses, tenants, and property
               bookings across the platform.
             </p>
@@ -160,28 +160,28 @@ export default function AdminBookingsPage() {
       </header>
 
       {/* Stats */}
-      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
-        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
-          <p className='text-xs text-on-surface-variant mb-2'>Total Bookings</p>
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 md:mb-6'>
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-1.5'>Total Bookings</p>
           <h3 className='text-2xl font-bold'>{stats?.total || 0}</h3>
         </div>
 
-        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
-          <p className='text-xs text-on-surface-variant mb-2'>Confirmed</p>
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-1.5'>Confirmed</p>
           <h3 className='text-2xl font-bold text-blue-600'>
             {stats?.paymentConfirmed || 0}
           </h3>
         </div>
 
-        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
-          <p className='text-xs text-on-surface-variant mb-2'>Pending</p>
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-1.5'>Pending</p>
           <h3 className='text-2xl font-bold text-amber-500'>
             {bookings.filter((b) => b.status === 'pending').length}
           </h3>
         </div>
 
-        <div className='bg-white rounded-2xl border border-outline-variant/10 p-4 shadow-sm'>
-          <p className='text-xs text-on-surface-variant mb-2'>Completed</p>
+        <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
+          <p className='text-xs text-on-surface-variant mb-1.5'>Completed</p>
           <h3 className='text-2xl font-bold text-emerald-600'>
             {stats?.completed || 0}
           </h3>

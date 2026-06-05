@@ -47,6 +47,15 @@ export default function GoogleSignInButton({
           grantOfflineAccess: true,
         })
 
+        // Sign out first to force account picker to show all accounts
+        // This ensures all Google accounts are shown instead of just the last used one
+        try {
+          await GoogleAuth.signOut()
+        } catch (e) {
+          // Ignore errors if user wasn't signed in
+          console.log('No existing Google session to sign out from')
+        }
+
         // Sign in with Google (native)
         const googleUser = await GoogleAuth.signIn()
 

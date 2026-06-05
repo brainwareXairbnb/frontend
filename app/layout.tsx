@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Manrope, Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
@@ -9,6 +9,11 @@ import { Toaster } from 'sonner'
 import ScrollToTop from '@/components/ScrollToTop'
 import { ViewingAsIndicator } from '@/components/ViewingAsIndicator'
 import { AppInitializer } from '@/components/AppInitializer'
+import { BackButtonHandler } from '@/components/BackButtonHandler'
+import { StatusBarConfig } from '@/components/StatusBarConfig'
+
+import { TopNavStack } from '@/components/TopNavStack'
+import { DeepLinkHandler } from '@/components/DeepLinkHandler'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -24,17 +29,22 @@ const inter = Inter({
   display: 'swap',
 })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  // Prevent viewport resizing when keyboard opens on mobile
+  interactiveWidget: 'resizes-content',
+  // Enable viewport to extend into safe areas (status bar, notches, etc.)
+  viewportFit: 'cover',
+  // Set theme color to white
+  themeColor: '#ffffff',
+}
+
 export const metadata: Metadata = {
   title: 'BrainX - Student Housing for Brainware University',
   description: 'Find and book quality rooms near Brainware University campus',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    // Prevent viewport resizing when keyboard opens on mobile
-    interactiveWidget: 'resizes-content',
-  },
 }
 
 export default function RootLayout({
@@ -62,15 +72,13 @@ export default function RootLayout({
       <body className='min-h-screen bg-slate-50 text-slate-900 flex flex-col'>
         <AppInitializer>
           <AuthProvider>
+            <StatusBarConfig />
+            <BackButtonHandler />
+            <DeepLinkHandler />
             <ScrollToTop />
 
             {/* Fixed Top Navigation Stack */}
-            <div className='sticky top-0 z-50 flex flex-col bg-white'>
-              <ViewingAsIndicator />
-              <div className='hidden md:block'>
-                <Navbar />
-              </div>
-            </div>
+            <TopNavStack />
 
             {/* App Shell */}
             <div className='flex flex-1 flex-col'>
@@ -86,7 +94,13 @@ export default function RootLayout({
             </div>
 
             {/* Notifications */}
-            <Toaster position='bottom-center' richColors />
+            <Toaster
+              position='bottom-center'
+              richColors
+              toastOptions={{
+                className: 'mb-20 md:mb-0 pb-safe md:pb-0',
+              }}
+            />
           </AuthProvider>
         </AppInitializer>
       </body>

@@ -75,7 +75,7 @@ export function BookingPanel({
 
       {/* Mobile Footer */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant/20 px-4 py-4 z-50 ${hasActiveBooking ? 'flex' : 'flex justify-between items-center'}`}
+        className={`md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant/20 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-50 ${hasActiveBooking ? 'flex' : 'flex justify-between items-center'}`}
       >
         {mode === 'student' ? (
           <>

@@ -176,8 +176,8 @@ export default function StudentBookingsPage() {
   return (
     <div className='bg-slate-50 min-h-screen'>
       {/* Airbnb Style Header - Always visible */}
-      <div className='sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/5'>
-        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6'>
+      <div className='sticky top-[env(safe-area-inset-top)] z-30 bg-white/80 backdrop-blur-xl border-b border-black/5'>
+        <div className='max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6'>
           <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6'>
             {/* Left */}
             <div>

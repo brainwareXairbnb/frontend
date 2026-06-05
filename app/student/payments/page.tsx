@@ -1,23 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { UpcomingPayments } from '@/components/UpcomingPayments'
 import { PaymentHistory } from '@/components/PaymentHistory'
-import { AuthPrompt } from '@/components/AuthPrompt'
 import { CreditCard, Calendar, History } from 'lucide-react'
 
 export default function StudentPaymentsPage() {
   const { isAuthenticated, user } = useAuth()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<'upcoming' | 'history'>('upcoming')
 
+  useEffect(() => {
+    // Redirect to login if not authenticated or not a student
+    if (!isAuthenticated || (user && user.role !== 'student')) {
+      router.push('/login')
+    }
+  }, [isAuthenticated, user, router])
+
+  // Show loading while redirecting
   if (!isAuthenticated || user?.role !== 'student') {
     return (
       <div className="min-h-[calc(100dvh-5rem)] flex items-center justify-center p-4">
-        <AuthPrompt
-          title="Student Access Required"
-          description="Please login with a student account to view your payment schedules."
-        />
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF385C]' />
       </div>
     )
   }

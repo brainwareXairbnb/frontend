@@ -53,9 +53,9 @@ export default function AdminProfilePage() {
 
   return (
     <div className='min-h-screen bg-white'>
-      <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12'>
+      <div className='max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 pt-4 pb-24 sm:py-12'>
         {/* Profile Card */}
-        <div className='bg-white border border-gray-200 rounded p-4 sm:p-6 mb-6 sm:mb-8 hover:shadow-lg transition-shadow'>
+        <div className='bg-white border border-gray-200 rounded p-4 sm:p-6 mb-4 sm:mb-8 hover:shadow-lg transition-shadow'>
           <div className='flex items-start justify-between gap-3'>
             <div className='flex items-start gap-3 sm:gap-5 flex-1 min-w-0'>
               {/* Avatar */}

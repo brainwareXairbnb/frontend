@@ -44,11 +44,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
   ]
 
   return (
-    <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8'>
+    <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-8'>
       {kpiData.map((kpi, index) => (
         <div
           key={index}
-          className='bg-white p-4 md:p-6 rounded-2xl border border-outline-variant/10 shadow-sm'
+          className='bg-white p-3 md:p-5 rounded-2xl border border-outline-variant/10 shadow-sm'
         >
           <div className='flex items-center justify-between mb-2'>
             <span className={`p-2 rounded-lg ${kpi.bg} ${kpi.color}`}>

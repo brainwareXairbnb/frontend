@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { AirbnbLoader } from '@/components/ui/spinner'
 import { RoleGuardProps } from '@/lib/types'
-import { ShieldCheck, LogIn } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 
 export function RoleGuard({
   children,
@@ -52,45 +52,12 @@ export function RoleGuard({
     )
   }
 
-  // Not authenticated
+  // Not authenticated - show loading spinner while redirecting
+  // (useEffect already handles the redirect, this just prevents flash of content)
   if (!user) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-black p-4'>
-        <div className='w-full max-w-sm'>
-          {/* Card */}
-          <div className='bg-[#1a1a1a] rounded-2xl shadow-2xl border border-gray-800 overflow-hidden'>
-            {/* Icon */}
-            <div className='pt-12 pb-8 flex justify-center'>
-              <div className='w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/20'>
-                <ShieldCheck className='w-10 h-10 text-blue-500' />
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className='px-8 pb-8 text-center'>
-              <h1 className='text-2xl font-bold text-white mb-4'>
-                Authentication Required
-              </h1>
-              <p className='text-sm text-gray-400 leading-relaxed mb-8'>
-                You need to be logged in to access this page. Please sign in with your mobile number to continue.
-              </p>
-
-              {/* Action Button */}
-              <button
-                onClick={() => router.push('/login')}
-                className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl'
-              >
-                <LogIn className='w-5 h-5' />
-                Login to Continue
-              </button>
-
-              {/* Footer Text */}
-              <p className='text-xs text-gray-500 mt-6'>
-                New user? You'll be automatically registered during login
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className='min-h-screen flex items-center justify-center bg-black'>
+        <AirbnbLoader />
       </div>
     )
   }

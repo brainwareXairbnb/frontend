@@ -208,7 +208,7 @@ function SearchContent() {
         </div>
 
         {/* Mobile Search Pill */}
-        <div className='md:hidden flex justify-center pb-4 pt-2 px-6'>
+        <div className='md:hidden flex justify-center pb-4 pt-4 px-6'>
           <div
             className='w-full bg-white border border-outline-variant/30 shadow-md rounded-[32px] flex items-center justify-center gap-3 px-5 py-3.5 cursor-pointer'
             onClick={() => setIsDrawerOpen(true)}
