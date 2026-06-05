@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "cap:sync": "npx cap sync",
-    "build:mobile": "npm run build && npm run cap:sync:android",
     "cap:sync:android": "npx cap sync android",
+    "build:mobile": "npm run build && npm run cap:sync:android",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios"
   },

@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.brainx.app",
+      "sha256_cert_fingerprints": [
+        "3C:53:C9:5B:9D:C5:69:FA:B1:17:E4:15:00:09:67:9F:3D:5C:6C:30:5B:A3:97:FC:28:75:22:63:BF:48:9F:5D"
+      ]
+    }
+  }
+]

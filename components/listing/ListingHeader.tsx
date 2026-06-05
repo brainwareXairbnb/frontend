@@ -30,7 +30,17 @@ export function ListingHeader({
   const { user } = useAuth()
   
   const hasViewingIndicator = user && user.role !== 'student' && mode !== 'admin'
-  const topClass = mode === 'admin' ? 'top-16' : hasViewingIndicator ? 'top-[53px]' : 'top-0'
+  
+  const headerStyle = {
+    top: mode === 'admin'
+      ? 'calc(4rem + env(safe-area-inset-top))'
+      : hasViewingIndicator
+      ? 'calc(53px + env(safe-area-inset-top))'
+      : '0px',
+    paddingTop: (mode === 'admin' || hasViewingIndicator)
+      ? '0.75rem'
+      : 'calc(0.75rem + env(safe-area-inset-top))',
+  }
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -90,7 +100,8 @@ export function ListingHeader({
 
   return (
     <div
-      className={`md:hidden fixed ${topClass} w-full z-[100] transition-all duration-300 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-2 flex justify-between items-center ${isScrolled ? 'bg-white border-b border-outline-variant/10 shadow-sm' : 'bg-transparent'}`}
+      style={headerStyle}
+      className={`md:hidden fixed w-full z-[100] transition-all duration-300 px-4 pb-2 flex justify-between items-center ${isScrolled ? 'bg-white border-b border-outline-variant/10 shadow-sm' : 'bg-transparent'}`}
     >
       <button
         onClick={() => router.back()}
