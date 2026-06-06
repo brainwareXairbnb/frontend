@@ -100,14 +100,16 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
     <RoleGuard allowedRoles={['owner']}>
       <div className='flex min-h-screen bg-[#fafafa] flex-col'>
         {/* Common Header */}
-        <div className={`sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] ${pathname.startsWith('/owner/profile') ? 'hidden md:flex' : ''}`}>
+        <div className={`sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] ${pathname.startsWith('/owner/profile') ? 'hidden md:block' : 'block'}`}>
           <div className='flex items-center justify-between h-full px-6 md:px-8'>
-            <Logo noMargin compact heading='Owner Portal' />
-            <div className='flex items-center gap-3'>
+            <div className='shrink-0'>
+              <Logo noMargin compact heading='Owner Portal' />
+            </div>
+            <div className='flex items-center gap-3 md:gap-4'>
               <NotificationBell />
               <Link
                 href='/owner/profile'
-                className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center'
+                className='w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center shrink-0'
               >
                 {user?.profilePicUrl ? (
                   <Image
