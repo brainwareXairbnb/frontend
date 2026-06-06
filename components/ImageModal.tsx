@@ -70,7 +70,7 @@ export default function ImageModal({
   return (
     <div className='fixed inset-0 z-[9999] bg-black'>
       {/* Header */}
-      <div className='absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 bg-gradient-to-b from-black/60 to-transparent'>
+      <div className='absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 pt-[max(1rem,env(safe-area-inset-top))] bg-gradient-to-b from-black/60 to-transparent'>
         <button
           onClick={onClose}
           className='flex items-center gap-2 text-white hover:text-white/80 transition-colors'
@@ -97,7 +97,7 @@ export default function ImageModal({
 
       {/* Grid View */}
       {viewMode === 'grid' && (
-        <div className='h-full w-full overflow-y-auto pt-20 pb-10 px-4 md:px-20'>
+        <div className='h-full w-full overflow-y-auto pt-[calc(5rem+env(safe-area-inset-top))] pb-[max(2.5rem,env(safe-area-inset-bottom))] px-4 md:px-20'>
           <div className='max-w-7xl mx-auto'>
             <h2 className='text-white text-2xl md:text-3xl font-semibold mb-8'>
               All Photos
@@ -124,7 +124,7 @@ export default function ImageModal({
 
       {/* Single Image View */}
       {viewMode === 'single' && (
-        <div className='h-full w-full flex items-center justify-center px-4 md:px-20'>
+        <div className='h-full w-full flex items-center justify-center px-4 md:px-20 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]'>
           <div className='relative w-full h-full flex items-center justify-center'>
             {/* Previous Button */}
             {images.length > 1 && (

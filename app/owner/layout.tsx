@@ -100,7 +100,7 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
     <RoleGuard allowedRoles={['owner']}>
       <div className='flex min-h-screen bg-[#fafafa] flex-col'>
         {/* Common Header */}
-        <div className='sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]'>
+        <div className={`sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline-variant/10 h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] ${pathname.startsWith('/owner/profile') ? 'hidden md:flex' : ''}`}>
           <div className='flex items-center justify-between h-full px-6 md:px-8'>
             <Logo noMargin compact heading='Owner Portal' />
             <div className='flex items-center gap-3'>
@@ -155,8 +155,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                     href={item.href}
                     title={isSidebarCollapsed ? item.label : ''}
                     className={`flex items-center rounded-lg mb-1 transition-all text-sm ${isSidebarCollapsed
-                        ? 'justify-center px-3 py-3'
-                        : 'gap-3 px-3 py-2.5'
+                      ? 'justify-center px-3 py-3'
+                      : 'gap-3 px-3 py-2.5'
                       } ${isActive(item.href)
                         ? 'bg-primary/10 text-primary font-semibold'
                         : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
@@ -176,8 +176,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                 href='/'
                 title={isSidebarCollapsed ? 'View as Student' : ''}
                 className={`flex items-center rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium ${isSidebarCollapsed
-                    ? 'justify-center px-3 py-3'
-                    : 'gap-3 px-3 py-2.5'
+                  ? 'justify-center px-3 py-3'
+                  : 'gap-3 px-3 py-2.5'
                   }`}
               >
                 <Eye className='w-5 h-5 shrink-0' />
@@ -275,8 +275,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             <Link
               href='/owner'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
+                ? 'text-primary'
+                : 'text-on-surface-variant'
                 }`}
             >
               <LayoutDashboard className='w-6 h-6' />
@@ -285,8 +285,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             <Link
               href='/owner/listings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/listings')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
+                ? 'text-primary'
+                : 'text-on-surface-variant'
                 }`}
             >
               <Building2 className='w-6 h-6' />
@@ -295,8 +295,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             <Link
               href='/owner/bookings'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/bookings')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
+                ? 'text-primary'
+                : 'text-on-surface-variant'
                 }`}
             >
               <Calendar className='w-6 h-6' />
@@ -305,8 +305,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             <Link
               href='/owner/notifications'
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/notifications')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
+                ? 'text-primary'
+                : 'text-on-surface-variant'
                 }`}
             >
               <Bell className='w-6 h-6' />
@@ -315,8 +315,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
             <div
               onClick={() => setIsDrawerOpen(true)}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/profile')
-                  ? 'text-primary'
-                  : 'text-on-surface-variant'
+                ? 'text-primary'
+                : 'text-on-surface-variant'
                 }`}
             >
               <Menu className='w-6 h-6' />
@@ -361,8 +361,8 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                       href={item.href}
                       onClick={() => setIsDrawerOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive(item.href)
-                          ? 'bg-primary/10 text-primary font-semibold'
-                          : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
                         }`}
                     >
                       <Icon className='w-6 h-6' />

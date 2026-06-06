@@ -17,8 +17,10 @@ export function ViewingAsIndicator() {
     pathname === '/register'
   const isManagementPage =
     pathname.startsWith('/admin') || pathname.startsWith('/owner')
+  const termsOrPrivacypage =
+    pathname.startsWith('/terms') || pathname.startsWith('/privacy')
 
-  if (isAuthPage || isManagementPage) return null
+  if (isAuthPage || isManagementPage || termsOrPrivacypage) return null
 
   const isAdmin = user.role === 'admin'
 
