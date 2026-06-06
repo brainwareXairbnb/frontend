@@ -102,19 +102,19 @@ export default function ImageModal({
             <h2 className='text-white text-2xl md:text-3xl font-semibold mb-8'>
               All Photos
             </h2>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <div className='columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4'>
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className='relative aspect-[4/3] cursor-pointer group overflow-hidden rounded'
+                  className='break-inside-avoid cursor-pointer group overflow-hidden rounded-2xl border border-neutral-800/30 bg-neutral-900 mb-4 relative transition-all duration-300 hover:scale-[1.02]'
                   onClick={() => handleImageClick(index)}
                 >
                   <img
                     src={image}
                     alt={`Photo ${index + 1}`}
-                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
+                    className='w-full h-auto block'
                   />
-                  <div className='absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300' />
+                  <div className='absolute inset-0 bg-black/0 group-hover:bg-white/5 transition-colors duration-300' />
                 </div>
               ))}
             </div>

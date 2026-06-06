@@ -315,6 +315,18 @@ export const roomsApi = {
   },
 
   /**
+   * Get booked date ranges for a listing
+   */
+  getListingBookedDates: async (id: string) => {
+    return apiFetch<{
+      bookedRanges: Array<{ start: string; end: string }>
+      earliestAvailable: string
+      availableStudents: number
+      totalStudents: number
+    }>(`/student/listings/${id}/booked-dates`)
+  },
+
+  /**
    * Create listing (owner only)
    */
   createListing: async (data: any, token?: string) => {

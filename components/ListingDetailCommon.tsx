@@ -15,6 +15,32 @@ import { ListingLocation } from '@/components/listing/ListingLocation'
 import { ListingReviews } from '@/components/listing/ListingReviews'
 import { BookingPanel } from '@/components/listing/BookingPanel'
 import { toast } from 'sonner'
+import { CigaretteOff, Wine, VolumeX, Clock, PawPrint, Users, Check } from 'lucide-react'
+
+function getHouseRuleIcon(ruleName: string) {
+  const norm = ruleName.toLowerCase().trim()
+
+  if (norm.includes('smok')) {
+    return CigaretteOff
+  }
+  if (norm.includes('alcohol') || norm.includes('drug') || norm.includes('drink')) {
+    return Wine
+  }
+  if (norm.includes('music') || norm.includes('loud') || norm.includes('noise')) {
+    return VolumeX
+  }
+  if (norm.includes('curfew') || norm.includes('pm') || norm.includes('am') || norm.includes('time')) {
+    return Clock
+  }
+  if (norm.includes('pet')) {
+    return PawPrint
+  }
+  if (norm.includes('student') || norm.includes('overnight')) {
+    return Users
+  }
+
+  return Check
+}
 
 interface Props {
   mode: 'student' | 'admin'
@@ -90,8 +116,8 @@ export default function ListingDetailCommon({ mode, id }: Props) {
               : l.images?.length
                 ? l.images
                 : [
-                    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
-                  ],
+                  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
+                ],
             reviews: reviews.map((r: any) => ({
               author: r.student?.name || 'Anonymous',
               initials: (r.student?.name || 'A').charAt(0),
@@ -104,11 +130,13 @@ export default function ListingDetailCommon({ mode, id }: Props) {
             })),
             lat,
             lng,
-            area: l.totalBeds
-              ? `${l.availableBeds ?? l.totalBeds} / ${l.totalBeds} Beds`
-              : l.totalArea
-                ? `${l.totalArea} sqft`
-                : 'Spacious',
+            area: l.totalStudents
+              ? `${l.availableStudents ?? l.totalStudents} / ${l.totalStudents} Students`
+              : l.totalBeds
+                ? `${l.availableBeds ?? l.totalBeds} / ${l.totalBeds} Beds`
+                : l.totalArea
+                  ? `${l.totalArea} sqft`
+                  : 'Spacious',
           }
           setListing(mapped)
 
@@ -336,9 +364,33 @@ export default function ListingDetailCommon({ mode, id }: Props) {
               reviewCount={listing.reviewCount}
               owner={listing.owner}
               description={listing.description}
+              totalStudents={listing.totalStudents}
+              totalBedrooms={listing.totalBedrooms}
+              totalBeds={listing.totalBeds}
+              totalBathrooms={listing.totalBathrooms}
+              roomType={listing.roomType}
             />
 
             <ListingAmenities amenities={listing.amenities} />
+
+            {listing.houseRules && listing.houseRules.length > 0 && (
+              <div className='pb-8 border-b border-outline-variant/20 mb-8'>
+                <h3 className='text-[22px] font-bold text-gray-950 mb-6'>House Rules</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-6'>
+                  {listing.houseRules.map((rule: string, index: number) => {
+                    const IconComponent = getHouseRuleIcon(rule)
+                    return (
+                      <div key={index} className='flex gap-4 items-center py-0.5'>
+                        <IconComponent className='w-6 h-6 text-gray-700 stroke-[1.75]' />
+                        <span className='text-[15px] md:text-base text-gray-800 font-medium'>
+                          {rule}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <ListingLocation lat={listing.lat} lng={listing.lng} />
 

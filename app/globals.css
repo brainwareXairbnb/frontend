@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 /**
  * Horizon Ethos Design System
@@ -22,6 +23,20 @@
 /* Safe area for bottom notch/home indicator */
 .pb-safe {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+/* Safe area for top status bar */
+.pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+/* Safe area combined utilities */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 :root {

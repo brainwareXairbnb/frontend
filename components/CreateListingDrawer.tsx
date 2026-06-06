@@ -21,6 +21,7 @@ import { LocationStep } from '@/components/listing-form/LocationStep'
 import { PricingAmenitiesStep } from '@/components/listing-form/PricingAmenitiesStep'
 import { PhotosStep } from '@/components/listing-form/PhotosStep'
 import { FormNavigation } from '@/components/listing-form/FormNavigation'
+import { ListingFlowLayout } from '@/components/listing-flow/ListingFlowLayout'
 
 export default function CreateListingDrawer({
   open,
@@ -29,6 +30,40 @@ export default function CreateListingDrawer({
   editingListing,
   viewMode = false,
 }: CreateListingDrawerProps) {
+  const isMobile = useIsMobile()
+
+  // On mobile, render full-screen flow instead of drawer
+  if (isMobile && open) {
+    return (
+      <div className='fixed inset-0 z-100 bg-white'>
+        <ListingFlowLayout
+          editingListing={editingListing}
+          viewMode={viewMode}
+          onSuccess={onSuccess}
+          onClose={() => onOpenChange(false)}
+        />
+      </div>
+    )
+  }
+
+  // Desktop: Continue with original drawer implementation
+  return <DesktopDrawerContent
+    open={open}
+    onOpenChange={onOpenChange}
+    onSuccess={onSuccess}
+    editingListing={editingListing}
+    viewMode={viewMode}
+  />
+}
+
+function DesktopDrawerContent({
+  open,
+  onOpenChange,
+  onSuccess,
+  editingListing,
+  viewMode = false,
+}: CreateListingDrawerProps) {
+  const isMobile = useIsMobile()
   const [loadingAction, setLoadingAction] = useState<'draft' | 'submit' | null>(null)
   const [photos, setPhotos] = useState<string[]>([])
   const [currentStep, setCurrentStep] = useState(1)
@@ -45,14 +80,13 @@ export default function CreateListingDrawer({
     landmark: '',
     genderPref: 'any',
     amenities: [] as string[],
+    houseRules: [] as string[],
     totalBeds: '1',
     isAvailable: true,
     location: {
       coordinates: [88.4337, 22.9716] as [number, number], // Default: Kalyani, West Bengal
     },
   })
-
-  const isMobile = useIsMobile()
 
   const steps = [
     { number: 1, title: 'Basic Info', icon: Home },
@@ -102,7 +136,8 @@ export default function CreateListingDrawer({
         pincode: editingListing.address?.pincode || '',
         landmark: editingListing.address?.landmark || '',
         genderPref: editingListing.genderPref || 'any',
-        amenities: editingListing.amenities,
+        amenities: editingListing.amenities || [],
+        houseRules: editingListing.houseRules || [],
         totalBeds: String(editingListing.totalBeds || 1),
         isAvailable: editingListing.isAvailable ?? true,
         location: {
@@ -126,6 +161,7 @@ export default function CreateListingDrawer({
         landmark: '',
         genderPref: 'any',
         amenities: [],
+        houseRules: [],
         totalBeds: '1',
         isAvailable: true,
         location: {
@@ -166,6 +202,7 @@ export default function CreateListingDrawer({
         },
         genderPref: formData.genderPref,
         amenities: formData.amenities,
+        houseRules: formData.houseRules,
         totalBeds: Number(formData.totalBeds),
         isAvailable: formData.isAvailable,
         location: {
@@ -203,6 +240,7 @@ export default function CreateListingDrawer({
         landmark: '',
         genderPref: 'any',
         amenities: [],
+        houseRules: [],
         totalBeds: '1',
         isAvailable: true,
         location: {
@@ -249,6 +287,7 @@ export default function CreateListingDrawer({
         },
         genderPref: formData.genderPref,
         amenities: formData.amenities,
+        houseRules: formData.houseRules,
         totalBeds: Number(formData.totalBeds),
         isAvailable: formData.isAvailable,
         location: {
@@ -290,6 +329,7 @@ export default function CreateListingDrawer({
         landmark: '',
         genderPref: 'any',
         amenities: [],
+        houseRules: [],
         totalBeds: '1',
         isAvailable: true,
         location: {
@@ -403,8 +443,10 @@ export default function CreateListingDrawer({
                 pricing={{ rent: formData.rent, deposit: formData.deposit }}
                 amenitiesData={{ amenities: formData.amenities }}
                 availability={{ isAvailable: formData.isAvailable }}
+                houseRulesData={{ houseRules: formData.houseRules }}
                 onPricingChange={(pricing) => setFormData({ ...formData, ...pricing })}
                 onAmenitiesChange={(amenities) => setFormData({ ...formData, amenities })}
+                onHouseRulesChange={(houseRules) => setFormData({ ...formData, houseRules })}
                 onAvailabilityChange={(isAvailable) => setFormData({ ...formData, isAvailable })}
                 disabled={viewMode}
                 editingListing={editingListing}

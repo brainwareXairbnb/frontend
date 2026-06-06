@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Calendar, Clock, Home, CreditCard, Info } from 'lucide-react'
+import { roomsApi } from '@/lib/api'
 
 interface BookingRequestModalProps {
   isOpen: boolean
@@ -25,6 +26,30 @@ export function BookingRequestModal({
   const [moveInDate, setMoveInDate] = useState('')
   const [durationMonths, setDurationMonths] = useState(3)
   const [message, setMessage] = useState('')
+  const [bookedDates, setBookedDates] = useState<Array<{ start: string; end: string }>>([])
+  const [earliestAvailable, setEarliestAvailable] = useState<string | null>(null)
+  const [loadingDates, setLoadingDates] = useState(false)
+
+  // Fetch booked dates when modal opens
+  useEffect(() => {
+    if (isOpen && listing?._id) {
+      setLoadingDates(true)
+      roomsApi
+        .getListingBookedDates(listing._id)
+        .then((data) => {
+          setBookedDates(data.bookedRanges || [])
+          setEarliestAvailable(data.earliestAvailable || null)
+        })
+        .catch((error) => {
+          console.error('Failed to fetch booked dates:', error)
+          setBookedDates([])
+          setEarliestAvailable(null)
+        })
+        .finally(() => {
+          setLoadingDates(false)
+        })
+    }
+  }, [isOpen, listing?._id])
 
   // Reset form when modal opens
   useEffect(() => {
@@ -35,9 +60,42 @@ export function BookingRequestModal({
     }
   }, [isOpen])
 
-  const minDate = new Date()
-  minDate.setDate(minDate.getDate() + 1)
+  // Calculate minimum date based on earliest available or tomorrow
+  const calculateMinDate = () => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    if (earliestAvailable) {
+      const earliestDate = new Date(earliestAvailable)
+      return earliestDate > tomorrow ? earliestDate : tomorrow
+    }
+
+    return tomorrow
+  }
+
+  const minDate = calculateMinDate()
   const minDateStr = minDate.toISOString().split('T')[0]
+
+  // Check if a date range conflicts with booked dates
+  const isDateRangeBooked = (startDate: Date, endDate: Date): boolean => {
+    return bookedDates.some((range) => {
+      const bookedStart = new Date(range.start)
+      const bookedEnd = new Date(range.end)
+      // Check if ranges overlap
+      return startDate < bookedEnd && bookedStart < endDate
+    })
+  }
+
+  // Validate selected date
+  const validateMoveInDate = (dateStr: string): boolean => {
+    if (!dateStr) return true // Don't show error if empty
+
+    const selectedDate = new Date(dateStr)
+    const endDate = new Date(selectedDate)
+    endDate.setMonth(endDate.getMonth() + durationMonths)
+
+    return !isDateRangeBooked(selectedDate, endDate)
+  }
 
   const monthlyRent = listing?.price || listing?.rent || 0
   const deposit = listing?.deposit || 0
@@ -126,9 +184,33 @@ export function BookingRequestModal({
                   onChange={(e) => setMoveInDate(e.target.value)}
                   min={minDateStr}
                   required
-                  className='w-full pl-10 md:pl-11 pr-3 md:pr-4 py-2.5 md:py-3 text-sm border border-outline-variant/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF385C] focus:border-transparent'
+                  className={`w-full pl-10 md:pl-11 pr-3 md:pr-4 py-2.5 md:py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+                    moveInDate && !validateMoveInDate(moveInDate)
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-outline-variant/30 focus:ring-[#FF385C]'
+                  }`}
                 />
               </div>
+              {loadingDates && (
+                <p className='text-xs text-blue-600 mt-1'>
+                  Checking availability...
+                </p>
+              )}
+              {earliestAvailable && new Date(earliestAvailable) > new Date() && (
+                <p className='text-xs text-amber-600 mt-1'>
+                  This property is currently booked. Earliest available:{' '}
+                  {new Date(earliestAvailable).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })}
+                </p>
+              )}
+              {moveInDate && !validateMoveInDate(moveInDate) && (
+                <p className='text-xs text-red-500 mt-1'>
+                  This date range conflicts with existing bookings. Please choose a different date or duration.
+                </p>
+              )}
             </div>
 
             {/* Duration */}
@@ -152,6 +234,11 @@ export function BookingRequestModal({
                   </button>
                 ))}
               </div>
+              {moveInDate && !validateMoveInDate(moveInDate) && (
+                <p className='text-xs text-amber-600 mt-2'>
+                  Try selecting a different duration to find available dates
+                </p>
+              )}
             </div>
 
             {/* Message (Optional) */}
@@ -239,7 +326,7 @@ export function BookingRequestModal({
               </button>
               <button
                 type='submit'
-                disabled={loading || !moveInDate}
+                disabled={loading || !moveInDate || !validateMoveInDate(moveInDate)}
                 className='flex-1 px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-[#FF385C] text-white rounded-lg font-bold hover:brightness-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95'
               >
                 {loading ? 'Sending...' : 'Request to book'}

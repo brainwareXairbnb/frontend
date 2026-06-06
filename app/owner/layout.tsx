@@ -55,13 +55,7 @@ const NAV_ITEMS = [
     label: 'Payouts',
     icon: IndianRupee,
     href: '/owner/payouts',
-  },
-  // {
-  //   id: 'analytics',
-  //   label: 'Analytics',
-  //   icon: BarChart3,
-  //   href: '/owner/analytics',
-  // },
+  }
 ]
 
 export default function OwnerLayout({ children }: OwnerLayoutProps) {
@@ -160,15 +154,13 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                     key={item.id}
                     href={item.href}
                     title={isSidebarCollapsed ? item.label : ''}
-                    className={`flex items-center rounded-lg mb-1 transition-all text-sm ${
-                      isSidebarCollapsed
+                    className={`flex items-center rounded-lg mb-1 transition-all text-sm ${isSidebarCollapsed
                         ? 'justify-center px-3 py-3'
                         : 'gap-3 px-3 py-2.5'
-                    } ${
-                      isActive(item.href)
+                      } ${isActive(item.href)
                         ? 'bg-primary/10 text-primary font-semibold'
                         : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
-                    }`}
+                      }`}
                   >
                     <Icon className='w-5 h-5 shrink-0' />
                     {!isSidebarCollapsed && <span>{item.label}</span>}
@@ -183,11 +175,10 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
               <Link
                 href='/'
                 title={isSidebarCollapsed ? 'View as Student' : ''}
-                className={`flex items-center rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium ${
-                  isSidebarCollapsed
+                className={`flex items-center rounded-lg mb-1 transition-all text-sm text-on-surface-variant hover:bg-blue-50 hover:text-blue-600 font-medium ${isSidebarCollapsed
                     ? 'justify-center px-3 py-3'
                     : 'gap-3 px-3 py-2.5'
-                }`}
+                  }`}
               >
                 <Eye className='w-5 h-5 shrink-0' />
                 {!isSidebarCollapsed && <span>View as Student</span>}
@@ -282,45 +273,51 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
         <div className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant/10 pb-safe transition-all duration-300 ${isDrawerOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
           <div className='flex items-center justify-around px-2 py-2'>
             <Link
-              href='/owner/listings'
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                isActive('/owner/listings')
+              href='/owner'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
-              }`}
+                }`}
+            >
+              <LayoutDashboard className='w-6 h-6' />
+              <span className='text-[10px] font-bold'>Dashboard</span>
+            </Link>
+            <Link
+              href='/owner/listings'
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/listings')
+                  ? 'text-primary'
+                  : 'text-on-surface-variant'
+                }`}
             >
               <Building2 className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Listings</span>
             </Link>
             <Link
               href='/owner/bookings'
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                isActive('/owner/bookings')
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/bookings')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
-              }`}
+                }`}
             >
               <Calendar className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Bookings</span>
             </Link>
             <Link
               href='/owner/notifications'
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                isActive('/owner/notifications')
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/notifications')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
-              }`}
+                }`}
             >
               <Bell className='w-6 h-6' />
               <span className='text-[10px] font-bold'>Notifications</span>
             </Link>
             <div
               onClick={() => setIsDrawerOpen(true)}
-              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                isActive('/owner/profile')
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${isActive('/owner/profile')
                   ? 'text-primary'
                   : 'text-on-surface-variant'
-              }`}
+                }`}
             >
               <Menu className='w-6 h-6' />
               <span className='text-[10px] font-bold'>More</span>
@@ -363,11 +360,10 @@ export default function OwnerLayout({ children }: OwnerLayoutProps) {
                       key={item.id}
                       href={item.href}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                        isActive(item.href)
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive(item.href)
                           ? 'bg-primary/10 text-primary font-semibold'
                           : 'text-on-surface-variant hover:bg-gray-50 hover:text-on-surface font-medium'
-                      }`}
+                        }`}
                     >
                       <Icon className='w-6 h-6' />
                       <span className='text-sm'>{item.label}</span>

@@ -136,8 +136,14 @@ export interface Listing {
   roomType: string | 'single' | 'double' | 'shared'
   gender?: 'male' | 'female' | 'any'
   genderPref?: string
+  // Capacity fields
+  totalStudents?: number
+  availableStudents?: number
+  totalBedrooms?: number
   totalBeds?: number
   availableBeds?: number
+  totalBathrooms?: number
+  // Legacy fields
   bedrooms?: number
   bathrooms?: number
   totalArea?: number
@@ -161,6 +167,7 @@ export interface Listing {
   updatedAt?: string
   // Additional Fields
   rejectionReason?: string
+  houseRules?: string[]
 }
 
 export type ListingStatus =
@@ -367,6 +374,7 @@ export interface ListingFormData {
   availableFrom: string
   roomType: 'single' | 'double' | 'shared'
   gender: 'male' | 'female' | 'any'
+  houseRules?: string[]
 }
 
 export interface ModalConfig {

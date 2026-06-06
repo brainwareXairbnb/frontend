@@ -20,6 +20,7 @@ export function PhotoUpload({
 }: PhotoUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [uploadingCount, setUploadingCount] = useState(0)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +75,7 @@ export function PhotoUpload({
             credentials: 'include',
             headers,
             body: formData,
-          }
+          },
         )
 
         if (!response.ok) {
@@ -89,7 +90,7 @@ export function PhotoUpload({
       const uploadedUrls = await Promise.all(uploadPromises)
       onChange([...photos, ...uploadedUrls])
       toast.success(
-        `${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} uploaded successfully`
+        `${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} uploaded successfully`,
       )
     } catch (error: any) {
       toast.error('Upload failed', {
@@ -156,40 +157,61 @@ export function PhotoUpload({
 
       {/* Photo Grid */}
       {photos.length > 0 && (
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-          {photos.map((photo, index) => (
-            <div
-              key={index}
-              className='relative aspect-[4/3] rounded overflow-hidden bg-surface-container group'
-            >
-              <img
-                src={photo}
-                alt={`Photo ${index + 1}`}
-                className='w-full h-full object-cover'
-              />
-
-              {/* Cover Badge */}
-              {index === 0 && (
-                <div className='absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-lg'>
-                  Cover Photo
-                </div>
-              )}
-
-              {/* Remove Button */}
-              <button
-                type='button'
-                onClick={() => handleRemovePhoto(index)}
-                className='absolute top-2 right-2 w-8 h-8 bg-black/70 text-white rounded-full flex items-center justify-center hover:bg-black transition-colors'
+        <div>
+          <p className='text-sm text-on-surface-variant mb-3'>
+            Drag and drop photos to reorder. First photo will be the cover
+            image.
+          </p>
+          <div className='columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4'>
+            {photos.map((photo, index) => (
+              <div
+                key={index}
+                draggable
+                onDragStart={() => setDraggedIndex(index)}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  if (draggedIndex !== null && draggedIndex !== index) {
+                    handleReorder(draggedIndex, index)
+                    setDraggedIndex(index)
+                  }
+                }}
+                onDragEnd={() => setDraggedIndex(null)}
+                className={`break-inside-avoid rounded-2xl overflow-hidden border border-neutral-200 bg-white group cursor-move transition-all duration-300 shadow-sm mb-4 relative ${
+                  draggedIndex === index
+                    ? 'opacity-50 scale-95'
+                    : 'hover:scale-[1.02] hover:shadow-md'
+                }`}
               >
-                <X className='w-4 h-4' />
-              </button>
+                {/* Foreground image showing actual uncropped size */}
+                <img
+                  src={photo}
+                  alt={`Photo ${index + 1}`}
+                  className='w-full h-auto pointer-events-none block'
+                />
 
-              {/* Photo Number */}
-              <div className='absolute bottom-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-lg'>
-                {index + 1}
+                {/* Cover Badge */}
+                {index === 0 && (
+                  <div className='absolute top-3 left-3 bg-primary text-white text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-lg shadow z-20'>
+                    Cover Photo
+                  </div>
+                )}
+
+                {/* Remove Button */}
+                <button
+                  type='button'
+                  onClick={() => handleRemovePhoto(index)}
+                  className='absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors shadow z-20'
+                >
+                  <X className='w-4 h-4' />
+                </button>
+
+                {/* Photo Number */}
+                <div className='absolute bottom-3 left-3 bg-black/60 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-lg shadow z-20'>
+                  {index + 1}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 

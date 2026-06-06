@@ -27,12 +27,14 @@ export function BookingPanel({
     <>
       {/* Desktop Sidebar */}
       <div className='hidden md:block w-[35%] relative'>
-        <div className='sticky top-28 bg-white border border-outline-variant/30 rounded-2xl p-6 shadow-lg'>
-          <div className='flex items-baseline gap-1 mb-6'>
-            <span className='text-2xl font-bold'>
-              ₹{price?.toLocaleString('en-IN')}
-            </span>
-            <span className='text-on-surface-variant'>/ month</span>
+        <div className='sticky top-28 bg-white border border-gray-200 rounded-xl p-6 shadow-xl'>
+          <div className='mb-5'>
+            <div className='flex items-baseline gap-1.5 mb-1'>
+              <span className='text-[22px] font-semibold text-gray-900'>
+                ₹{price?.toLocaleString('en-IN')}
+              </span>
+              <span className='text-gray-600 text-base font-normal'> / month</span>
+            </div>
           </div>
           {mode === 'student' ? (
             <>
@@ -42,11 +44,11 @@ export function BookingPanel({
                 <>
                   <button
                     onClick={onBookingRequest}
-                    className='w-full bg-[#E51D53] text-white py-3.5 rounded-lg font-bold mb-4 hover:brightness-95 transition-all'
+                    className='w-full bg-[#FF385C] hover:bg-[#E11A38] text-white py-3.5 rounded-xl font-bold mb-3 transition-all shadow-md'
                   >
-                    Request to book
+                    Reserve
                   </button>
-                  <p className='text-center text-xs text-on-surface-variant'>
+                  <p className='text-center text-xs text-gray-500'>
                     You won't be charged yet
                   </p>
                 </>
@@ -84,7 +86,7 @@ export function BookingPanel({
             ) : (
               <>
                 <div className='flex-1'>
-                  <div className='font-bold text-lg'>
+                  <div className='font-bold text-lg text-gray-900'>
                     ₹{price?.toLocaleString('en-IN')}{' '}
                     <span className='text-sm font-normal opacity-70'>/ mo</span>
                   </div>
@@ -94,7 +96,7 @@ export function BookingPanel({
                 </div>
                 <button
                   onClick={onBookingRequest}
-                  className='bg-[#E51D53] text-white px-8 py-3 rounded-lg font-bold active:scale-95 transition-all touch-manipulation select-none'
+                  className='bg-[#FF385C] hover:bg-[#E11A38] text-white px-8 py-3 rounded-xl font-bold active:scale-95 transition-all touch-manipulation select-none'
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   Reserve

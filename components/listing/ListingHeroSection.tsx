@@ -103,7 +103,7 @@ export function ListingHeroSection({
               key={idx}
               src={img}
               alt=''
-              className='w-full h-full object-cover shrink-0 snap-center cursor-pointer'
+              className='w-full h-full object-contain bg-neutral-950 shrink-0 snap-center cursor-pointer'
               onClick={() => {
                 setImageModalIndex(idx)
                 setImageModalShowGrid(false)

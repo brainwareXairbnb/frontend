@@ -1,10 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MapPin, Navigation, Edit3 } from 'lucide-react'
+import { MapPin, Navigation, Move } from 'lucide-react'
 import { toast } from 'sonner'
 import { Geolocation } from '@capacitor/geolocation'
 import { Capacitor } from '@capacitor/core'
+import dynamic from 'next/dynamic'
+
+// Dynamically import InteractiveMap to avoid SSR issues with Leaflet
+const InteractiveMap = dynamic(
+  () =>
+    import('./InteractiveMap').then((mod) => ({ default: mod.InteractiveMap })),
+  { ssr: false },
+)
 
 interface LocationData {
   coordinates: [number, number]
@@ -32,17 +40,21 @@ export function LocationStep({
   onAddressChange,
   disabled = false,
 }: LocationStepProps) {
-  const [showCoordinateInput, setShowCoordinateInput] = useState(false)
   const [loadingLocation, setLoadingLocation] = useState(false)
-  const [mapKey, setMapKey] = useState(Date.now()) // Force map refresh with timestamp
   const [justUpdated, setJustUpdated] = useState(false) // Visual feedback
+  const [mapMounted, setMapMounted] = useState(false)
 
-  // Update map when location coordinates change
+  // Mount map after component loads (avoid SSR issues)
   useEffect(() => {
-    console.log('📍 Location prop changed:', location.coordinates)
-    // Use random number + timestamp for aggressive cache busting
-    setMapKey(Date.now() + Math.random() * 10000)
-  }, [location.coordinates[0], location.coordinates[1]])
+    setMapMounted(true)
+  }, [])
+
+  // Handle location changes from the map
+  const handleMapLocationChange = (newCoordinates: [number, number]) => {
+    onLocationChange({ coordinates: newCoordinates })
+    setJustUpdated(true)
+    setTimeout(() => setJustUpdated(false), 1000)
+  }
 
   const handleUseMyLocation = async () => {
     setLoadingLocation(true)
@@ -92,30 +104,19 @@ export function LocationStep({
 
       console.log('📍 Location received:', { latitude, longitude, accuracy })
 
-      // Update location coordinates FIRST
+      // Update location coordinates
       onLocationChange({
         coordinates: [longitude, latitude],
       })
 
       console.log('🗺️ Coordinates updated:', [longitude, latitude])
 
-      // Force immediate map refresh
-      setMapKey(Date.now() + Math.random())
-
-      // Small delay to ensure parent component updates location state
-      setTimeout(() => {
-        setLoadingLocation(false)
-        setJustUpdated(true)
-
-        // Force another refresh after parent state updates
-        setTimeout(() => {
-          setMapKey(Date.now())
-          setJustUpdated(false)
-        }, 500)
-      }, 200)
+      setLoadingLocation(false)
+      setJustUpdated(true)
+      setTimeout(() => setJustUpdated(false), 1000)
 
       toast.dismiss()
-      toast.success('📍 Location and address updated!', {
+      toast.success('📍 Location updated!', {
         description: `Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)} (±${Math.round(accuracy)}m)`,
         duration: 5000,
       })
@@ -180,159 +181,47 @@ export function LocationStep({
             </div>
           )}
 
-          {/* Static Map Image - Click to open interactive */}
-          {!loadingLocation ? (
-            <a
-              href={`https://www.google.com/maps?q=${location.coordinates[1]},${location.coordinates[0]}`}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='block w-full h-full relative'
-              key={`map-container-${mapKey}`}
-            >
-              <img
-                src={`https://maps.googleapis.com/maps/api/staticmap?center=${location.coordinates[1]},${location.coordinates[0]}&zoom=16&size=600x400&scale=2&markers=color:red%7C${location.coordinates[1]},${location.coordinates[0]}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&t=${mapKey}`}
-                alt='Location map'
-                className='w-full h-full object-cover'
-                loading='eager'
-                onLoad={() =>
-                  console.log('🗺️ Map loaded:', location.coordinates)
-                }
-                onError={(e) => {
-                  console.error('❌ Map load failed, using iframe fallback')
-                  e.currentTarget.style.display = 'none'
-                  const iframe = document.createElement('iframe')
-                  iframe.src = `https://maps.google.com/maps?q=${location.coordinates[1]},${location.coordinates[0]}&z=16&output=embed`
-                  iframe.className = 'w-full h-full border-0'
-                  e.currentTarget.parentElement?.appendChild(iframe)
-                }}
+          {/* Interactive Map with Leaflet */}
+          {mapMounted && !loadingLocation ? (
+            <>
+              <InteractiveMap
+                coordinates={location.coordinates}
+                onLocationChange={handleMapLocationChange}
+                disabled={disabled}
               />
-              <div className='absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-semibold text-on-surface shadow-sm'>
-                📍 Click to open in Google Maps
+              <div className='absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface shadow-md flex items-center gap-1.5 pointer-events-none z-1000'>
+                <Move className='w-3.5 h-3.5 text-primary' />
+                Drag pin or click map to set location
               </div>
-            </a>
+            </>
           ) : null}
 
+          {/* Loading state */}
+          {!mapMounted && !loadingLocation ? (
+            <div className='absolute inset-0 flex items-center justify-center bg-surface-container'>
+              <div className='text-center'>
+                <div className='w-10 h-10 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2'></div>
+                <p className='text-xs font-semibold text-on-surface-variant'>
+                  Loading map...
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Use My Location Button */}
           <button
             type='button'
             onClick={handleUseMyLocation}
             disabled={disabled || loadingLocation}
-            className='absolute bottom-3 right-3 bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg flex items-center gap-2 transition-all active:scale-95 z-10 disabled:opacity-50 disabled:cursor-not-allowed'
+            className='absolute bottom-3 right-3 bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg flex items-center gap-2 transition-all active:scale-95 z-1000 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             <Navigation
               className={`w-4 h-4 ${loadingLocation ? 'animate-pulse' : ''}`}
             />
             {loadingLocation ? 'Locating...' : 'Use My Location'}
           </button>
-          <button
-            type='button'
-            onClick={handleResetLocation}
-            disabled={disabled}
-            className='absolute bottom-3 left-3 bg-white hover:bg-gray-50 text-on-surface px-3 py-2 rounded-lg text-xs font-bold shadow-lg border border-outline-variant/20 transition-all active:scale-95 z-10 disabled:opacity-50 disabled:cursor-not-allowed'
-          >
-            Reset
-          </button>
-        </div>
-        <div className='flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded p-3 animate-in fade-in slide-in-from-bottom-2'>
-          <div>
-            <p className='text-[10px] tracking-wider font-bold text-blue-600 mb-0.5'>
-              Current Location
-            </p>
-            <p className='text-xs text-on-surface font-mono font-bold'>
-              📍 {location.coordinates[1].toFixed(6)},{' '}
-              {location.coordinates[0].toFixed(6)}
-            </p>
-          </div>
-          <button
-            type='button'
-            onClick={() => setShowCoordinateInput(!showCoordinateInput)}
-            disabled={disabled}
-            className='text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1 bg-white px-2 py-1.5 rounded border border-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all'
-          >
-            <Edit3 className='w-3 h-3' />
-            {showCoordinateInput ? 'Hide' : 'Edit'}
-          </button>
-        </div>
-        <div className='bg-blue-50/50 border border-blue-200 rounded p-3'>
-          <p className='text-xs font-bold text-blue-900 mb-1'>
-            💡 How to set your property location:
-          </p>
-          <ul className='text-xs text-blue-800 space-y-1 list-disc list-inside'>
-            <li>
-              <strong>"Use My Location"</strong> - Automatically detect your
-              current GPS location
-            </li>
-            <li>
-              <strong>"Click the map"</strong> - Opens in Google Maps to
-              manually select exact location
-            </li>
-            <li>
-              <strong>"Edit"</strong> - Manually enter latitude/longitude
-              coordinates
-            </li>
-          </ul>
         </div>
       </div>
-
-      {/* Manual Coordinate Input */}
-      {showCoordinateInput && (
-        <div className='bg-primary/5 border-2 border-primary/30 rounded p-4 space-y-3 animate-in slide-in-from-top-2'>
-          <p className='text-xs font-bold text-on-surface mb-2 flex items-center gap-2'>
-            <Edit3 className='w-4 h-4 text-primary' />
-            Edit Coordinates Manually
-          </p>
-          <div className='grid grid-cols-2 gap-3'>
-            <div className='space-y-1'>
-              <label className='text-xs font-semibold text-on-surface-variant'>
-                Latitude
-              </label>
-              <input
-                value={location.coordinates[1]}
-                disabled={disabled}
-                onChange={(e) => {
-                  const lat = parseFloat(e.target.value) || 0
-                  onLocationChange({
-                    coordinates: [location.coordinates[0], lat],
-                  })
-                }}
-                className='w-full h-10 bg-white border-2 border-outline-variant/30 rounded px-3 text-sm font-semibold text-on-surface focus:border-primary outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed'
-                placeholder='22.5726'
-                type='number'
-                step='0.0001'
-              />
-            </div>
-            <div className='space-y-1'>
-              <label className='text-xs font-semibold text-on-surface-variant'>
-                Longitude
-              </label>
-              <input
-                value={location.coordinates[0]}
-                disabled={disabled}
-                onChange={(e) => {
-                  const lng = parseFloat(e.target.value) || 0
-                  onLocationChange({
-                    coordinates: [lng, location.coordinates[1]],
-                  })
-                }}
-                className='w-full h-10 bg-white border-2 border-outline-variant/30 rounded px-3 text-sm font-semibold text-on-surface focus:border-primary outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed'
-                placeholder='88.3639'
-                type='number'
-                step='0.0001'
-              />
-            </div>
-          </div>
-          <div className='bg-blue-50 border border-blue-200 rounded p-3 space-y-2'>
-            <p className='text-xs font-bold text-blue-900'>
-              How to get coordinates from Google Maps:
-            </p>
-            <ol className='text-xs text-blue-800 space-y-1 list-decimal list-inside'>
-              <li>Open Google Maps in a new tab</li>
-              <li>Right-click on your exact location</li>
-              <li>Click the coordinates that appear at the top</li>
-              <li>They'll be copied! Paste them here</li>
-            </ol>
-          </div>
-        </div>
-      )}
 
       <div className='space-y-2'>
         <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
