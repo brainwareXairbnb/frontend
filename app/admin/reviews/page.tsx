@@ -63,6 +63,7 @@ import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { useState, useEffect } from 'react'
 import { adminApi } from '@/lib/api'
 import { toast } from 'sonner'
+import { AdminReviewsSkeleton } from '@/components/skeletons/AdminReviewsSkeleton'
 
 export default function AdminReviewsPage() {
   const [modalConfig, setModalConfig] = useState<{
@@ -92,7 +93,7 @@ export default function AdminReviewsPage() {
     total: 0,
     pages: 0,
   })
-  const [filterType, setFilterType] = useState<'all' | 'pending'>('pending')
+  const [filterType, setFilterType] = useState<'all' | 'pending'>('all')
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -168,11 +169,7 @@ export default function AdminReviewsPage() {
   }
 
   if (loading && reviews.length === 0) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
+    return <AdminReviewsSkeleton />
   }
 
   return (
@@ -201,7 +198,7 @@ export default function AdminReviewsPage() {
         <div className='bg-white p-4 sm:p-6 rounded border border-gray-200 shadow-sm'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+              <p className='text-xs font-medium text-gray-500  mb-1'>
                 Pending Reviews
               </p>
               <h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
@@ -217,7 +214,7 @@ export default function AdminReviewsPage() {
         <div className='bg-gray-900 p-4 sm:p-6 rounded shadow-sm'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-xs font-medium text-gray-400 uppercase mb-1'>
+              <p className='text-xs font-medium text-gray-400  mb-1'>
                 Average Approval Time
               </p>
               <h3 className='text-2xl sm:text-3xl font-bold text-white'>
@@ -287,7 +284,7 @@ export default function AdminReviewsPage() {
               <div className='p-4 sm:p-6'>
                 <div className='flex flex-col sm:flex-row gap-4'>
                   {/* Property Image */}
-                  <div className='w-full sm:w-32 h-32 sm:h-24 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative'>
+                  <div className='w-full sm:w-32 h-32 sm:h-24 rounded overflow-hidden bg-gray-100 shrink-0 relative'>
                     <img
                       alt={review.property}
                       className='w-full h-full object-cover'
@@ -309,9 +306,6 @@ export default function AdminReviewsPage() {
                           {review.property}
                         </h3>
                         <div className='flex flex-wrap items-center gap-2 text-xs text-gray-500'>
-                          <span className='truncate'>
-                            ID: {review.id.substring(0, 8)}
-                          </span>
                           <span>•</span>
                           <span>
                             {new Date(review.date).toLocaleDateString('en-US', {
@@ -349,7 +343,7 @@ export default function AdminReviewsPage() {
                           {review.reviewer}
                         </p>
                         <p className='text-sm text-gray-600 leading-relaxed line-clamp-2'>
-                          "{review.comment}"
+                          {review.comment}
                         </p>
                       </div>
                     </div>

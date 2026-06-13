@@ -9,20 +9,19 @@ import {
   Clock,
   PauseCircle,
   Ban,
-  MoreVertical,
-  ChevronLeft,
   ChevronRight,
   ShieldCheck,
   Loader2,
   RefreshCcw,
   Info,
-  Copy,
   User,
+  ChevronLeft,
 } from 'lucide-react'
 import { adminApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
+import { AdminPayoutsSkeleton } from '@/components/skeletons/AdminPayoutsSkeleton'
 
 export default function AdminPayoutsPage() {
   const [loading, setLoading] = useState(true)
@@ -180,11 +179,7 @@ export default function AdminPayoutsPage() {
   }
 
   if (loading && pagination.page === 1) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
+    return <AdminPayoutsSkeleton />
   }
 
   return (
@@ -230,7 +225,7 @@ export default function AdminPayoutsPage() {
       </header>
 
       {/* Stats Cards */}
-      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 md:mb-6'>
+      <section className='grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4 md:mb-6'>
         <div className='bg-white p-3 sm:p-5 rounded border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
           <div className='flex items-center justify-between mb-2 md:mb-4'>
             <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0'>
@@ -238,7 +233,7 @@ export default function AdminPayoutsPage() {
             </div>
             <div className='w-2 h-2 rounded-full bg-orange-500 animate-pulse' />
           </div>
-          <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+          <p className='text-xs font-medium text-gray-500  mb-1'>
             Awaiting Settlement
           </p>
           <h3 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1'>
@@ -259,7 +254,7 @@ export default function AdminPayoutsPage() {
               <span>Ready</span>
             </div>
           </div>
-          <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+          <p className='text-xs font-medium text-gray-500  mb-1'>
             Verified Accounts
           </p>
           <h3 className='text-2xl sm:text-3xl font-bold text-green-600 mb-1'>
@@ -274,7 +269,7 @@ export default function AdminPayoutsPage() {
               <AlertCircle className='w-5 h-5 md:w-6 md:h-6 text-white' />
             </div>
           </div>
-          <p className='text-xs font-medium text-gray-400 uppercase mb-1'>
+          <p className='text-xs font-medium text-gray-400  mb-1'>
             Manual Review Required
           </p>
           <h3 className='text-2xl sm:text-3xl font-bold text-white mb-1'>
@@ -510,22 +505,22 @@ export default function AdminPayoutsPage() {
           <table className='w-full border-collapse'>
             <thead>
               <tr className='bg-gray-50 border-b border-gray-200'>
-                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 '>
                   Owner
                 </th>
-                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 '>
                   Bank Account
                 </th>
-                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 '>
                   Amount
                 </th>
-                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 '>
                   Date
                 </th>
-                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-6 py-3 text-xs font-medium text-gray-500 '>
                   Status
                 </th>
-                <th className='text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-right px-6 py-3 text-xs font-medium text-gray-500 '>
                   Actions
                 </th>
               </tr>

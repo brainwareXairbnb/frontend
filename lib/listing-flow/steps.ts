@@ -19,6 +19,7 @@ export type StepId =
   | 'intro-place'
   | 'property-type'
   | 'gender-pref'
+  | 'furnishing'
   | 'capacity'
   | 'location-map'
   | 'address'
@@ -44,6 +45,7 @@ export interface ListingFormData {
   pincode: string
   landmark: string
   genderPref: string
+  furnishing: string
   amenities: string[]
   houseRules: string[]
   // Capacity fields
@@ -84,6 +86,11 @@ export const STEPS: Step[] = [
     title: 'Gender preference',
     section: 1,
     validate: validateGenderPref,
+  },
+  {
+    id: 'furnishing',
+    title: 'Furnishing',
+    section: 1,
   },
   {
     id: 'capacity',

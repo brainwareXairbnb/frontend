@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   Zap,
   CheckCircle2,
-  Loader2,
   Eye,
   UserCheck,
   Download,
@@ -29,6 +28,7 @@ import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import { exportToCSV, formatCurrency } from '@/lib/export-utils'
 import { format } from 'date-fns'
+import { OwnerDashboardSkeleton } from '@/components/skeletons/OwnerDashboardSkeleton'
 
 interface AnalyticsData {
   views: number
@@ -158,9 +158,15 @@ export default function OwnerDashboardPage() {
       // Add summary row
       exportData.push({
         month: 'TOTAL',
-        grossRevenue: formatCurrency(dataToExport.reduce((sum, m) => sum + m.gross, 0)),
-        serviceFee: formatCurrency(dataToExport.reduce((sum, m) => sum + m.serviceCharge, 0)),
-        netEarnings: formatCurrency(dataToExport.reduce((sum, m) => sum + m.net, 0)),
+        grossRevenue: formatCurrency(
+          dataToExport.reduce((sum, m) => sum + m.gross, 0),
+        ),
+        serviceFee: formatCurrency(
+          dataToExport.reduce((sum, m) => sum + m.serviceCharge, 0),
+        ),
+        netEarnings: formatCurrency(
+          dataToExport.reduce((sum, m) => sum + m.net, 0),
+        ),
       })
 
       // Define CSV headers
@@ -172,7 +178,10 @@ export default function OwnerDashboardPage() {
       }
 
       // Generate filename with current date and filter period
-      const periodLabel = filterPeriod === 'all' ? 'all-time' : filterPeriod.replace('months', 'mo').replace('month', 'mo')
+      const periodLabel =
+        filterPeriod === 'all'
+          ? 'all-time'
+          : filterPeriod.replace('months', 'mo').replace('month', 'mo')
       const filename = `owner_revenue_${periodLabel}_${format(new Date(), 'yyyy-MM-dd')}.csv`
 
       // Export CSV
@@ -188,11 +197,7 @@ export default function OwnerDashboardPage() {
   }
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
+    return <OwnerDashboardSkeleton />
   }
 
   // Filter revenue data based on selected period
@@ -206,7 +211,7 @@ export default function OwnerDashboardPage() {
     switch (filterPeriod) {
       case '1month':
         return analytics.monthlyRevenue.filter(
-          m => m._id.year === currentYear && m._id.month === currentMonth
+          (m) => m._id.year === currentYear && m._id.month === currentMonth,
         )
       case '3months':
         return analytics.monthlyRevenue.slice(0, 3)
@@ -223,8 +228,8 @@ export default function OwnerDashboardPage() {
   const revenueGrowth =
     filteredRevenue.length >= 2
       ? (((filteredRevenue[0]?.net || 0) - (filteredRevenue[1]?.net || 0)) /
-        (filteredRevenue[1]?.net || 1)) *
-      100
+          (filteredRevenue[1]?.net || 1)) *
+        100
       : 0
 
   // Get last 7 months of revenue data for the chart
@@ -243,7 +248,7 @@ export default function OwnerDashboardPage() {
                 <Landmark className='w-6 h-6 md:w-8 md:h-8' />
               </div>
               <div>
-                <div className='inline-flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-1.5 md:mb-3'>
+                <div className='inline-flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-[9px] md:text-[10px] font-black  tracking-widest mb-1.5 md:mb-3'>
                   <ShieldCheck className='w-3 h-3 md:w-3.5 md:h-3.5' />
                   Action Required
                 </div>
@@ -258,7 +263,7 @@ export default function OwnerDashboardPage() {
             </div>
             <button
               onClick={() => router.push('/owner/payouts')}
-              className='w-full lg:w-auto px-6 md:px-8 h-12 md:h-14 bg-on-surface text-surface rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all active:scale-95 shadow-xl shadow-on-surface/10 relative z-10'
+              className='w-full lg:w-auto px-6 md:px-8 h-12 md:h-14 bg-on-surface text-surface rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs  tracking-[0.2em] hover:bg-primary hover:text-white transition-all active:scale-95 shadow-xl shadow-on-surface/10 relative z-10'
             >
               Add Bank Details
             </button>
@@ -266,14 +271,14 @@ export default function OwnerDashboardPage() {
         )}
 
         {/* Stats Cards */}
-        <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6 lg:gap-8 mt-1.5 md:mt-6'>
+        <section className='grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6 lg:gap-8 mt-1.5 md:mt-6'>
           {/* Total Revenue */}
           <div className='bg-white p-3 md:p-6 lg:p-8 rounded border border-outline-variant/10 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-500'>
             <div className='flex flex-col md:flex-row md:justify-between md:items-start mb-2 md:mb-4 lg:mb-6'>
               <div className='w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-emerald-50 text-emerald-600 rounded-lg md:rounded-xl lg:rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 mb-1 md:mb-0'>
                 <TrendingUp className='w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6' />
               </div>
-              <p className='text-sm md:text-base font-black text-on-surface-variant uppercase tracking-wider md:tracking-widest opacity-60'>
+              <p className='text-sm md:text-base font-black text-on-surface-variant  tracking-wider md:tracking-widest opacity-60'>
                 Total Earnings
               </p>
             </div>
@@ -284,10 +289,11 @@ export default function OwnerDashboardPage() {
               {(analytics?.monthlyRevenue?.length ?? 0) >= 2 && (
                 <div className='flex items-center gap-1 md:gap-2 mt-1 md:mt-3 lg:mt-4'>
                   <div
-                    className={`px-1 md:px-2 py-0.5 md:py-1 rounded md:rounded-lg flex items-center gap-0.5 md:gap-1 text-[7px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-tight md:tracking-tighter ${revenueGrowth >= 0
-                      ? 'bg-emerald-50 text-emerald-600'
-                      : 'bg-red-50 text-red-600'
-                      }`}
+                    className={`px-1 md:px-2 py-0.5 md:py-1 rounded md:rounded-lg flex items-center gap-0.5 md:gap-1 text-[7px] md:text-[9px] lg:text-[10px] font-black  tracking-tight md:tracking-tighter ${
+                      revenueGrowth >= 0
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'bg-red-50 text-red-600'
+                    }`}
                   >
                     {revenueGrowth >= 0 ? (
                       <ArrowUp className='w-2 h-2 md:w-3 md:h-3' />
@@ -296,7 +302,7 @@ export default function OwnerDashboardPage() {
                     )}
                     {Math.abs(revenueGrowth).toFixed(1)}%
                   </div>
-                  <p className='hidden md:block text-on-surface-variant/40 text-[9px] lg:text-[10px] font-bold uppercase tracking-widest'>
+                  <p className='hidden md:block text-on-surface-variant/40 text-[9px] lg:text-[10px] font-bold  tracking-widest'>
                     vs last month
                   </p>
                 </div>
@@ -310,7 +316,7 @@ export default function OwnerDashboardPage() {
               <div className='w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-blue-50 text-blue-600 rounded-lg md:rounded-xl lg:rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-1 md:mb-0'>
                 <Building2 className='w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6' />
               </div>
-              <p className='text-sm md:text-base font-black text-on-surface-variant uppercase tracking-wider md:tracking-widest opacity-60'>
+              <p className='text-sm md:text-base font-black text-on-surface-variant  tracking-wider md:tracking-widest opacity-60'>
                 Total Properties
               </p>
             </div>
@@ -318,11 +324,11 @@ export default function OwnerDashboardPage() {
               <h2 className='text-lg md:text-3xl lg:text-4xl font-headline font-black text-on-surface tracking-tighter'>
                 {analytics?.totalListings || 0}
               </h2>
-              <p className='text-on-surface-variant/40 text-sm md:text-base font-bold uppercase tracking-wider md:tracking-widest mt-1 md:mt-3 lg:mt-4'>
+              <p className='text-on-surface-variant/40 text-sm md:text-base font-bold  tracking-wider md:tracking-widest mt-1 md:mt-3 lg:mt-4'>
                 <span className='text-blue-600 font-black'>
                   {analytics?.views || 0}
                 </span>{' '}
-                <span className='hidden md:inline'>views</span>
+                <span className=''>views</span>
               </p>
             </div>
           </div>
@@ -336,7 +342,7 @@ export default function OwnerDashboardPage() {
               <div className='w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-orange-50 text-orange-600 rounded-lg md:rounded-xl lg:rounded-2xl flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all duration-500 mb-1 md:mb-0'>
                 <BookOpen className='w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6' />
               </div>
-              <p className='text-sm md:text-base font-black text-on-surface-variant uppercase tracking-wider md:tracking-widest opacity-60'>
+              <p className='text-sm md:text-base font-black text-on-surface-variant  tracking-wider md:tracking-widest opacity-60'>
                 Pending Requests
               </p>
             </div>
@@ -347,7 +353,7 @@ export default function OwnerDashboardPage() {
                   (analytics?.completedBookings || 0)}
               </h2>
               <div className='flex items-center gap-1 md:gap-2 mt-1 md:mt-3 lg:mt-4'>
-                <div className='px-1 md:px-2 py-0.5 md:py-1 bg-orange-50 text-orange-600 rounded md:rounded-lg flex items-center gap-0.5 md:gap-1 text-[7px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-tight md:tracking-tighter'>
+                <div className='px-1 md:px-2 py-0.5 md:py-1 bg-orange-50 text-orange-600 rounded md:rounded-lg flex items-center gap-0.5 md:gap-1 text-[7px] md:text-[9px] lg:text-[10px] font-black  tracking-tight md:tracking-tighter'>
                   <Zap className='w-2 h-2 md:w-3 md:h-3' />
                   <span className='hidden md:inline'>REVIEW NEEDED</span>
                   <span className='md:hidden'>REVIEW</span>
@@ -408,10 +414,11 @@ export default function OwnerDashboardPage() {
                     return (
                       <div
                         key={index}
-                        className={`w-full rounded-t-[1rem] relative group transition-all duration-500 overflow-hidden ${index === revenueChartData.length - 1
-                          ? 'bg-primary'
-                          : 'bg-primary/10 hover:bg-primary/20'
-                          }`}
+                        className={`w-full rounded-t-[1rem] relative group transition-all duration-500 overflow-hidden ${
+                          index === revenueChartData.length - 1
+                            ? 'bg-primary'
+                            : 'bg-primary/10 hover:bg-primary/20'
+                        }`}
                         style={{ height: `${Math.max(height, 10)}%` }}
                       >
                         {index === revenueChartData.length - 1 && (
@@ -424,7 +431,7 @@ export default function OwnerDashboardPage() {
                     )
                   })}
                 </div>
-                <div className='flex justify-between mt-8 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] px-2 opacity-40'>
+                <div className='flex justify-between mt-8 text-[10px] font-black text-on-surface-variant  tracking-[0.2em] px-2 opacity-40'>
                   {revenueChartData.map((monthData, index) => (
                     <span key={index}>
                       {monthNames[monthData._id.month - 1]}
@@ -498,13 +505,13 @@ export default function OwnerDashboardPage() {
                             <div className='flex gap-2'>
                               <button
                                 onClick={() => handleAcceptBooking(booking._id)}
-                                className='flex-1 h-9 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black rounded-xl uppercase tracking-widest transition-all active:scale-95 shadow-sm'
+                                className='flex-1 h-9 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black rounded-xl  tracking-widest transition-all active:scale-95 shadow-sm'
                               >
                                 Accept
                               </button>
                               <button
                                 onClick={() => handleRejectBooking(booking._id)}
-                                className='flex-1 h-9 bg-surface-container hover:bg-surface-container-high text-on-surface-variant text-[9px] font-black rounded-xl uppercase tracking-widest transition-all active:scale-95'
+                                className='flex-1 h-9 bg-surface-container hover:bg-surface-container-high text-on-surface-variant text-[9px] font-black rounded-xl  tracking-widest transition-all active:scale-95'
                               >
                                 Reject
                               </button>
@@ -516,7 +523,7 @@ export default function OwnerDashboardPage() {
                   </div>
                   <button
                     onClick={() => router.push('/owner/bookings')}
-                    className='w-full text-center mt-6 pt-4 border-t border-outline-variant/10 text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:tracking-[0.25em] transition-all'
+                    className='w-full text-center mt-6 pt-4 border-t border-outline-variant/10 text-[10px] font-black text-primary  tracking-[0.2em] hover:tracking-[0.25em] transition-all'
                   >
                     View All Requests
                   </button>
@@ -552,7 +559,7 @@ export default function OwnerDashboardPage() {
                 </div>
                 <button
                   onClick={() => router.push('/owner/listings')}
-                  className='text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest hover:underline text-left sm:text-right'
+                  className='text-[9px] md:text-[10px] font-black text-primary  tracking-widest hover:underline text-left sm:text-right'
                 >
                   View All Properties
                 </button>
@@ -592,7 +599,7 @@ export default function OwnerDashboardPage() {
                       </div>
                       <div className='flex items-center gap-4 md:gap-6 pt-4 md:pt-6 border-t border-outline-variant/5'>
                         <div className='flex-1 min-w-0'>
-                          <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mb-1.5 md:mb-2'>
+                          <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black  tracking-widest opacity-40 mb-1.5 md:mb-2'>
                             Total Revenue
                           </p>
                           <p className='font-headline font-black text-xl md:text-2xl text-primary tracking-tighter truncate'>
@@ -604,7 +611,7 @@ export default function OwnerDashboardPage() {
                         </div>
                         <div className='w-px h-8 md:h-10 bg-outline-variant/10'></div>
                         <div className='flex-1 text-right min-w-0'>
-                          <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mb-1.5 md:mb-2'>
+                          <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black  tracking-widest opacity-40 mb-1.5 md:mb-2'>
                             Rating
                           </p>
                           <div className='flex items-center justify-end gap-1 md:gap-1.5'>
@@ -624,7 +631,7 @@ export default function OwnerDashboardPage() {
                 {/* Top by Views */}
                 {analytics.topPerformers.byViews &&
                   analytics.topPerformers.byViews.id !==
-                  analytics.topPerformers.byRevenue?.id && (
+                    analytics.topPerformers.byRevenue?.id && (
                     <div
                       onClick={() => router.push(`/owner/listings`)}
                       className='group bg-white rounded overflow-hidden border border-outline-variant/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 shadow-sm cursor-pointer'
@@ -656,7 +663,7 @@ export default function OwnerDashboardPage() {
                         </div>
                         <div className='flex items-center gap-4 md:gap-6 pt-4 md:pt-6 border-t border-outline-variant/5'>
                           <div className='flex-1 min-w-0'>
-                            <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mb-1.5 md:mb-2'>
+                            <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black  tracking-widest opacity-40 mb-1.5 md:mb-2'>
                               Total Views
                             </p>
                             <p className='font-headline font-black text-xl md:text-2xl text-primary tracking-tighter truncate'>
@@ -667,7 +674,7 @@ export default function OwnerDashboardPage() {
                           </div>
                           <div className='w-px h-8 md:h-10 bg-outline-variant/10'></div>
                           <div className='flex-1 text-right min-w-0'>
-                            <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black uppercase tracking-widest opacity-40 mb-1.5 md:mb-2'>
+                            <p className='text-[9px] md:text-[10px] text-on-surface-variant font-black  tracking-widest opacity-40 mb-1.5 md:mb-2'>
                               Rating
                             </p>
                             <div className='flex items-center justify-end gap-1 md:gap-1.5'>
@@ -699,7 +706,7 @@ export default function OwnerDashboardPage() {
                     <p className='text-xs md:text-sm text-on-surface-variant font-medium max-w-[200px] mx-auto leading-relaxed'>
                       List another property to increase your earnings
                     </p>
-                    <div className='mt-6 md:mt-8 inline-flex items-center gap-2 text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em] group-hover:gap-4 transition-all'>
+                    <div className='mt-6 md:mt-8 inline-flex items-center gap-2 text-[9px] md:text-[10px] font-black text-primary  tracking-[0.2em] group-hover:gap-4 transition-all'>
                       Create Listing
                       <ChevronRight className='w-3 h-3 md:w-3.5 md:h-3.5' />
                     </div>
@@ -725,7 +732,7 @@ export default function OwnerDashboardPage() {
               </p>
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className='px-8 md:px-10 py-3 md:py-4 bg-primary text-white rounded font-black text-xs md:text-sm uppercase tracking-widest hover:brightness-110 transition-all active:scale-95 shadow-xl shadow-primary/20'
+                className='px-8 md:px-10 py-3 md:py-4 bg-primary text-white rounded font-black text-xs md:text-sm  tracking-widest hover:brightness-110 transition-all active:scale-95 shadow-xl shadow-primary/20'
               >
                 Create Your First Listing
               </button>

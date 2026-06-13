@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { RoomCard } from '@/components/RoomCard'
+import { CategorySection } from '@/components/CategorySection'
 import { SkeletonGrid } from '@/components/skeletons'
 import {
   Search,
@@ -42,53 +43,24 @@ export default function HomePage() {
   const [guestCount, setGuestCount] = useState(0)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [rooms, setRooms] = useState<any[]>([])
+  const [categories, setCategories] = useState<Record<string, any[]>>({})
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    const fetchCategories = async () => {
       setLoading(true)
       try {
-        const response: any = await roomsApi.getListings()
-        if (response && response.listings) {
-          const mappedRooms = response.listings.map((listing: any) => ({
-            id: listing._id,
-            title: listing.title,
-            description: listing.description,
-            location:
-              `${listing.address?.street || ''}, ${listing.address?.city || ''}`.replace(
-                /^,\s*/,
-                '',
-              ),
-            price: listing.rent,
-            createdAt: listing.createdAt,
-            deposit: listing.deposit,
-            rating: listing.avgRating || 0,
-            reviewCount: listing.viewCount || 0, // Fallback since reviews count isn't returned in list API
-            isBookmarked: listing.isBookmarked || false,
-            type: listing.roomType,
-            gender: listing.genderPref,
-            images: listing.photos?.length
-              ? listing.photos
-              : [
-                  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
-                  'https://images.unsplash.com/photo-1502672260266-1c1de2d93688?auto=format&fit=crop&q=80&w=2340',
-                ],
-            amenities: listing.amenities || [],
-            owner: listing.owner || { name: 'Verified Owner' },
-          }))
-
-          if (mappedRooms.length > 0) {
-            setRooms(mappedRooms)
-          }
+        const response = await roomsApi.getCategorizedListings()
+        if (response && response.categories) {
+          setCategories(response.categories)
         }
       } catch (error) {
-        console.error('Failed to fetch rooms:', error)
+        console.error('Failed to fetch categorized listings:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchRooms()
+    fetchCategories()
   }, [])
 
   const filterState = useFilterState()
@@ -234,28 +206,39 @@ export default function HomePage() {
           </DrawerContent>
         </Drawer>
       </div>
-      <div className='px-4 md:px-10 pb-32 pt-0'>
-        {/* All Listings Section */}
-        <section className='mb-12'>
-          <div className='flex items-center justify-between my-4'>
-            <h2 className='text-[22px] font-semibold text-on-surface tracking-tight'>
-              Explore
-            </h2>
-          </div>
+      <div className='px-4 md:px-10 pb-12 pt-4'>
+        {loading ? (
+          <SkeletonGrid
+            count={8}
+            className='grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6'
+          />
+        ) : (
+          <>
+            {/* Categorized Sections */}
+            {Object.entries(categories).map(([categoryName, listings]) => (
+              <CategorySection
+                key={categoryName}
+                title={categoryName}
+                listings={listings}
+                onViewAll={() => {
+                  // Navigate to search page with category filter
+                  router.push(
+                    `/search?category=${encodeURIComponent(categoryName)}`,
+                  )
+                }}
+              />
+            ))}
 
-          {loading ? (
-            <SkeletonGrid
-              count={8}
-              className='grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6'
-            />
-          ) : (
-            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6'>
-              {rooms.map((room) => (
-                <RoomCard key={room.id} room={room} priceSuffix='/ month' />
-              ))}
-            </div>
-          )}
-        </section>
+            {/* Fallback if no categories */}
+            {Object.keys(categories).length === 0 && (
+              <div className='text-center py-20'>
+                <p className='text-on-surface-variant'>
+                  No listings available at the moment
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

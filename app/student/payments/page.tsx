@@ -53,11 +53,10 @@ export default function StudentPaymentsPage() {
           <div className='flex gap-6 mt-6'>
             <button
               onClick={() => setActiveTab('upcoming')}
-              className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative ${
-                activeTab === 'upcoming'
+              className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative ${activeTab === 'upcoming'
                   ? 'text-[#FF385C]'
                   : 'text-on-surface-variant hover:text-on-surface'
-              }`}
+                }`}
             >
               <Calendar className='w-4 h-4' />
               Upcoming
@@ -67,11 +66,10 @@ export default function StudentPaymentsPage() {
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative ${
-                activeTab === 'history'
+              className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative ${activeTab === 'history'
                   ? 'text-[#FF385C]'
                   : 'text-on-surface-variant hover:text-on-surface'
-              }`}
+                }`}
             >
               <History className='w-4 h-4' />
               History
@@ -84,7 +82,7 @@ export default function StudentPaymentsPage() {
       </div>
 
       {/* Content */}
-      <div className='container mx-auto px-4 py-6 max-w-3xl'>
+      <div className='container mx-auto px-4 py-6'>
         {activeTab === 'upcoming' ? <UpcomingPayments /> : <PaymentHistory />}
       </div>
     </div>

@@ -9,6 +9,7 @@ import { IntroStandoutStep } from './steps/intro/IntroStandoutStep'
 import { IntroPublishStep } from './steps/intro/IntroPublishStep'
 import { PropertyTypeStep } from './steps/place/PropertyTypeStep'
 import { GenderPrefStep } from './steps/place/GenderPrefStep'
+import { FurnishingStep } from './steps/place/FurnishingStep'
 import { CapacityStep } from './steps/place/CapacityStep'
 import { AddressStep } from './steps/location/AddressStep'
 import { MapStep } from './steps/location/MapStep'
@@ -61,6 +62,8 @@ export function ListingStepRenderer({
         return <PropertyTypeStep {...commonProps} />
       case 'gender-pref':
         return <GenderPrefStep {...commonProps} />
+      case 'furnishing':
+        return <FurnishingStep {...commonProps} />
       case 'capacity':
         return <CapacityStep {...commonProps} />
       case 'address':

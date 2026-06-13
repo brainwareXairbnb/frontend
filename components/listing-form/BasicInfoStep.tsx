@@ -7,6 +7,7 @@ interface FormData {
   description: string
   roomType: string
   genderPref: string
+  furnishing: string
   totalBeds: string
 }
 
@@ -98,6 +99,22 @@ export function BasicInfoStep({
             <option value='coed'>Co-ed</option>
           </select>
         </div>
+      </div>
+
+      <div className='space-y-2'>
+        <label className='text-xs font-semibold text-on-surface-variant tracking-wider'>
+          Furnishing
+        </label>
+        <select
+          value={formData.furnishing}
+          disabled={disabled}
+          onChange={(e) => onChange({ furnishing: e.target.value })}
+          className='w-full h-12 bg-surface-container border border-outline-variant/20 rounded px-4 text-sm text-on-surface focus:border-primary focus:bg-white outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed'
+        >
+          <option value='Furnished'>Furnished</option>
+          <option value='Semi-Furnished'>Semi-Furnished</option>
+          <option value='Unfurnished'>Unfurnished</option>
+        </select>
       </div>
 
       <div className='space-y-2'>

@@ -39,6 +39,7 @@ export function ListingFlowLayout({
     pincode: '',
     landmark: '',
     genderPref: 'any',
+    furnishing: 'Unfurnished',
     amenities: [],
     houseRules: [],
     // Capacity fields
@@ -71,6 +72,7 @@ export function ListingFlowLayout({
         pincode: editingListing.address?.pincode || '',
         landmark: editingListing.address?.landmark || '',
         genderPref: editingListing.genderPref || 'any',
+        furnishing: editingListing.furnishing || 'Unfurnished',
         amenities: editingListing.amenities || [],
         houseRules: editingListing.houseRules || [],
         // Capacity fields
@@ -147,6 +149,7 @@ export function ListingFlowLayout({
           landmark: formData.landmark,
         },
         genderPref: formData.genderPref,
+        furnishing: formData.furnishing,
         amenities: formData.amenities,
         houseRules: formData.houseRules,
         // Capacity fields
@@ -196,6 +199,7 @@ export function ListingFlowLayout({
           landmark: formData.landmark,
         },
         genderPref: formData.genderPref,
+        furnishing: formData.furnishing,
         amenities: formData.amenities,
         houseRules: formData.houseRules,
         // Capacity fields

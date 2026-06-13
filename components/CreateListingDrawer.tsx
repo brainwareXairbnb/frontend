@@ -79,12 +79,13 @@ function DesktopDrawerContent({
     pincode: '',
     landmark: '',
     genderPref: 'any',
+    furnishing: 'Unfurnished',
     amenities: [] as string[],
     houseRules: [] as string[],
     totalBeds: '1',
     isAvailable: true,
     location: {
-      coordinates: [88.4337, 22.9716] as [number, number], // Default: Kalyani, West Bengal
+      coordinates: [88.4306945, 22.5049875] as [number, number], // Default: Brainware University
     },
   })
 
@@ -136,6 +137,7 @@ function DesktopDrawerContent({
         pincode: editingListing.address?.pincode || '',
         landmark: editingListing.address?.landmark || '',
         genderPref: editingListing.genderPref || 'any',
+        furnishing: editingListing.furnishing || 'Unfurnished',
         amenities: editingListing.amenities || [],
         houseRules: editingListing.houseRules || [],
         totalBeds: String(editingListing.totalBeds || 1),
@@ -160,6 +162,7 @@ function DesktopDrawerContent({
         pincode: '',
         landmark: '',
         genderPref: 'any',
+        furnishing: 'Unfurnished',
         amenities: [],
         houseRules: [],
         totalBeds: '1',
@@ -201,6 +204,7 @@ function DesktopDrawerContent({
           landmark: formData.landmark,
         },
         genderPref: formData.genderPref,
+        furnishing: formData.furnishing,
         amenities: formData.amenities,
         houseRules: formData.houseRules,
         totalBeds: Number(formData.totalBeds),
@@ -239,6 +243,7 @@ function DesktopDrawerContent({
         pincode: '',
         landmark: '',
         genderPref: 'any',
+        furnishing: 'Unfurnished',
         amenities: [],
         houseRules: [],
         totalBeds: '1',
@@ -286,6 +291,7 @@ function DesktopDrawerContent({
           landmark: formData.landmark,
         },
         genderPref: formData.genderPref,
+        furnishing: formData.furnishing,
         amenities: formData.amenities,
         houseRules: formData.houseRules,
         totalBeds: Number(formData.totalBeds),
@@ -328,6 +334,7 @@ function DesktopDrawerContent({
         pincode: '',
         landmark: '',
         genderPref: 'any',
+        furnishing: 'Unfurnished',
         amenities: [],
         houseRules: [],
         totalBeds: '1',
@@ -414,6 +421,7 @@ function DesktopDrawerContent({
                   description: formData.description,
                   roomType: formData.roomType,
                   genderPref: formData.genderPref,
+                  furnishing: formData.furnishing,
                   totalBeds: formData.totalBeds,
                 }}
                 onChange={(data) => setFormData({ ...formData, ...data })}

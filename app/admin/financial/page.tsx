@@ -7,20 +7,17 @@ import {
   Clock,
   ArrowUpRight,
   Wallet,
-  BarChart3,
   Calendar,
-  ChevronRight,
-  ShieldCheck,
   Loader2,
   AlertCircle,
   FileText,
   Download,
-  RefreshCw,
 } from 'lucide-react'
 import { adminApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { EmptyState } from '@/components/EmptyState'
+import { AdminFinancialSkeleton } from '@/components/skeletons/AdminFinancialSkeleton'
 
 export default function AdminFinancialPage() {
   const [loading, setLoading] = useState(true)
@@ -46,11 +43,7 @@ export default function AdminFinancialPage() {
   }
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
+    return <AdminFinancialSkeleton />
   }
 
   if (!data) {
@@ -138,7 +131,7 @@ export default function AdminFinancialPage() {
       </header>
 
       {/* KPI Cards */}
-      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+      <section className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
         {kpis.map((kpi, index) => {
           const Icon = kpi.icon
           return (
@@ -157,7 +150,7 @@ export default function AdminFinancialPage() {
                   <span>Live</span>
                 </div>
               </div>
-              <p className='text-xs font-medium text-gray-500 uppercase mb-1'>
+              <p className='text-xs font-medium text-gray-500 mb-1'>
                 {kpi.label}
               </p>
               <h3 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1'>
@@ -307,19 +300,19 @@ export default function AdminFinancialPage() {
           <table className='w-full border-collapse'>
             <thead>
               <tr className='bg-gray-50'>
-                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500'>
                   Transaction ID
                 </th>
-                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500'>
                   Owner
                 </th>
-                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-500'>
                   Rent
                 </th>
-                <th className='text-right px-4 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-right px-4 sm:px-6 py-3 text-xs font-medium text-gray-500'>
                   Commission
                 </th>
-                <th className='text-right px-4 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase'>
+                <th className='text-right px-4 sm:px-6 py-3 text-xs font-medium text-gray-500'>
                   Status
                 </th>
               </tr>

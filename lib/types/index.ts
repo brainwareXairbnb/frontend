@@ -127,6 +127,9 @@ export interface Listing {
     pincode?: string
     landmark?: string
   }
+  // Distance from Brainware University
+  distance?: number
+  distanceZone?: '0-5km' | '5-10km' | '10-15km' | '15-20km' | '20km+'
   // Amenities and Features
   amenities: string[]
   images?: string[]
@@ -136,6 +139,7 @@ export interface Listing {
   roomType: string | 'single' | 'double' | 'shared'
   gender?: 'male' | 'female' | 'any'
   genderPref?: string
+  furnishing?: string
   // Capacity fields
   totalStudents?: number
   availableStudents?: number
@@ -408,6 +412,8 @@ export interface SearchParams {
   maxPrice?: number
   roomType?: string
   gender?: string
+  distance?: number
+  distanceZone?: '0-5km' | '5-10km' | '10-15km' | '15-20km' | '20km+'
 }
 
 // ============================================================================

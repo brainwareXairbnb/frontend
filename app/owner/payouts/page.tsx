@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import {
-  TrendingUp,
   Wallet,
   Search,
   Download,
   IndianRupee,
   ArrowUpRight,
   History,
-  ChevronRight,
   ShieldCheck,
   Building2,
   Clock,
@@ -21,7 +19,6 @@ import {
 } from 'lucide-react'
 import { ownerApi } from '@/lib/api'
 import { Skeleton } from '@/components/skeletons'
-import { useAuth } from '@/lib/auth-context'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,7 +29,6 @@ import {
 import { toast } from 'sonner'
 
 export default function OwnerPayoutsPage() {
-  const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [transactions, setTransactions] = useState<any[]>([])
@@ -317,7 +313,10 @@ export default function OwnerPayoutsPage() {
             Manual Payout Process
           </h4>
           <p className='text-xs md:text-sm text-blue-800 leading-relaxed'>
-            Payouts are processed manually by our admin team via UPI or bank transfer. Once a student's payment is confirmed, the admin will initiate your payout and update the status accordingly. You can track all payout statuses below.
+            Payouts are processed manually by our admin team via UPI or bank
+            transfer. Once a student's payment is confirmed, the admin will
+            initiate your payout and update the status accordingly. You can
+            track all payout statuses below.
           </p>
         </div>
       </div>
@@ -556,7 +555,7 @@ export default function OwnerPayoutsPage() {
             className='absolute inset-0'
             onClick={() => !savingBank && setIsBankModalOpen(false)}
           />
-          <div className='relative w-full max-w-xl bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-outline-variant/10 animate-in slide-in-from-bottom md:zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto'>
+          <div className='relative w-full max-w-xl bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-outline-variant/10 animate-in slide-in-from-bottom md:zoom-in-95 duration-300 max-h-[85vh] md:max-h-[90vh] overflow-y-auto'>
             {/* Mobile Drag Handle */}
             <div className='md:hidden flex justify-center pt-4 pb-2'>
               <div className='w-12 h-1.5 bg-on-surface-variant/10 rounded-full' />
@@ -567,7 +566,8 @@ export default function OwnerPayoutsPage() {
                 Bank Account Details
               </h3>
               <p className='text-xs md:text-sm text-on-surface-variant font-medium'>
-                Add your Indian bank details for receiving payouts. Admin will process settlements manually via UPI or bank transfer.
+                Add your Indian bank details for receiving payouts. Admin will
+                process settlements manually via UPI or bank transfer.
               </p>
             </div>
 
@@ -671,10 +671,7 @@ export default function OwnerPayoutsPage() {
                   {savingBank ? (
                     <div className='w-5 h-5 border-2 border-surface/30 border-t-surface rounded-full animate-spin'></div>
                   ) : (
-                    <>
-                      <Plus className='w-4 h-4' />
-                      Save Details
-                    </>
+                    <span>Save Details</span>
                   )}
                 </Button>
               </div>

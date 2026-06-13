@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { adminApi } from '@/lib/api'
-import { DashboardStats } from '@/lib/types'
 import {
   UserPlus,
   Home,
@@ -16,6 +15,7 @@ import {
 import { exportToCSV, formatCurrency } from '@/lib/export-utils'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
+import { AdminDashboardSkeleton } from '@/components/skeletons/AdminDashboardSkeleton'
 
 export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -194,16 +194,7 @@ export default function AdminDashboardPage() {
   }
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[60vh]'>
-        <div className='text-center'>
-          <div className='w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4'></div>
-          <p className='text-on-surface-variant font-medium'>
-            Loading dashboard...
-          </p>
-        </div>
-      </div>
-    )
+    return <AdminDashboardSkeleton />
   }
 
   return (
@@ -254,7 +245,7 @@ export default function AdminDashboardPage() {
       </header>
 
       {/* KPI Cards */}
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-3 md:mb-6'>
+      <section className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 mb-3 md:mb-6'>
         {kpis.map((kpi, index) => {
           const Icon = kpi.icon
           return (

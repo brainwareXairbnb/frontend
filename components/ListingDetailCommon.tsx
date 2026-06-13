@@ -14,8 +14,19 @@ import { ListingAmenities } from '@/components/listing/ListingAmenities'
 import { ListingLocation } from '@/components/listing/ListingLocation'
 import { ListingReviews } from '@/components/listing/ListingReviews'
 import { BookingPanel } from '@/components/listing/BookingPanel'
+import { PropertyHighlights } from '@/components/listing/PropertyHighlights'
+import { PaymentDetails } from '@/components/listing/PaymentDetails'
+import { ImportantInfo } from '@/components/listing/ImportantInfo'
 import { toast } from 'sonner'
-import { CigaretteOff, Wine, VolumeX, Clock, PawPrint, Users, Check } from 'lucide-react'
+import {
+  CigaretteOff,
+  Wine,
+  VolumeX,
+  Clock,
+  PawPrint,
+  Users,
+  Check,
+} from 'lucide-react'
 
 function getHouseRuleIcon(ruleName: string) {
   const norm = ruleName.toLowerCase().trim()
@@ -23,13 +34,26 @@ function getHouseRuleIcon(ruleName: string) {
   if (norm.includes('smok')) {
     return CigaretteOff
   }
-  if (norm.includes('alcohol') || norm.includes('drug') || norm.includes('drink')) {
+  if (
+    norm.includes('alcohol') ||
+    norm.includes('drug') ||
+    norm.includes('drink')
+  ) {
     return Wine
   }
-  if (norm.includes('music') || norm.includes('loud') || norm.includes('noise')) {
+  if (
+    norm.includes('music') ||
+    norm.includes('loud') ||
+    norm.includes('noise')
+  ) {
     return VolumeX
   }
-  if (norm.includes('curfew') || norm.includes('pm') || norm.includes('am') || norm.includes('time')) {
+  if (
+    norm.includes('curfew') ||
+    norm.includes('pm') ||
+    norm.includes('am') ||
+    norm.includes('time')
+  ) {
     return Clock
   }
   if (norm.includes('pet')) {
@@ -116,8 +140,8 @@ export default function ListingDetailCommon({ mode, id }: Props) {
               : l.images?.length
                 ? l.images
                 : [
-                  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
-                ],
+                    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
+                  ],
             reviews: reviews.map((r: any) => ({
               author: r.student?.name || 'Anonymous',
               initials: (r.student?.name || 'A').charAt(0),
@@ -147,10 +171,13 @@ export default function ListingDetailCommon({ mode, id }: Props) {
               author: data.myReview.student?.name || 'You',
               initials: (data.myReview.student?.name || 'Y').charAt(0),
               institution: 'Student',
-              date: new Date(data.myReview.createdAt).toLocaleDateString('en-US', {
-                month: 'short',
-                year: 'numeric',
-              }),
+              date: new Date(data.myReview.createdAt).toLocaleDateString(
+                'en-US',
+                {
+                  month: 'short',
+                  year: 'numeric',
+                },
+              ),
               content: data.myReview.reviewText,
               rating: data.myReview.overallRating,
               isApproved: data.myReview.isApproved,
@@ -369,18 +396,33 @@ export default function ListingDetailCommon({ mode, id }: Props) {
               totalBeds={listing.totalBeds}
               totalBathrooms={listing.totalBathrooms}
               roomType={listing.roomType}
+              furnishing={listing.furnishing}
+            />
+
+            <PropertyHighlights
+              amenities={listing.amenities}
+              genderPref={listing.genderPref}
+              availableFrom={listing.availableFrom}
+              distanceFromCampus={listing.distanceToCampus}
+              furnishing={listing.furnishing}
+              isAvailable={listing.isAvailable}
             />
 
             <ListingAmenities amenities={listing.amenities} />
 
             {listing.houseRules && listing.houseRules.length > 0 && (
               <div className='pb-8 border-b border-outline-variant/20 mb-8'>
-                <h3 className='text-[22px] font-bold text-gray-950 mb-6'>House Rules</h3>
+                <h3 className='text-[22px] font-bold text-gray-950 mb-6'>
+                  House Rules
+                </h3>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-6'>
                   {listing.houseRules.map((rule: string, index: number) => {
                     const IconComponent = getHouseRuleIcon(rule)
                     return (
-                      <div key={index} className='flex gap-4 items-center py-0.5'>
+                      <div
+                        key={index}
+                        className='flex gap-4 items-center py-0.5'
+                      >
                         <IconComponent className='w-6 h-6 text-gray-700 stroke-[1.75]' />
                         <span className='text-[15px] md:text-base text-gray-800 font-medium'>
                           {rule}
@@ -394,6 +436,20 @@ export default function ListingDetailCommon({ mode, id }: Props) {
 
             <ListingLocation lat={listing.lat} lng={listing.lng} />
 
+            <PaymentDetails
+              rent={listing.price || listing.rent}
+              deposit={listing.deposit}
+            />
+
+            <ImportantInfo
+              roomType={listing.roomType}
+              genderPref={listing.genderPref}
+              totalBeds={listing.totalBeds}
+              totalBedrooms={listing.totalBedrooms}
+              totalBathrooms={listing.totalBathrooms}
+              availableBeds={listing.availableBeds}
+              furnishing={listing.furnishing}
+            />
             <ListingReviews
               reviews={listing.reviews}
               myReview={myReview}

@@ -34,51 +34,7 @@ function SearchContent() {
   const [rooms, setRooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const response: any = await roomsApi.getListings({
-          search: searchParams.get('q') || undefined,
-          roomType: searchParams.get('type') || undefined,
-          gender: searchParams.get('gender') || undefined,
-        })
-        if (response && response.listings) {
-          const mapped = response.listings.map((l: any) => ({
-            id: l._id,
-            title: l.title,
-            description: l.description,
-            location:
-              `${l.address?.street || ''}, ${l.address?.city || ''}`.replace(
-                /^,\s*/,
-                '',
-              ),
-            price: l.rent,
-            createdAt: l.createdAt,
-            deposit: l.deposit || 0,
-            rating: l.avgRating || 0,
-            reviewCount: l.viewCount || 0,
-            isBookmarked: l.isBookmarked || false,
-            type: l.roomType,
-            gender: l.genderPref,
-            images: l.photos?.length
-              ? l.photos
-              : [
-                  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
-                ],
-            amenities: l.amenities || [],
-            owner: l.owner || { name: 'Verified Owner' },
-          }))
-          setRooms(mapped)
-        }
-      } catch (error) {
-        console.error('Failed to fetch rooms:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRooms()
-  }, [searchParams])
-
+  // Initialize filter state BEFORE using it in useEffect
   const filterState = useFilterState()
   const {
     priceRange,
@@ -90,6 +46,98 @@ function SearchContent() {
     availableNow,
     minRating,
   } = filterState
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const category = searchParams.get('category')
+
+        // If category is specified, fetch from categories endpoint
+        if (category) {
+          const categoriesResponse: any = await roomsApi.getCategorizedListings()
+          if (categoriesResponse && categoriesResponse.categories && categoriesResponse.categories[category]) {
+            const categoryListings = categoriesResponse.categories[category]
+            const mapped = categoryListings.map((l: any) => ({
+              id: l._id,
+              title: l.title,
+              description: l.description,
+              location:
+                `${l.address?.street || ''}, ${l.address?.city || ''}`.replace(
+                  /^,\s*/,
+                  '',
+                ),
+              distanceToCampus: l.distance ? `${l.distance} km from campus` : undefined,
+              distanceZone: l.distanceZone,
+              price: l.rent,
+              createdAt: l.createdAt,
+              deposit: l.deposit || 0,
+              rating: l.avgRating || 0,
+              reviewCount: l.viewCount || 0,
+              isBookmarked: l.isBookmarked || false,
+              type: l.roomType,
+              gender: l.genderPref,
+              images: l.photos?.length
+                ? l.photos
+                : [
+                    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
+                  ],
+              amenities: l.amenities || [],
+              owner: l.owner || { name: 'Verified Owner' },
+            }))
+            setRooms(mapped)
+          }
+        } else {
+          // Regular filtered search
+          const response: any = await roomsApi.getListings({
+            search: searchParams.get('q') || undefined,
+            roomType: selectedType !== 'Any type' ? selectedType : undefined,
+            gender: selectedGender !== 'Any' ? selectedGender : undefined,
+            distance: distance > 0 ? distance : undefined,
+            minRent: priceRange.min,
+            maxRent: priceRange.max,
+            availableNow: availableNow || undefined,
+            furnishing: selectedFurnishing !== 'Any' ? selectedFurnishing : undefined,
+            rating: minRating > 0 ? minRating : undefined,
+          })
+          if (response && response.listings) {
+            const mapped = response.listings.map((l: any) => ({
+              id: l._id,
+              title: l.title,
+              description: l.description,
+              location:
+                `${l.address?.street || ''}, ${l.address?.city || ''}`.replace(
+                  /^,\s*/,
+                  '',
+                ),
+              distanceToCampus: l.distance ? `${l.distance} km from campus` : undefined,
+              distanceZone: l.distanceZone,
+              price: l.rent,
+              createdAt: l.createdAt,
+              deposit: l.deposit || 0,
+              rating: l.avgRating || 0,
+              reviewCount: l.viewCount || 0,
+              isBookmarked: l.isBookmarked || false,
+              type: l.roomType,
+              gender: l.genderPref,
+              images: l.photos?.length
+                ? l.photos
+                : [
+                    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2340',
+                  ],
+              amenities: l.amenities || [],
+              owner: l.owner || { name: 'Verified Owner' },
+            }))
+            setRooms(mapped)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch rooms:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRooms()
+  }, [searchParams, distance, priceRange, selectedType, selectedGender, selectedFurnishing, availableNow, minRating])
 
   const handleSearch = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -232,24 +280,63 @@ function SearchContent() {
 
         {/* Right side Grid */}
         <section className='flex-1 p-4 lg:p-8 pb-32'>
-          <p className='text-sm font-semibold mb-6 hidden md:block'>
-            Over 1,000 homes
-          </p>
+          {/* Category Header */}
+          {searchParams.get('category') ? (
+            <div className='mb-6'>
+              <h1 className='text-2xl md:text-3xl font-black font-headline tracking-tight text-on-surface mb-2'>
+                {searchParams.get('category')}
+              </h1>
+              <p className='text-sm font-semibold text-on-surface-variant'>
+                {rooms.length} {rooms.length === 1 ? 'listing' : 'listings'} found
+              </p>
+            </div>
+          ) : (
+            <p className='text-sm font-semibold mb-6 hidden md:block'>
+              Over 1,000 homes
+            </p>
+          )}
 
-          <div className='grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6'>
-            {rooms.map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                subtitle={room.distanceToCampus}
-                dateStr='19-24 Apr'
-                priceSuffix={
-                  <span className='hidden sm:inline'>for 5 nights</span>
-                }
-                showReviewCount={true}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className='flex items-center justify-center py-20'>
+              <div className='text-center'>
+                <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>
+                <p className='text-on-surface-variant'>Loading listings...</p>
+              </div>
+            </div>
+          ) : rooms.length === 0 ? (
+            <div className='flex flex-col items-center justify-center py-20 px-4'>
+              <div className='text-center max-w-md'>
+                <div className='w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mx-auto mb-6'>
+                  <Search className='w-10 h-10 text-on-surface-variant' />
+                </div>
+                <h2 className='text-2xl font-bold text-on-surface mb-3'>No listings found</h2>
+                <p className='text-on-surface-variant mb-6'>
+                  We couldn't find any listings matching your filters. Try adjusting your search criteria or clearing some filters.
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className='px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors'
+                >
+                  Clear all filters
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className='grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6'>
+              {rooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  subtitle={room.distanceToCampus}
+                  dateStr='19-24 Apr'
+                  priceSuffix={
+                    <span className='hidden sm:inline'>for 5 nights</span>
+                  }
+                  showReviewCount={true}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </main>
 

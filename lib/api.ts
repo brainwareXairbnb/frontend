@@ -293,6 +293,9 @@ export const roomsApi = {
     maxRent?: number
     gender?: string
     amenities?: string[]
+    distance?: number
+    availableNow?: boolean
+    rating?: number
     page?: number
     limit?: number
   }) => {
@@ -305,6 +308,13 @@ export const roomsApi = {
       })
     }
     return apiFetch(`/student/listings?${queryParams.toString()}`)
+  },
+
+  /**
+   * Get categorized listings
+   */
+  getCategorizedListings: async () => {
+    return apiFetch<{ categories: Record<string, any[]> }>('/student/listings/categories')
   },
 
   /**

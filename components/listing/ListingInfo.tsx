@@ -16,6 +16,7 @@ interface ListingInfoProps {
   totalBeds?: number
   totalBathrooms?: number
   roomType?: string
+  furnishing?: string
 }
 
 export function ListingInfo({
@@ -30,6 +31,7 @@ export function ListingInfo({
   totalBeds,
   totalBathrooms,
   roomType,
+  furnishing,
 }: ListingInfoProps) {
   const displayRating = rating !== undefined && rating !== null ? rating : 0
   const displayReviewCount = reviewCount !== undefined && reviewCount !== null ? reviewCount : 0
@@ -104,6 +106,9 @@ export function ListingInfo({
   }
   if (totalBathrooms !== undefined && totalBathrooms !== null && totalBathrooms > 0) {
     capacityParts.push(`${totalBathrooms} ${totalBathrooms === 1 ? 'Bathroom' : 'Bathrooms'}`)
+  }
+  if (furnishing) {
+    capacityParts.push(furnishing)
   }
   const capacityStr = capacityParts.join(' · ')
 
