@@ -295,6 +295,7 @@ export const roomsApi = {
     amenities?: string[]
     distance?: number
     availableNow?: boolean
+    furnishing?: string
     rating?: number
     page?: number
     limit?: number
