@@ -1,25 +1,37 @@
 'use client'
 
-import { Rocket } from 'lucide-react'
+import Image from 'next/image'
 
 export function IntroPublishStep() {
   return (
-    <div className='flex flex-col items-center justify-center py-16 text-center px-4'>
-      {/* Icon */}
-      <div className='w-24 h-24 bg-tertiary/10 rounded-full flex items-center justify-center mb-6'>
-        <Rocket className='w-12 h-12 text-tertiary' />
+    <div className='flex flex-col items-start justify-start px-6 py-6 md:py-12 bg-surface text-left'>
+      {/* Centered Image Container */}
+      <div className='w-full flex justify-center mb-8 mt-2'>
+        <div className='w-full max-w-[320px] aspect-square relative'>
+          <Image
+            src="/images/listing-flow/intro_publish.png"
+            alt="Finish up and publish"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
       </div>
 
-      {/* Title */}
-      <h1 className='text-3xl md:text-4xl font-bold text-on-surface mb-4'>
-        Finish up and publish
-      </h1>
-
-      {/* Description */}
-      <p className='text-lg text-on-surface-variant max-w-2xl'>
-        {"Finally, you'll set your pricing and availability. Once you're ready, you can publish"}
-        {" your listing and start welcoming guests!"}
-      </p>
+      {/* Text Content */}
+      <div className='w-full max-w-xl'>
+        <p className='text-sm md:text-base font-bold text-on-surface-variant mb-2'>
+          Step 3
+        </p>
+        <h1 className='text-3xl md:text-4xl font-black text-on-surface mb-4 tracking-tight leading-tight'>
+          Finish up and publish
+        </h1>
+        <p className='text-base md:text-lg text-on-surface-variant/85 leading-relaxed'>
+          {"Finally, you'll set your pricing and availability. Once you're ready, you can publish your listing and start welcoming guests!"}
+        </p>
+      </div>
     </div>
   )
 }
+
+

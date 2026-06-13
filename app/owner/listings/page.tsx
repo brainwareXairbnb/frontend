@@ -124,9 +124,9 @@ export default function OwnerListingsPage() {
     avgRating:
       listings.length > 0
         ? (
-            listings.reduce((sum, l) => sum + (l.avgRating || 0), 0) /
-            listings.length
-          ).toFixed(1)
+          listings.reduce((sum, l) => sum + (l.avgRating || 0), 0) /
+          listings.length
+        ).toFixed(1)
         : '0.0',
   }
 
@@ -136,7 +136,7 @@ export default function OwnerListingsPage() {
         {/* Header Section */}
         <header className='pt-1 pb-2 md:py-6'>
           <div className='max-w-3xl mb-2 md:mb-6'>
-            <h2 className='text-lg md:text-xl font-headline font-black text-on-surface mb-1 md:mb-2 uppercase tracking-wide'>
+            <h2 className='text-lg md:text-xl font-headline font-black text-on-surface mb-1 md:mb-2  tracking-wide'>
               Property Ecosystem
             </h2>
             <p className='text-on-surface-variant font-body text-sm md:text-base leading-relaxed font-medium hidden md:block'>
@@ -163,7 +163,7 @@ export default function OwnerListingsPage() {
               {/* Status Filter Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className='h-10 sm:h-12 px-3 sm:px-4 border rounded transition-all flex items-center gap-2 shadow-sm text-on-surface font-black uppercase tracking-widest text-[9px] sm:text-[10px] bg-white border-outline-variant/10 hover:bg-surface-container-low flex-shrink-0'>
+                  <button className='h-10 sm:h-12 px-3 sm:px-4 border rounded transition-all flex items-center gap-2 shadow-sm text-on-surface font-black  tracking-widest text-[9px] sm:text-[10px] bg-white border-outline-variant/10 hover:bg-surface-container-low flex-shrink-0'>
                     <Filter className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
                     <span className='hidden sm:inline'>
                       {filterStatus === 'all'
@@ -266,7 +266,7 @@ export default function OwnerListingsPage() {
                     setFilterStatus('all')
                     setSearchQuery('')
                   }}
-                  className='h-10 sm:h-12 px-3 sm:px-4 border rounded-xl transition-all flex items-center gap-2 shadow-sm text-on-surface-variant font-black uppercase tracking-widest text-[9px] sm:text-[10px] bg-white border-outline-variant/10 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 flex-shrink-0'
+                  className='h-10 sm:h-12 px-3 sm:px-4 border rounded-xl transition-all flex items-center gap-2 shadow-sm text-on-surface-variant font-black  tracking-widest text-[9px] sm:text-[10px] bg-white border-outline-variant/10 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 flex-shrink-0'
                   title='Reset all filters'
                 >
                   <RotateCcw className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
@@ -280,7 +280,7 @@ export default function OwnerListingsPage() {
               {/* Create New Listing Button */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className='flex-1 sm:flex-none h-10 sm:h-12 bg-primary text-on-primary px-4 sm:px-6 rounded font-black text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:brightness-110 transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-primary/20 active:scale-95 whitespace-nowrap'
+                className='flex-1 sm:flex-none h-10 sm:h-12 bg-primary text-on-primary px-4 sm:px-6 rounded font-black text-[10px] sm:text-xs  tracking-[0.15em] sm:tracking-[0.2em] hover:brightness-110 transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-primary/20 active:scale-95 whitespace-nowrap'
               >
                 <Plus className='w-4 h-4 sm:w-5 sm:h-5' />
                 <span className='hidden sm:inline'>Create New Listing</span>
@@ -299,7 +299,7 @@ export default function OwnerListingsPage() {
               <div className='bg-white p-3 md:p-4 lg:p-6 rounded border border-outline-variant/10 shadow-sm'>
                 <div className='flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2'>
                   <Building2 className='w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-on-surface-variant/40' />
-                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black  tracking-widest text-on-surface-variant/60'>
                     Total
                   </p>
                 </div>
@@ -310,7 +310,7 @@ export default function OwnerListingsPage() {
               <div className='bg-white p-3 md:p-4 lg:p-6 rounded border border-outline-variant/10 shadow-sm'>
                 <div className='flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2'>
                   <Activity className='w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-emerald-600/60' />
-                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black  tracking-widest text-on-surface-variant/60'>
                     Live
                   </p>
                 </div>
@@ -321,7 +321,7 @@ export default function OwnerListingsPage() {
               <div className='bg-white p-3 md:p-4 lg:p-6 rounded border border-outline-variant/10 shadow-sm'>
                 <div className='flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2'>
                   <Eye className='w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-primary/60' />
-                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black  tracking-widest text-on-surface-variant/60'>
                     Views
                   </p>
                 </div>
@@ -332,7 +332,7 @@ export default function OwnerListingsPage() {
               <div className='bg-white p-3 md:p-4 lg:p-6 rounded border border-outline-variant/10 shadow-sm'>
                 <div className='flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2'>
                   <Star className='w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 fill-yellow-500 text-yellow-500' />
-                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-on-surface-variant/60'>
+                  <p className='text-[8px] md:text-[9px] lg:text-[10px] font-black  tracking-widest text-on-surface-variant/60'>
                     Rating
                   </p>
                 </div>
