@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "296069206416",
+    "project_id": "brainx-24ec8",
+    "storage_bucket": "brainx-24ec8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296069206416:android:38baa202efbec3190aa315",
+        "android_client_info": {
+          "package_name": "com.brainx.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "296069206416-eas09oolohrl48k0q20t2en5fdirbuhc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brainx.app",
+            "certificate_hash": "9ce04b70120bb8af40a6dc88303c0a0575af3bfa"
+          }
+        },
+        {
+          "client_id": "296069206416-kq0or001v2rpki0jq471em0jl70vd8gd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brainx.app",
+            "certificate_hash": "fb8e309aabe74828fbe7729c904ce7812a817fce"
+          }
+        },
+        {
+          "client_id": "296069206416-nl84jgdfq3va0thplfhhoebo49gc1miv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ2IIeWv_joarwu7lU3e-xrTOpA2xIwaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "296069206416-nl84jgdfq3va0thplfhhoebo49gc1miv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

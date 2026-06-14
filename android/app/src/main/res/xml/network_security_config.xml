@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+        IMPORTANT: This config allows HTTP only for local development.
+        For PRODUCTION builds, ensure these domains point to your actual dev IPs only,
+        or create a separate production config that blocks all cleartext traffic.
+    -->
+
+    <!-- Allow cleartext (HTTP) traffic ONLY for local development -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">192.168.0.102</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Android Emulator -->
+    </domain-config>
+
+    <!--
+        All other traffic (including Razorpay) requires HTTPS.
+        Base config ensures HTTPS-only for production APIs.
+    -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
