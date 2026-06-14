@@ -9,7 +9,7 @@ export default function TermsOfServicePage() {
   return (
     <div className='min-h-screen' style={{ background: '#fff' }}>
       {/* Header */}
-      <div className='sticky top-0 z-10' style={{ background: '#fff', borderBottom: '1px solid #e5e5e5' }}>
+      <div className='sticky top-[env(safe-area-inset-top)] z-10' style={{ background: '#fff', borderBottom: '1px solid #e5e5e5' }}>
         <div className='max-w-3xl mx-auto px-5 py-4 flex items-center gap-3'>
           <button
             onClick={() => router.back()}

@@ -3,10 +3,7 @@
 import { useState, useEffect } from 'react'
 import {
   Search,
-  Filter,
-  ArrowUpDown,
   Home,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   Calendar,
@@ -14,8 +11,6 @@ import {
   User,
   Building2,
   FileText,
-  Loader2,
-  AlertCircle,
   IndianRupee,
   Eye,
 } from 'lucide-react'
@@ -24,9 +19,10 @@ import { toast } from 'sonner'
 import { format, addMonths } from 'date-fns'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/skeletons/Skeleton'
+import { AdminBookingCardSkeleton } from '@/components/skeletons/AdminBookingCardSkeleton'
 
 export default function AdminBookingsPage() {
-  const [activeView, setActiveView] = useState('list')
   const [loading, setLoading] = useState(true)
   const [bookings, setBookings] = useState<any[]>([])
   const [pagination, setPagination] = useState<any>(null)
@@ -120,16 +116,7 @@ export default function AdminBookingsPage() {
     }
   }
 
-  if (loading && bookings.length === 0) {
-    return (
-      <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
-        <Loader2 className='w-10 h-10 text-primary animate-spin' />
-        <p className='text-[10px] font-black tracking-[0.2em] text-on-surface-variant opacity-40'>
-          Loading platform bookings...
-        </p>
-      </div>
-    )
-  }
+
 
   return (
     <div className='min-h-screen bg-[#fafafa] px-4 sm:px-6 lg:px-8 pt-4 pb-24'>
@@ -163,28 +150,44 @@ export default function AdminBookingsPage() {
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 md:mb-6'>
         <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
           <p className='text-xs text-on-surface-variant mb-1.5'>Total Bookings</p>
-          <h3 className='text-2xl font-bold'>{stats?.total || 0}</h3>
+          {stats ? (
+            <h3 className='text-2xl font-bold'>{stats.total}</h3>
+          ) : (
+            <Skeleton className='h-8 w-16 mt-1' />
+          )}
         </div>
 
         <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
           <p className='text-xs text-on-surface-variant mb-1.5'>Confirmed</p>
-          <h3 className='text-2xl font-bold text-blue-600'>
-            {stats?.paymentConfirmed || 0}
-          </h3>
+          {stats ? (
+            <h3 className='text-2xl font-bold text-blue-600'>
+              {stats.paymentConfirmed}
+            </h3>
+          ) : (
+            <Skeleton className='h-8 w-16 mt-1' />
+          )}
         </div>
 
         <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
           <p className='text-xs text-on-surface-variant mb-1.5'>Pending</p>
-          <h3 className='text-2xl font-bold text-amber-500'>
-            {bookings.filter((b) => b.status === 'pending').length}
-          </h3>
+          {loading && bookings.length === 0 ? (
+            <Skeleton className='h-8 w-16 mt-1' />
+          ) : (
+            <h3 className='text-2xl font-bold text-amber-500'>
+              {bookings.filter((b) => b.status === 'pending').length}
+            </h3>
+          )}
         </div>
 
         <div className='bg-white rounded-2xl border border-outline-variant/10 p-3 md:p-4 shadow-sm'>
           <p className='text-xs text-on-surface-variant mb-1.5'>Completed</p>
-          <h3 className='text-2xl font-bold text-emerald-600'>
-            {stats?.completed || 0}
-          </h3>
+          {stats ? (
+            <h3 className='text-2xl font-bold text-emerald-600'>
+              {stats.completed}
+            </h3>
+          ) : (
+            <Skeleton className='h-8 w-16 mt-1' />
+          )}
         </div>
       </div>
 
@@ -235,15 +238,19 @@ export default function AdminBookingsPage() {
 
       {/* Booking List */}
       <section className='space-y-4'>
-        {bookings.length === 0 ? (
+        {loading && bookings.length === 0 ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <AdminBookingCardSkeleton key={i} />
+          ))
+        ) : bookings.length === 0 ? (
           <EmptyState
             icon={FileText}
             title='No Bookings Found'
             message={
               statusFilter
                 ? `No ${getStatusDisplay(
-                    statusFilter,
-                  ).label.toLowerCase()} bookings found.`
+                  statusFilter,
+                ).label.toLowerCase()} bookings found.`
                 : 'There are no bookings yet.'
             }
           />
@@ -456,11 +463,10 @@ export default function AdminBookingsPage() {
                 <button
                   key={i}
                   onClick={() => setPage(i + 1)}
-                  className={`min-w-[40px] h-10 rounded-xl text-sm font-medium transition-all ${
-                    page === i + 1
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'border border-outline-variant/10 bg-white hover:bg-surface-container'
-                  }`}
+                  className={`min-w-[40px] h-10 rounded-xl text-sm font-medium transition-all ${page === i + 1
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'border border-outline-variant/10 bg-white hover:bg-surface-container'
+                    }`}
                 >
                   {i + 1}
                 </button>

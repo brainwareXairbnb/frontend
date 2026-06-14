@@ -75,7 +75,7 @@ export function ChangePasswordForm({
       {/* Mobile View - EXACTLY like previous */}
       <div className='md:hidden min-h-screen bg-[#fafafa]'>
         {/* Header */}
-        <div className='bg-white border-b border-outline-variant/10'>
+        <div className={`bg-white border-b border-outline-variant/10 ${userRole !== 'student' ? 'pt-[env(safe-area-inset-top)]' : ''}`}>
           <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
             <h1 className='text-xl sm:text-2xl font-bold text-on-surface'>
               Change Password

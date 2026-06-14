@@ -2,6 +2,66 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Skeleton } from '@/components/skeletons/Skeleton'
+
+function PayoutMethodSkeleton() {
+  return (
+    <div className='space-y-6'>
+      {/* Info Card Skeleton */}
+      <div className='bg-blue-50 border border-blue-100 rounded p-4 flex gap-4 animate-pulse'>
+        <Skeleton className='w-12 h-12 rounded-xl shrink-0' />
+        <div className='flex-1 space-y-2 py-1'>
+          <Skeleton className='h-4 w-32' />
+          <Skeleton className='h-3 w-full' />
+          <Skeleton className='h-3 w-2/3' />
+        </div>
+      </div>
+
+      {/* Main Details Card Skeleton */}
+      <div className='border border-outline-variant rounded bg-white overflow-hidden shadow-sm animate-pulse'>
+        {/* Card Header */}
+        <div className='p-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30'>
+          <div className='flex items-center gap-3'>
+            <Skeleton className='w-10 h-10 rounded-xl' />
+            <div className='space-y-1.5'>
+              <Skeleton className='h-4 w-28' />
+              <Skeleton className='h-3 w-16' />
+            </div>
+          </div>
+          <Skeleton className='h-4 w-12 rounded' />
+        </div>
+
+        {/* Card Body */}
+        <div className='p-5 space-y-6'>
+          <div className='grid grid-cols-2 gap-6'>
+            <div className='space-y-2'>
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-4 w-32' />
+            </div>
+            <div className='space-y-2'>
+              <Skeleton className='h-3 w-24' />
+              <Skeleton className='h-4 w-36' />
+            </div>
+            <div className='space-y-2'>
+              <Skeleton className='h-3 w-20' />
+              <Skeleton className='h-4 w-28' />
+            </div>
+            <div className='space-y-2'>
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-4 w-24' />
+            </div>
+          </div>
+
+          {/* Card Footer */}
+          <div className='pt-4 border-t border-outline-variant/10 flex items-center gap-2'>
+            <Skeleton className='w-3 h-3 rounded-full' />
+            <Skeleton className='h-4 w-40' />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 import { useAuth } from '@/lib/auth-context'
 import { ownerApi } from '@/lib/api'
 import { toast } from 'sonner'
@@ -99,18 +159,10 @@ export default function BankDetailsPage() {
     }
   }
 
-  if (authLoading || loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen bg-[#fafafa]'>
-        <Loader2 className='w-8 h-8 animate-spin text-primary' />
-      </div>
-    )
-  }
-
   return (
     <div className='min-h-screen bg-[#fafafa]'>
       {/* Header */}
-      <div className='bg-white border-b border-outline-variant/10'>
+      <div className='bg-white border-b border-outline-variant/10 md:pt-0 pt-[env(safe-area-inset-top)]'>
         <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
           <button
             onClick={() => router.push('/owner/profile')}
@@ -130,7 +182,9 @@ export default function BankDetailsPage() {
 
       <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8'>
         <div className='bg-white'>
-          {bankDetails && !isEditing ? (
+          {authLoading || loading ? (
+            <PayoutMethodSkeleton />
+          ) : bankDetails && !isEditing ? (
             <div className='space-y-4 sm:space-y-5'>
               <div className='bg-blue-50 border border-blue-100 rounded p-3 sm:p-4 flex gap-3 sm:gap-4'>
                 <div className='w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg shadow-sm flex items-center justify-center shrink-0'>

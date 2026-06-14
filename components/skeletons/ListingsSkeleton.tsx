@@ -1,6 +1,6 @@
 export default function ListingsSkeleton() {
   return (
-    <div className='px-2 md:px-12 pb-20'>
+    <div className='px-0 md:px-12 pb-20'>
       {/* Stats Grid Skeleton */}
       <section className='grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10 animate-pulse'>
         {[1, 2, 3, 4].map((stat) => (

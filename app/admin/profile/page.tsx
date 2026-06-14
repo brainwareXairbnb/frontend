@@ -150,6 +150,8 @@ export default function AdminProfilePage() {
     <>
       {/* Mobile View - EXACTLY like previous */}
       <div className='md:hidden min-h-screen' style={{ background: '#fff' }}>
+        {/* Sticky Safe Area Spacer */}
+        <div className='sticky top-0 z-50 bg-white h-[env(safe-area-inset-top)] w-full' />
         <div className='max-w-lg mx-auto px-5 pt-6 pb-24'>
           {/* Avatar Card */}
           <div className='relative flex items-center gap-4 mb-8'>
